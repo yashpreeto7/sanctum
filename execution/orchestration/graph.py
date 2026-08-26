@@ -251,4 +251,33 @@ class PersonalAIEngine:
 
         elif tool_name == "calendar.create_event":
             ev = CalendarEvent(
-                summary=args.get("summ
+                summary=args.get("summary", "Event"),
+                start_time=args.get("start_time", ""),
+                end_time=args.get("end_time", ""),
+                description=args.get("description"),
+            )
+            result = calendar_connector.create_event(ev)
+
+        elif tool_name == "email.send":
+            out_email = OutboundEmail(
+                to=args.get("to", ""),
+                subject=args.get("subject", ""),
+                body=args.get("body", ""),
+            )
+            result = gmail_connector.send_email(out_email)
+
+        return {
+            "execution_result": result,
+            "final_output": f"Executed {tool_name} successfully.",
+        }
+
+    async def _low_priority_store_node(self, state: AgentState) -> Dict[str, Any]:
+        facts = state.get("clean_facts", {})
+        sub = facts.get("clean_subject", "Low Priority")
+        return {
+            "final_output": f"Stored low priority message without invoking LLM: {sub}",
+        }
+
+
+# Singleton instance
+agent_engine = PersonalAIEngine()
