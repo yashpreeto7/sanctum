@@ -1,8 +1,11 @@
-"""Deterministic Calendar Tool supporting Google Calendar API and local offline testing."""
+"""Deterministic Calendar Tool supporting live Google Calendar API and local offline testing."""
 
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 
 class CalendarEvent(BaseModel):
@@ -21,16 +24,29 @@ class CalendarConnector:
     """Manages reading, scheduling, and conflict detection for calendar events."""
 
     def __init__(self, service: Optional[Any] = None):
-        self.service = service
+        self._custom_service = service
         self._mock_events: List[CalendarEvent] = []
+
+    def _get_service(self):
+        if self._custom_service is not None:
+            return self._custom_service
+
+        token_path = Path(__file__).resolve().parent.parent.parent / ".tmp" / "google_token.json"
+        if token_path.exists():
+            try:
+                creds = Credentials.from_authorized_user_file(str(token_path))
+                return build("calendar", "v3", credentials=creds)
+            except Exception:
+                pass
+        return None
 
     def list_upcoming_events(self, days_ahead: int = 7) -> List[CalendarEvent]:
         """Lists events occurring in the next N days."""
-        if self.service is not None:
-            # Google Calendar API live call
+        service = self._get_service()
+        if service is not None:
             try:
                 now_iso = datetime.utcnow().isoformat() + "Z"
-                events_result = self.service.events().list(
+                events_result = service.events().list(
                     calendarId="primary",
                     timeMin=now_iso,
                     maxResults=20,
@@ -38,19 +54,24 @@ class CalendarConnector:
                     orderBy="startTime",
                 ).execute()
                 items = events_result.get("items", [])
-                return [
-                    CalendarEvent(
-                        id=i.get("id"),
-                        summary=i.get("summary", "Untitled"),
-                        start_time=i.get("start", {}).get("dateTime", ""),
-                        end_time=i.get("end", {}).get("dateTime", ""),
-                        description=i.get("description"),
-                        location=i.get("location"),
+                live_events = []
+                for i in items:
+                    start = i.get("start", {}).get("dateTime") or i.get("start", {}).get("date")
+                    end = i.get("end", {}).get("dateTime") or i.get("end", {}).get("date")
+                    live_events.append(
+                        CalendarEvent(
+                            id=i.get("id"),
+                            summary=i.get("summary", "Untitled"),
+                            start_time=start or "",
+                            end_time=end or "",
+                            description=i.get("description"),
+                            location=i.get("location"),
+                        )
                     )
-                    for i in items
-                ]
+                if live_events:
+                    return live_events
             except Exception:
-                return self._mock_events
+                pass
         return self._mock_events
 
     def check_conflicts(self, start_time_iso: str, end_time_iso: str) -> List[CalendarEvent]:
@@ -72,7 +93,8 @@ class CalendarConnector:
 
     def create_event(self, event: CalendarEvent) -> Dict[str, Any]:
         """Schedules a new calendar event."""
-        if self.service is not None:
+        service = self._get_service()
+        if service is not None:
             body = {
                 "summary": event.summary,
                 "description": event.description,
@@ -82,8 +104,8 @@ class CalendarConnector:
                 "attendees": [{"email": a} for a in event.attendees],
             }
             try:
-                created = self.service.events().insert(calendarId="primary", body=body).execute()
-                return {"status": "success", "event_id": created.get("id"), "summary": event.summary}
+                created = service.events().insert(calendarId="primary", body=body).execute()
+                return {"status": "success", "event_id": created.get("id"), "summary": event.summary, "provider": "google_calendar_api"}
             except Exception as e:
                 return {"status": "error", "message": str(e)}
 

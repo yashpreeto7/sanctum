@@ -48,6 +48,8 @@ class PermissionManager:
         "calendar.list_events": RiskLevel.LOW,
         "calendar.create_event": RiskLevel.MEDIUM,
         "email.list_unread": RiskLevel.LOW,
+        "email.search": RiskLevel.LOW,
+        "email.get_email": RiskLevel.LOW,
         "email.create_draft": RiskLevel.MEDIUM,
         "email.send": RiskLevel.HIGH,
         "shell.execute": RiskLevel.HIGH,
@@ -62,10 +64,10 @@ class PermissionManager:
 
     def can_auto_execute(self, tool_name: str) -> bool:
         """Determines if a tool call can proceed without prompting the user."""
+        if not settings.REQUIRE_APPROVAL_FOR_HIGH_RISK:
+            return True
         risk = self.get_tool_risk(tool_name)
         if risk == RiskLevel.LOW and settings.AUTO_APPROVE_LOW_RISK:
-            return True
-        if risk == RiskLevel.MEDIUM and not settings.REQUIRE_APPROVAL_FOR_HIGH_RISK:
             return True
         return False
 

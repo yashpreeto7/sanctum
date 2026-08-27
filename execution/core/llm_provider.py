@@ -58,6 +58,10 @@ class BaseLLMProvider(ABC):
         """Stream token chunks asynchronously."""
         pass
 
+    async def is_available(self) -> bool:
+        """Check if the provider backend is available."""
+        return True
+
 
 class OllamaProvider(BaseLLMProvider):
     """Local LLM Provider backed by an Ollama instance."""
@@ -229,7 +233,7 @@ class MockLLMProvider(BaseLLMProvider):
             data = json.loads(self.canned_response)
             return schema.model_validate(data)
         except Exception:
-            return schema.model_construct()
+            raise ValueError(f"Mock response does not match schema {schema.__name__}")
 
     async def stream(
         self,

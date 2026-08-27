@@ -1,0 +1,30 @@
+# Personal AI OS — Architecture, Subsystems & Operational Guide
+
+## What is Personal AI OS?
+Personal AI OS is a local-first, privacy-preserving AI operating system designed to run on personal hardware. It acts as an autonomous digital assistant that triages incoming communications, manages schedules, takes smart notes in Obsidian, and performs tasks with safety guardrails.
+
+## The 3 Core Agents (Why "Agents: 3" is displayed)
+Personal AI OS is split into 3 specialized modular agent layers:
+1. **Security & Quarantine Agent**:
+   - The primary perimeter defense.
+   - Evaluates untrusted inbound data (emails, webhooks, messages) inside an isolated Dual-LLM sandbox.
+   - Neutralizes Prompt Injections, Jailbreaks, and indirect malicious instructions before they reach the main system.
+2. **Triaging & ML Classifier Agent**:
+   - High-throughput Passive-Aggressive ML classifier.
+   - Classifies inbound items in < 5ms with importance scores (0.0 to 1.0).
+   - Only escalates high-value, actionable items to the reasoning LLM to conserve power and compute.
+3. **Reasoning & Tool Execution Agent**:
+   - LangGraph-powered autonomous decision engine.
+   - Retrieves private context via Hybrid RAG, decides the best tool (Gmail, Calendar, Obsidian), and executes actions under the HITL Safety Gate.
+
+## Human-in-the-Loop (HITL) Safety Gate
+- **Purpose**: Prevents autonomous AI from taking high-risk actions without explicit user authorization.
+- **Risk Tiers**:
+  - **LOW Risk**: Reading notes, searching knowledge, listing calendar events (Auto-approved).
+  - **MEDIUM Risk**: Creating draft emails, scheduling calendar events (Configurable).
+  - **HIGH Risk**: Sending external emails, deleting files, shell commands (Requires explicit human Approve/Reject click).
+
+## Topology DAG (Directed Acyclic Graph)
+The system's control flow is organized as a Directed Acyclic Graph (DAG) using LangGraph:
+- Entry -> Quarantine Node -> Triage Node -> [Branch] -> Retrieval Node -> Reasoning Node -> HITL Safety Gate -> Tool Execution Node -> Output.
+- A DAG guarantees deterministic state management, persistence via SQLite checkpoints, and full auditable traces.

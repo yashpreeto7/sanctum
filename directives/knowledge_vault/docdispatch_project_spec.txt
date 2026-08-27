@@ -1,0 +1,21 @@
+# DocDispatch — Autonomous Document Processing & Dispatch System
+
+## Project Overview
+DocDispatch is an enterprise-grade document ingestion, processing, and dispatching pipeline designed to automatically extract data from PDFs, invoices, receipts, and medical reports.
+
+## Architecture
+- **Ingestion Layer**: Watches cloud storage buckets (S3 / GCS) and local folders for incoming PDF, TIFF, and DOCX files.
+- **OCR & Extraction Engine**: Uses Tesseract and Surya OCR alongside specialized Vision-LLM models (Qwen-2-VL) to extract structured key-value pairs and tabular data.
+- **Validation Engine**: Pydantic schema validation with confidence scoring and automated error flagging for low-confidence fields (< 0.85).
+- **Dispatch Layer**: Formats extracted data into JSON payloads and dispatches them via Webhooks, Kafka events, and REST APIs to downstream ERP and CRM systems.
+
+## Key Team Contacts
+- Lead Engineer: Yashpreet (yashpreet@personalai.local)
+- Product Manager: Rahul Sharma (rahul@techcorp.io)
+- DevOps & Cloud: Sarah Jenkins (sarah.j@techcorp.io)
+
+## Staging & Production Deployment
+- Staging URL: https://staging.docdispatch.internal
+- Production URL: https://app.docdispatch.internal
+- Deployment Command: `docker-compose -f docker-compose.staging.yml up -d --build`
+- Log Monitoring: `tail -f /var/log/docdispatch/pipeline.log`

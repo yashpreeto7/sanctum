@@ -5,11 +5,13 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+_BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 class Settings(BaseSettings):
     """Central configuration for Personal AI OS."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(_BASE_DIR / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )

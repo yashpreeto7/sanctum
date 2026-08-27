@@ -1,0 +1,16 @@
+# Yashpreet's Contact Directory & Calendar Schedule
+
+## Key Contacts
+- **Rahul Sharma**: VP of Engineering at TechCorp (rahul@techcorp.io). Works on DocDispatch and Gateway infrastructure. Likes fast 15-minute syncs.
+- **Sarah Jenkins**: Senior Cloud Architect (sarah.j@techcorp.io). Coordinates AWS/GCP deployments and Kubernetes clusters.
+- **Alex Rivera**: Lead ML Researcher (alex.r@ai-labs.org). Collaborates on local LLM quantization and Qdrant vector benchmark experiments.
+
+## Weekly Recurring Schedule
+- **Mondays 10:00 AM - 11:00 AM**: DocDispatch Sprint Planning & Backlog Grooming.
+- **Wednesdays 2:00 PM - 3:00 PM**: AI Architecture & RAG Retrieval Optimization Sync.
+- **Thursdays 3:00 PM - 4:00 PM**: Staging Review & Gateway Status with Rahul.
+- **Fridays 4:00 PM - 5:00 PM**: Weekly Tech Retrospective & Demo Day.
+
+## Working Hours & Preferences
+- Preferred focus time: 9:00 AM - 12:00 PM (No meetings).
+- Timezone: Asia/Kolkata (IST).
