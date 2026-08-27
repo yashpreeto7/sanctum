@@ -29,6 +29,7 @@ from execution.orchestration.trace_manager import trace_store
 from execution.rag.hybrid_retriever import hybrid_retriever
 from execution.rag.reranker import reranker
 from execution.rag.vector_store import DocumentChunk, vector_store
+from execution.tools.gmail_connector import gmail_connector
 
 app = FastAPI(
     title="Personal AI OS",
@@ -339,9 +340,60 @@ async def ingest_inbound_email(payload: InboundEmailPayload):
     return inbox_item
 
 
+@app.post("/api/inbox/sync")
+async def sync_live_gmail():
+    """Fetches unread emails directly from Gmail API, runs triage & quarantine, and populates inbox."""
+    try:
+        unread_emails = gmail_connector.list_unread(max_results=10)
+        existing_ids = {item.get("id") for item in inbox_store}
+        new_count = 0
+
+        for em in unread_emails:
+            if em.id in existing_ids:
+                continue
+            
+            # Predict triage score
+            email_data = {
+                "sender": em.sender,
+                "subject": em.subject,
+                "body": em.body,
+                "is_known_contact": False,
+            }
+            pred = triaging_classifier.predict(email_data)
+            
+            inbox_item = {
+                "id": em.id,
+                "run_id": f"sync-{em.id[:8]}",
+                "sender": em.sender,
+                "subject": em.subject,
+                "body": em.body,
+                "clean_facts": {
+                    "clean_subject": em.subject,
+                    "factual_summary": em.body[:250],
+                    "is_suspicious_or_adversarial": False,
+                },
+                "triage": pred.model_dump(),
+                "approval_required": False,
+                "approval_request_id": None,
+                "final_output": em.body[:300],
+                "created_at": em.received_at_timestamp or time.time(),
+            }
+            inbox_store.append(inbox_item)
+            new_count += 1
+
+        return {"status": "synced", "total_inbox": len(inbox_store), "new_synced": new_count}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "total_inbox": len(inbox_store)}
+
+
 @app.get("/api/inbox")
 async def list_inbox():
-    """Retrieve all triaged inbound messages."""
+    """Retrieve all triaged inbound messages, auto-syncing live Gmail if empty."""
+    if not inbox_store:
+        try:
+            await sync_live_gmail()
+        except Exception:
+            pass
     return {"inbox": inbox_store}
 
 

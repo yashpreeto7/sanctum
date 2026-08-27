@@ -1195,6 +1195,10 @@ DASHBOARD_HTML = """
               <p class="text-xs text-slate-400 font-mono">Inbound emails sanitized through Dual-LLM quarantine and triaged by online ML classifier.</p>
             </div>
             <div class="flex items-center space-x-2">
+              <button onclick="fetchInbox(true); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>Sync Live Gmail</span>
+              </button>
               <button onclick="simulateNormalEmail(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
                 <i data-lucide="mail" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>Simulate Inbound</span>
@@ -2366,6 +2370,9 @@ DASHBOARD_HTML = """
       if (tabId === 'chat') {
         focusChatInput();
       }
+      if (tabId === 'inbox') {
+        fetchInbox();
+      }
       if (tabId === 'traces') {
         fetchTraces();
       }
@@ -3343,6 +3350,105 @@ DASHBOARD_HTML = """
       refreshIcons();
     }
 
+    // ── Inbox & Triage Stream ──
+    async function fetchInbox(forceSync = false) {
+      try {
+        const container = document.getElementById('inbox-cards-stream');
+        if (forceSync && container) {
+          container.innerHTML = `<div class="p-8 rounded-2xl theme-card border text-center text-xs text-cyan-400 animate-pulse"><i data-lucide="loader" class="w-5 h-5 inline mr-2 animate-spin"></i> Syncing unread messages directly from Gmail API...</div>`;
+          refreshIcons();
+          await fetch('/api/inbox/sync', { method: 'POST' });
+        }
+
+        const res = await fetch('/api/inbox');
+        const data = await res.json();
+        const inbox = data.inbox || [];
+
+        const navBadge = document.getElementById('nav-inbox-badge');
+        const cardBadge = document.getElementById('card-inbox-count');
+        if (navBadge) navBadge.textContent = inbox.length;
+        if (cardBadge) cardBadge.textContent = inbox.length;
+
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (inbox.length === 0) {
+          container.innerHTML = `
+            <div class="p-12 rounded-2xl theme-card border text-center space-y-3">
+              <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto">
+                <i data-lucide="inbox" class="w-6 h-6"></i>
+              </div>
+              <div class="text-sm font-bold text-white">Your Inbound Triage Stream is Empty</div>
+              <p class="text-xs text-slate-400 max-w-md mx-auto">No unread or triaged emails in queue. Click "Sync Live Gmail" to pull your real unread messages, or "Simulate Inbound" to test ML triage.</p>
+              <div class="pt-2 flex items-center justify-center space-x-2">
+                <button onclick="fetchInbox(true); playCyberClick();" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer shadow-sm">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                  <span>Sync Live Gmail Now</span>
+                </button>
+              </div>
+            </div>
+          `;
+          refreshIcons();
+          return;
+        }
+
+        inbox.forEach(em => {
+          const triage = em.triage || {};
+          const score = (triage.importance_score !== undefined) ? triage.importance_score : 0.5;
+          const isHigh = score >= 0.7;
+          const scoreColor = isHigh ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : (score >= 0.4 ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : 'text-slate-400 bg-slate-500/10 border-slate-500/30');
+
+          const card = document.createElement('div');
+          card.className = 'p-5 rounded-2xl theme-card border hover:border-cyan-500/40 transition space-y-3';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
+                  <i data-lucide="mail" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white flex items-center space-x-2">
+                    <span>${escapeHtml(em.sender)}</span>
+                    <span class="text-[10px] font-mono text-cyan-400 px-1.5 py-0.2 rounded bg-cyan-500/10 border border-cyan-500/20">🛡️ Sanitized</span>
+                  </div>
+                  <div class="text-xs text-slate-300 font-medium">${escapeHtml(em.subject)}</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${scoreColor}">
+                  ⚡ ML Score: ${(score * 100).toFixed(0)}% (${triage.importance_tier || (isHigh ? 'HIGH' : 'NORMAL')})
+                </span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-black/40 border theme-border text-xs text-slate-300 leading-relaxed font-sans select-text">
+              ${escapeHtml(em.body || em.final_output || '')}
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs">
+              <div class="text-[10px] font-mono text-slate-500">ID: ${em.id}</div>
+              <div class="flex items-center space-x-2">
+                <button onclick="openEmailInChat('${escapeHtml(em.subject.replace(/'/g, "\\'"))}')" class="px-3 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/60 text-cyan-300 border border-indigo-500/40 text-xs flex items-center space-x-1 cursor-pointer transition">
+                  <i data-lucide="message-square" class="w-3 h-3"></i>
+                  <span>Reply & Process in Chat</span>
+                </button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        refreshIcons();
+      } catch (err) {
+        console.error("Failed to fetch inbox:", err);
+      }
+    }
+
+    function openEmailInChat(subject) {
+      switchTab('chat');
+      setChatPrompt(`check full email with subject "${subject}"`);
+      sendChatMessage();
+    }
+
     // ── HITL Approvals ──
     async function fetchPendingApprovals() {
       try {
@@ -3718,6 +3824,7 @@ DASHBOARD_HTML = """
       // 8. Connect WebSocket & Load Data
       initWebSocket();
       fetchChatSessions(true);
+      fetchInbox();
       fetchTraces();
       fetchPendingApprovals();
       refreshIcons();
