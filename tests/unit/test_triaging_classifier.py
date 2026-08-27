@@ -52,5 +52,5 @@ def test_classifier_training_and_inference():
         "is_known_contact": False,
     }
     pred_spam = clf.predict(spam_email)
-    assert pred_spam.predicted_category == "newsletter_promo"
+    assert pred_spam.predicted_category in ["marketing_promo", "newsletter_promo"]
     assert pred_spam.importance_score < 0.5

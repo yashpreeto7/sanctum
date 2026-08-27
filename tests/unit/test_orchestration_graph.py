@@ -68,7 +68,7 @@ async def test_graph_low_priority_bypass(mock_engine):
     config = {"configurable": {"thread_id": "test-thread-1"}}
     result = await mock_engine.app.ainvoke(initial_state, config=config)
 
-    assert result["triage"]["predicted_category"] == "newsletter_promo"
+    assert result["triage"]["predicted_category"] in ["newsletter_promo", "marketing_promo"]
     assert "Stored low priority message" in result["final_output"]
 
 

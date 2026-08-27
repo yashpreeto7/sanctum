@@ -344,15 +344,14 @@ async def ingest_inbound_email(payload: InboundEmailPayload):
 async def sync_live_gmail():
     """Fetches unread emails directly from Gmail API, runs triage & quarantine, and populates inbox."""
     try:
-        unread_emails = gmail_connector.list_unread(max_results=10)
+        unread_emails = gmail_connector.list_unread(max_results=15)
         existing_ids = {item.get("id") for item in inbox_store}
         new_count = 0
 
         for em in unread_emails:
             if em.id in existing_ids:
                 continue
-            
-            # Predict triage score
+
             email_data = {
                 "sender": em.sender,
                 "subject": em.subject,
@@ -360,26 +359,34 @@ async def sync_live_gmail():
                 "is_known_contact": False,
             }
             pred = triaging_classifier.predict(email_data)
-            
+            pred_dict = pred.model_dump()
+
             inbox_item = {
                 "id": em.id,
                 "run_id": f"sync-{em.id[:8]}",
                 "sender": em.sender,
-                "subject": em.subject,
+                "subject": em.subject or "No Subject",
                 "body": em.body,
+                "snippet": pred.clean_snippet or (em.body[:120] if em.body else "No preview available"),
+                "category": pred.predicted_category,
+                "category_label": pred.category_label,
+                "badge_color": pred.badge_color,
                 "clean_facts": {
                     "clean_subject": em.subject,
-                    "factual_summary": em.body[:250],
-                    "is_suspicious_or_adversarial": False,
+                    "factual_summary": pred.clean_snippet,
+                    "is_suspicious_or_adversarial": pred.predicted_category == "likely_scam",
                 },
-                "triage": pred.model_dump(),
+                "triage": pred_dict,
                 "approval_required": False,
                 "approval_request_id": None,
                 "final_output": em.body[:300],
                 "created_at": em.received_at_timestamp or time.time(),
             }
-            inbox_store.append(inbox_item)
+            inbox_store.insert(0, inbox_item)
             new_count += 1
+
+        # Keep inbox sorted newest first
+        inbox_store.sort(key=lambda x: x.get("created_at", 0), reverse=True)
 
         return {"status": "synced", "total_inbox": len(inbox_store), "new_synced": new_count}
     except Exception as e:
@@ -563,16 +570,18 @@ ws_manager = ConnectionManager()
 _alerted_email_ids = set()
 
 async def proactive_background_worker():
-    """Periodically scans for urgent inbox items or calendar events and pushes proactive alerts."""
-    await asyncio.sleep(8)
+    """Periodically scans for urgent inbox items, syncs them to inbox_store, and pushes proactive alerts."""
+    await asyncio.sleep(5)
     while True:
         try:
             from execution.tools.gmail_connector import gmail_connector
-            unread = gmail_connector.list_unread(max_results=3)
+            unread = gmail_connector.list_unread(max_results=6)
+            new_incoming = False
             for em in unread:
                 if em.id not in _alerted_email_ids:
                     _alerted_email_ids.add(em.id)
-                    # Broadcast proactive alert to all connected dashboard sessions
+                    new_incoming = True
+                    # Broadcast proactive toast alert to dashboard
                     await ws_manager.broadcast({
                         "type": "proactive_alert",
                         "title": f"📬 Inbound Email: {em.subject[:45]}",
@@ -581,9 +590,12 @@ async def proactive_background_worker():
                         "email_id": em.id,
                         "timestamp": time.time()
                     })
+            if new_incoming:
+                await sync_live_gmail()
+                await ws_manager.broadcast({"type": "inbox_update"})
         except Exception:
             pass
-        await asyncio.sleep(60)
+        await asyncio.sleep(12)
 
 
 @app.on_event("startup")

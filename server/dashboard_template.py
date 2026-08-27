@@ -1188,27 +1188,62 @@ DASHBOARD_HTML = """
         </section>
 
         <!-- ══════════════════ TAB 4: INBOX & TRIAGE ══════════════════ -->
-        <section id="view-inbox" class="hidden space-y-6 max-w-7xl mx-auto">
-          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between">
-            <div class="space-y-1">
-              <h2 class="text-base font-display font-bold text-white">Inbox & ML Triage Stream</h2>
-              <p class="text-xs text-slate-400 font-mono">Inbound emails sanitized through Dual-LLM quarantine and triaged by online ML classifier.</p>
+        <section id="view-inbox" class="hidden space-y-4 max-w-7xl mx-auto">
+          <!-- Top Control Header -->
+          <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center">
+                  <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
+                </div>
+                <h2 class="text-sm font-display font-bold text-white">Smart Inbox & Triage</h2>
+              </div>
+              <p class="text-[11px] text-slate-400 font-mono">Live Gmail stream sanitized via Dual-LLM quarantine and classified by ML.</p>
             </div>
             <div class="flex items-center space-x-2">
-              <button onclick="fetchInbox(true); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+              <button onclick="fetchInbox(true); playCyberClick();" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                 <span>Sync Live Gmail</span>
               </button>
-              <button onclick="simulateNormalEmail(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
-                <i data-lucide="mail" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <button onclick="simulateNormalEmail(); playCyberClick();" class="px-3 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
+                <i data-lucide="mail-plus" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>Simulate Inbound</span>
               </button>
             </div>
           </div>
 
-          <div class="space-y-3" id="inbox-cards-stream">
-            <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400">
-              No inbound emails currently in queue. Click "Simulate Email" to test the quarantine and triage pipeline.
+          <!-- Category Filter Tabs Bar -->
+          <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs font-mono select-none" id="inbox-category-tabs">
+            <button onclick="filterInboxCategory('all')" id="inbox-tab-all" class="inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/30 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer">
+              <span>📥 All Inbound</span>
+              <span id="tab-count-all" class="px-1.5 py-0.2 rounded-full bg-white/10 text-[10px]">0</span>
+            </button>
+            <button onclick="filterInboxCategory('important')" id="inbox-tab-important" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-amber-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>⚡ Important</span>
+              <span id="tab-count-important" class="px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-400 text-[10px]">0</span>
+            </button>
+            <button onclick="filterInboxCategory('job_career')" id="inbox-tab-job_career" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-cyan-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>💼 Career & Jobs</span>
+              <span id="tab-count-job_career" class="px-1.5 py-0.2 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px]">0</span>
+            </button>
+            <button onclick="filterInboxCategory('system_update')" id="inbox-tab-system_update" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-blue-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>🔔 Updates & Alerts</span>
+              <span id="tab-count-system_update" class="px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-400 text-[10px]">0</span>
+            </button>
+            <button onclick="filterInboxCategory('marketing_promo')" id="inbox-tab-marketing_promo" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-purple-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>📢 Marketing & Promos</span>
+              <span id="tab-count-marketing_promo" class="px-1.5 py-0.2 rounded-full bg-purple-500/10 text-purple-400 text-[10px]">0</span>
+            </button>
+            <button onclick="filterInboxCategory('likely_scam')" id="inbox-tab-likely_scam" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-rose-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>🚨 Suspicious / Scam</span>
+              <span id="tab-count-likely_scam" class="px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-400 text-[10px]">0</span>
+            </button>
+          </div>
+
+          <!-- Crisp Gmail-Style Row Stream -->
+          <div class="rounded-2xl theme-card border divide-y divide-white/5 overflow-hidden shadow-xl" id="inbox-cards-stream">
+            <div class="p-8 text-center text-xs text-slate-400">
+              Loading inbox stream...
             </div>
           </div>
         </section>
@@ -2703,12 +2738,15 @@ DASHBOARD_HTML = """
         showProactiveToast(
           data.title || '📬 Proactive Inbox Alert',
           data.message || 'New inbound message received.',
-          'Open & Search in Chat',
+          'Open in Inbox',
           () => {
-            setChatPrompt(`Find emails from: ${data.sender || ''}`);
-            sendChatMessage();
+            switchTab('inbox');
           }
         );
+        fetchInbox(false);
+      }
+      else if (data.type === 'inbox_update') {
+        fetchInbox(false);
       }
     }
 
@@ -3350,96 +3388,209 @@ DASHBOARD_HTML = """
       refreshIcons();
     }
 
-    // ── Inbox & Triage Stream ──
+    // ── Smart Gmail-Style Inbox & Categorization Engine ──
+    let currentInboxCategory = 'all';
+    let cachedInboxItems = [];
+
+    function filterInboxCategory(categoryKey) {
+      currentInboxCategory = categoryKey;
+      playCyberClick(900);
+
+      // Update Tab Buttons UI
+      const tabs = ['all', 'important', 'job_career', 'system_update', 'marketing_promo', 'likely_scam'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`inbox-tab-${t}`);
+        if (!btn) return;
+        if (t === categoryKey) {
+          btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/40 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+        } else {
+          btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5 transition cursor-pointer";
+        }
+      });
+
+      renderInboxRows();
+    }
+
     async function fetchInbox(forceSync = false) {
       try {
         const container = document.getElementById('inbox-cards-stream');
         if (forceSync && container) {
-          container.innerHTML = `<div class="p-8 rounded-2xl theme-card border text-center text-xs text-cyan-400 animate-pulse"><i data-lucide="loader" class="w-5 h-5 inline mr-2 animate-spin"></i> Syncing unread messages directly from Gmail API...</div>`;
+          container.innerHTML = `<div class="p-8 text-center text-xs text-cyan-400 animate-pulse font-mono"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2 animate-spin"></i> Syncing live messages directly from Gmail API...</div>`;
           refreshIcons();
           await fetch('/api/inbox/sync', { method: 'POST' });
         }
 
         const res = await fetch('/api/inbox');
         const data = await res.json();
-        const inbox = data.inbox || [];
+        cachedInboxItems = data.inbox || [];
 
         const navBadge = document.getElementById('nav-inbox-badge');
         const cardBadge = document.getElementById('card-inbox-count');
-        if (navBadge) navBadge.textContent = inbox.length;
-        if (cardBadge) cardBadge.textContent = inbox.length;
+        if (navBadge) navBadge.textContent = cachedInboxItems.length;
+        if (cardBadge) cardBadge.textContent = cachedInboxItems.length;
 
-        if (!container) return;
-        container.innerHTML = '';
+        renderInboxRows();
+      } catch (err) {
+        console.error("Failed to fetch inbox:", err);
+      }
+    }
 
-        if (inbox.length === 0) {
-          container.innerHTML = `
-            <div class="p-12 rounded-2xl theme-card border text-center space-y-3">
-              <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto">
-                <i data-lucide="inbox" class="w-6 h-6"></i>
-              </div>
-              <div class="text-sm font-bold text-white">Your Inbound Triage Stream is Empty</div>
-              <p class="text-xs text-slate-400 max-w-md mx-auto">No unread or triaged emails in queue. Click "Sync Live Gmail" to pull your real unread messages, or "Simulate Inbound" to test ML triage.</p>
-              <div class="pt-2 flex items-center justify-center space-x-2">
-                <button onclick="fetchInbox(true); playCyberClick();" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer shadow-sm">
-                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                  <span>Sync Live Gmail Now</span>
-                </button>
-              </div>
+    function formatEmailDate(ts) {
+      if (!ts) return '';
+      const date = new Date(ts * 1000);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function getCategoryBadgeMarkup(cat) {
+      switch (cat) {
+        case 'likely_scam':
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">🚨 Likely Scam</span>`;
+        case 'important':
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">⚡ Important</span>`;
+        case 'job_career':
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">💼 Job / Career</span>`;
+        case 'system_update':
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">🔔 Update</span>`;
+        case 'marketing_promo':
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">📢 Promo</span>`;
+        default:
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-500/20 text-slate-300 border border-slate-500/30">📨 Normal</span>`;
+      }
+    }
+
+    function renderInboxRows() {
+      const container = document.getElementById('inbox-cards-stream');
+      if (!container) return;
+
+      // Calculate Category Counts
+      const counts = {
+        all: cachedInboxItems.length,
+        important: cachedInboxItems.filter(i => (i.category === 'important' || (i.triage && i.triage.predicted_category === 'important'))).length,
+        job_career: cachedInboxItems.filter(i => (i.category === 'job_career' || (i.triage && i.triage.predicted_category === 'job_career'))).length,
+        system_update: cachedInboxItems.filter(i => (i.category === 'system_update' || (i.triage && i.triage.predicted_category === 'system_update'))).length,
+        marketing_promo: cachedInboxItems.filter(i => (i.category === 'marketing_promo' || (i.triage && i.triage.predicted_category === 'marketing_promo'))).length,
+        likely_scam: cachedInboxItems.filter(i => (i.category === 'likely_scam' || (i.triage && i.triage.predicted_category === 'likely_scam'))).length,
+      };
+
+      document.getElementById('tab-count-all').textContent = counts.all;
+      document.getElementById('tab-count-important').textContent = counts.important;
+      document.getElementById('tab-count-job_career').textContent = counts.job_career;
+      document.getElementById('tab-count-system_update').textContent = counts.system_update;
+      document.getElementById('tab-count-marketing_promo').textContent = counts.marketing_promo;
+      document.getElementById('tab-count-likely_scam').textContent = counts.likely_scam;
+
+      // Filter Items
+      const filtered = currentInboxCategory === 'all' 
+        ? cachedInboxItems 
+        : cachedInboxItems.filter(i => (i.category === currentInboxCategory || (i.triage && i.triage.predicted_category === currentInboxCategory)));
+
+      container.innerHTML = '';
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center space-y-2">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto">
+              <i data-lucide="inbox" class="w-5 h-5"></i>
             </div>
-          `;
-          refreshIcons();
-          return;
+            <div class="text-xs font-bold text-white">No messages in this category</div>
+            <p class="text-[11px] text-slate-400">All caught up! Click "Sync Live Gmail" to fetch newly received emails.</p>
+          </div>
+        `;
+        refreshIcons();
+        return;
+      }
+
+      filtered.forEach((em, idx) => {
+        const cat = em.category || (em.triage ? em.triage.predicted_category : 'normal');
+        const badgeMarkup = getCategoryBadgeMarkup(cat);
+        const dateFormatted = formatEmailDate(em.created_at);
+        const snippetText = em.snippet || (em.clean_facts ? em.clean_facts.factual_summary : (em.body ? em.body.slice(0, 110) : 'No preview available'));
+        
+        // Clean sender display
+        let senderDisplay = em.sender || 'Unknown';
+        if (senderDisplay.includes('<')) {
+          senderDisplay = senderDisplay.split('<')[0].trim().replace(/['"]/g, '');
         }
 
-        inbox.forEach(em => {
-          const triage = em.triage || {};
-          const score = (triage.importance_score !== undefined) ? triage.importance_score : 0.5;
-          const isHigh = score >= 0.7;
-          const scoreColor = isHigh ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : (score >= 0.4 ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : 'text-slate-400 bg-slate-500/10 border-slate-500/30');
-
-          const card = document.createElement('div');
-          card.className = 'p-5 rounded-2xl theme-card border hover:border-cyan-500/40 transition space-y-3';
-          card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
-                  <i data-lucide="mail" class="w-4 h-4"></i>
-                </div>
-                <div>
-                  <div class="text-xs font-bold text-white flex items-center space-x-2">
-                    <span>${escapeHtml(em.sender)}</span>
-                    <span class="text-[10px] font-mono text-cyan-400 px-1.5 py-0.2 rounded bg-cyan-500/10 border border-cyan-500/20">🛡️ Sanitized</span>
-                  </div>
-                  <div class="text-xs text-slate-300 font-medium">${escapeHtml(em.subject)}</div>
-                </div>
+        const row = document.createElement('div');
+        row.className = 'group transition';
+        row.innerHTML = `
+          <!-- Concise Header Row (Gmail Style) -->
+          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition">
+            <!-- Left: Sender -->
+            <div class="flex items-center space-x-3 w-56 flex-shrink-0">
+              <div class="w-6 h-6 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-mono text-[10px] flex items-center justify-center font-bold">
+                ${escapeHtml((senderDisplay[0] || 'M').toUpperCase())}
               </div>
-              <div class="flex items-center space-x-2">
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${scoreColor}">
-                  ⚡ ML Score: ${(score * 100).toFixed(0)}% (${triage.importance_tier || (isHigh ? 'HIGH' : 'NORMAL')})
-                </span>
-              </div>
+              <span class="text-xs font-semibold text-white truncate max-w-[170px]" title="${escapeHtml(em.sender)}">
+                ${escapeHtml(senderDisplay)}
+              </span>
             </div>
 
-            <div class="p-3 rounded-xl bg-black/40 border theme-border text-xs text-slate-300 leading-relaxed font-sans select-text">
+            <!-- Middle: Subject & 1-line Snippet (Crisp Layout) -->
+            <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
+              <span class="font-medium text-slate-100 flex-shrink-0 truncate max-w-[280px]">${escapeHtml(em.subject || 'No Subject')}</span>
+              <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${escapeHtml(snippetText)}</span>
+            </div>
+
+            <!-- Right: Category Badge + Timestamp + Expand -->
+            <div class="flex items-center space-x-3 flex-shrink-0">
+              ${badgeMarkup}
+              <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
+              <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
+            </div>
+          </div>
+
+          <!-- Expandable Detail Drawer -->
+          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/40 border-t border-white/5 space-y-3">
+            <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
+              <div class="space-y-0.5">
+                <div class="text-slate-300 font-mono text-[11px]">From: <span class="text-white">${escapeHtml(em.sender)}</span></div>
+                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-cyan-300 font-bold">${escapeHtml(em.subject)}</span></div>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">🛡️ Dual-LLM Sanitized</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
               ${escapeHtml(em.body || em.final_output || '')}
             </div>
 
-            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs">
-              <div class="text-[10px] font-mono text-slate-500">ID: ${em.id}</div>
+            <div class="flex items-center justify-between pt-1 text-xs font-mono">
+              <span class="text-[10px] text-slate-500">Message ID: ${em.id}</span>
               <div class="flex items-center space-x-2">
-                <button onclick="openEmailInChat('${escapeHtml(em.subject.replace(/'/g, "\\'"))}')" class="px-3 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/60 text-cyan-300 border border-indigo-500/40 text-xs flex items-center space-x-1 cursor-pointer transition">
-                  <i data-lucide="message-square" class="w-3 h-3"></i>
+                <button onclick="openEmailInChat('${escapeHtml(em.subject.replace(/'/g, "\\'"))}')" class="px-3 py-1.5 rounded-xl bg-indigo-600/40 hover:bg-indigo-600/70 text-cyan-300 border border-indigo-500/50 text-xs flex items-center space-x-1.5 cursor-pointer transition shadow-sm">
+                  <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
                   <span>Reply & Process in Chat</span>
                 </button>
               </div>
             </div>
-          `;
-          container.appendChild(card);
-        });
-        refreshIcons();
-      } catch (err) {
-        console.error("Failed to fetch inbox:", err);
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      refreshIcons();
+    }
+
+    function toggleInboxRowDetails(emailId) {
+      const drawer = document.getElementById(`drawer-${emailId}`);
+      const chevron = document.getElementById(`chevron-${emailId}`);
+      if (!drawer) return;
+      
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden) {
+        drawer.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        playCyberClick(800);
+      } else {
+        drawer.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
       }
     }
 
@@ -3828,6 +3979,11 @@ DASHBOARD_HTML = """
       fetchTraces();
       fetchPendingApprovals();
       refreshIcons();
+
+      // 9. Periodic Fast Background Refresh (15s)
+      setInterval(() => {
+        fetchInbox(false);
+      }, 15000);
     });
   </script>
 </body>
