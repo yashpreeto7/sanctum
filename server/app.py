@@ -366,7 +366,7 @@ DASHBOARD_HTML = """
       -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 15%, transparent 70%);
     }
 
-    /* ─── 3D Spatial Ribbon Track ──────────────────────────────────── */
+    /* ─── 3D Spatial Ribbon Track & Fluid River Spine ──────────────── */
     .ribbon-track {
       position: absolute;
       top: 50%;
@@ -374,40 +374,229 @@ DASHBOARD_HTML = """
       transform-style: preserve-3d;
       display: flex;
       align-items: center;
-      gap: 50px;
+      gap: 0px;
       cursor: grab;
       will-change: transform;
-      margin-left: -270px;
-      margin-top: -190px;
+      margin-left: -330px;
+      margin-top: -215px;
     }
     .ribbon-track:active {
       cursor: grabbing;
     }
 
-    /* ─── 3D Ribbon Card ───────────────────────────────────────────── */
-    .ribbon-card {
-      width: 540px;
-      height: 380px;
+    /* ─── Ambient Flowing Water River Background ───────────────────── */
+    .water-river-backdrop {
+      position: absolute;
+      top: 50%;
+      left: -150px;
+      width: 3200px;
+      height: 180px;
+      transform: translateY(-50%) translateZ(-30px);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.9;
+    }
+    .water-stream-path {
+      fill: none;
+      stroke: #06b6d4;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 24 16;
+      animation: flowWaterStream 1.8s linear infinite;
+      filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.95)) drop-shadow(0 0 30px rgba(99, 102, 241, 0.7));
+    }
+    .water-glow-wave {
+      fill: none;
+      stroke: #3b82f6;
+      stroke-width: 42;
+      stroke-linecap: round;
+      opacity: 0.35;
+      filter: blur(14px);
+    }
+    @keyframes flowWaterStream {
+      0% { stroke-dashoffset: 240; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    /* ─── Fluid Conduit Bridge Between Cards ───────────────────────── */
+    .fluid-bridge {
+      width: 70px;
+      height: 430px;
       flex-shrink: 0;
-      border-radius: var(--card-radius);
-      background: rgba(13, 19, 34, 0.85);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
       transform-style: preserve-3d;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .fluid-tube {
+      width: 70px;
+      height: 16px;
+      position: relative;
+      border-radius: 999px;
+      background: rgba(13, 22, 41, 0.95);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(6, 182, 212, 0.5);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .fluid-tube-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6, #a855f7);
+      opacity: 0.5;
+      filter: blur(6px);
+      pointer-events: none;
+    }
+    .fluid-tube-core {
+      position: absolute;
+      inset: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6, #a855f7, #10b981);
+      background-size: 200% 100%;
+      animation: fluidTubeFlow 2s linear infinite;
+      opacity: 0.9;
+    }
+    .fluid-flowing-pulse {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #ffffff, transparent);
+      border-radius: 999px;
+      animation: fluidPulseTravel 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      opacity: 0.95;
+    }
+    @keyframes fluidTubeFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    @keyframes fluidPulseTravel {
+      0% { transform: translateX(-40px); }
+      100% { transform: translateX(80px); }
+    }
+    .fluid-particle-stream {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      pointer-events: none;
+    }
+    .fluid-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 6px #22d3ee;
+      animation: fluidDotBlink 1s ease-in-out infinite alternate;
+    }
+    .fluid-dot.d1 { animation-delay: 0s; }
+    .fluid-dot.d2 { animation-delay: 0.3s; }
+    .fluid-dot.d3 { animation-delay: 0.6s; }
+    @keyframes fluidDotBlink {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.4); }
+    }
+
+    /* Ambient Flowing Neon Wave on Cards */
+    .water-wave-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      overflow: hidden;
+      border-radius: 0 0 32px 32px;
+    }
+    .water-wave-glow {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6, #a855f7, #10b981);
+      background-size: 300% 100%;
+      animation: fluidTubeFlow 3s linear infinite;
+      opacity: 0.8;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
+    }
+
+    /* ─── 3D Ribbon Card (Enlarged & Flowing Water Aesthetic) ───────── */
+    .ribbon-card {
+      width: 660px;
+      height: 430px;
+      flex-shrink: 0;
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(13, 22, 41, 0.94) 0%, rgba(7, 13, 28, 0.96) 100%);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 35px 70px -15px rgba(0, 0, 0, 0.9), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(6, 182, 212, 0.05);
+      transform-style: preserve-3d;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease, filter 0.35s ease;
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      z-index: 10;
+    }
+    .ribbon-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.9), rgba(99, 102, 241, 0.8), rgba(16, 185, 129, 0.8), transparent);
+      opacity: 0.8;
+      animation: waterShimmer 3s ease-in-out infinite alternate;
+    }
+    @keyframes waterShimmer {
+      0% { opacity: 0.5; filter: hue-rotate(0deg); }
+      100% { opacity: 1; filter: hue-rotate(45deg); }
     }
     .ribbon-card:hover {
-      border-color: rgba(99, 102, 241, 0.6);
-      box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-color: rgba(6, 182, 212, 0.6);
+      box-shadow: 
+        0 45px 90px -15px rgba(6, 182, 212, 0.35), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 0 35px rgba(6, 182, 212, 0.1);
     }
     .ribbon-card.active-center {
-      border-color: rgba(6, 182, 212, 0.6);
-      box-shadow: 0 40px 90px -15px rgba(6, 182, 212, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      border-color: rgba(6, 182, 212, 0.75);
+      box-shadow: 
+        0 50px 100px -15px rgba(6, 182, 212, 0.4), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        inset 0 0 45px rgba(6, 182, 212, 0.12);
+    }
+
+    /* Fluid Connection Ports on Left & Right of Cards */
+    .fluid-port-left, .fluid-port-right {
+      position: absolute;
+      top: 50%;
+      width: 10px;
+      height: 24px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 20;
+    }
+    .fluid-port-left {
+      left: -5px;
+      border-radius: 0 12px 12px 0;
+      background: linear-gradient(to right, rgba(6, 182, 212, 0.9), transparent);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.9);
+    }
+    .fluid-port-right {
+      right: -5px;
+      border-radius: 12px 0 0 12px;
+      background: linear-gradient(to left, rgba(6, 182, 212, 0.9), transparent);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.9);
     }
 
     /* ─── Singular Expansion Modal ─────────────────────────────────── */
@@ -544,127 +733,274 @@ DASHBOARD_HTML = """
     </div>
   </header>
 
+  <!-- ─── SVG GRADIENTS & DEFINITIONS FOR WATER FLOW ─────────────── -->
+  <svg style="position: absolute; width: 0; height: 0; pointer-events: none; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.9" />
+        <stop offset="35%" stop-color="#3b82f6" stop-opacity="0.9" />
+        <stop offset="70%" stop-color="#a855f7" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="#10b981" stop-opacity="0.9" />
+      </linearGradient>
+      <linearGradient id="waterGlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.4" />
+        <stop offset="50%" stop-color="#6366f1" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="#10b981" stop-opacity="0.4" />
+      </linearGradient>
+      <linearGradient id="cyanBlueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#06b6d4" />
+        <stop offset="100%" stop-color="#3b82f6" />
+      </linearGradient>
+      <linearGradient id="bluePurpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3b82f6" />
+        <stop offset="100%" stop-color="#a855f7" />
+      </linearGradient>
+      <linearGradient id="purpleEmeraldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#a855f7" />
+        <stop offset="100%" stop-color="#10b981" />
+      </linearGradient>
+    </defs>
+  </svg>
+
   <!-- ─── 3D SPATIAL PERSPECTIVE VIEWPORT ──────────────────────────── -->
   <div id="spatial-viewport" class="spatial-viewport">
     <div class="grid-floor"></div>
 
     <div class="spatial-scene">
       <div id="ribbon-track" class="ribbon-track">
+
+        <!-- CONTINUOUS WATER RIVER SPANNING THE CARDS -->
+        <svg class="water-river-backdrop" viewBox="0 0 3200 140" preserveAspectRatio="none">
+          <path class="water-glow-wave" d="M0,70 Q200,20 400,70 T800,70 T1200,70 T1600,70 T2000,70 T2400,70 T2800,70 T3200,70" />
+          <path class="water-stream-path" d="M0,70 Q200,20 400,70 T800,70 T1200,70 T1600,70 T2000,70 T2400,70 T2800,70 T3200,70" />
+        </svg>
         
         <!-- CARD 0: INBOUND & SECURITY QUARANTINE -->
-        <div onclick="openSingular(0)" class="ribbon-card p-7 flex flex-col justify-between group" data-index="0">
+        <div onclick="openSingular(0)" class="ribbon-card p-8 flex flex-col justify-between group" data-index="0">
+          <div class="fluid-port-right"></div>
+          
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">
-              MODULE 01 • INBOUND
-            </span>
-            <div class="w-9 h-9 rounded-full bg-white/10 group-hover:bg-brand-500 group-hover:text-white flex items-center justify-center transition text-slate-300">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono font-bold px-3 py-1.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                MODULE 01 • INGESTION
+              </span>
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-1.5 animate-pulse"></span>
+                Step 1 of 4
+              </span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-white/10 group-hover:bg-brand-500 group-hover:text-white flex items-center justify-center transition text-slate-300">
               <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <h3 class="font-display font-extrabold text-2xl text-white group-hover:text-brand-300 transition">
+          <div class="space-y-3">
+            <h3 class="font-display font-extrabold text-3xl text-white group-hover:text-brand-300 transition tracking-tight">
               Smart Inbound Stream & Quarantine
             </h3>
-            <p class="text-xs text-slate-400 font-sans leading-relaxed line-clamp-2">
-              Sub-5ms ML gatekeeper + Dual-LLM anti-injection isolation filter intercepting adversarial payloads.
+            <p class="text-sm text-slate-400 font-sans leading-relaxed line-clamp-3">
+              Sub-5ms ML gatekeeper with Dual-LLM anti-injection isolation layer intercepting malicious payloads before reasoning.
             </p>
+            <div class="flex items-center space-x-2 pt-2">
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">TF-IDF + SGD</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Dual-LLM Sandboxing</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Passive-Aggressive Learner</span>
+            </div>
           </div>
 
-          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
             <span class="flex items-center space-x-1.5 text-cyber-emerald">
-              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
               <span>100% Injection Block Rate</span>
             </span>
-            <span>Click to Expand ↗</span>
+            <span class="text-brand-300 group-hover:translate-x-1 transition-transform">Click to Expand ↗</span>
+          </div>
+          <div class="water-wave-bar"><div class="water-wave-glow"></div></div>
+        </div>
+
+        <!-- FLUID BRIDGE 1: CARD 0 ➔ CARD 1 -->
+        <div class="fluid-bridge">
+          <div class="fluid-tube">
+            <div class="fluid-tube-glow"></div>
+            <div class="fluid-tube-core"></div>
+            <div class="fluid-flowing-pulse"></div>
+            <div class="fluid-particle-stream">
+              <span class="fluid-dot d1"></span>
+              <span class="fluid-dot d2"></span>
+              <span class="fluid-dot d3"></span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/30 text-[9px] font-mono text-cyber-cyan shadow-[0_0_12px_rgba(6,182,212,0.4)]">
+            <i data-lucide="waves" class="w-3 h-3 animate-pulse"></i>
+            <span>FLOW</span>
           </div>
         </div>
 
         <!-- CARD 1: NEURAL COPILOT & WORKFLOW STUDIO -->
-        <div onclick="openSingular(1)" class="ribbon-card p-7 flex flex-col justify-between group" data-index="1">
+        <div onclick="openSingular(1)" class="ribbon-card p-8 flex flex-col justify-between group" data-index="1">
+          <div class="fluid-port-left"></div>
+          <div class="fluid-port-right"></div>
+
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30">
-              MODULE 02 • COPILOT
-            </span>
-            <div class="w-9 h-9 rounded-full bg-white/10 group-hover:bg-cyber-cyan group-hover:text-obsidian-950 flex items-center justify-center transition text-slate-300">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono font-bold px-3 py-1.5 rounded-full bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30">
+                MODULE 02 • COPILOT
+              </span>
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyber-cyan mr-1.5 animate-pulse"></span>
+                Step 2 of 4
+              </span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-white/10 group-hover:bg-cyber-cyan group-hover:text-obsidian-950 flex items-center justify-center transition text-slate-300">
               <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <h3 class="font-display font-extrabold text-2xl text-white group-hover:text-cyber-cyan transition">
+          <div class="space-y-3">
+            <h3 class="font-display font-extrabold text-3xl text-white group-hover:text-cyber-cyan transition tracking-tight">
               Neural Copilot & Live Console
             </h3>
-            <p class="text-xs text-slate-400 font-sans leading-relaxed line-clamp-2">
-              Real-time token streaming WebSocket with deterministic Obsidian vault, calendar, and email tools.
+            <p class="text-sm text-slate-400 font-sans leading-relaxed line-clamp-3">
+              Real-time token streaming WebSocket interface with deterministic Obsidian vault, calendar, and email tools.
             </p>
+            <div class="flex items-center space-x-2 pt-2">
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">WebSocket /ws/chat</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Deterministic Tool Chain</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Live Token Stream</span>
+            </div>
           </div>
 
-          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
             <span class="flex items-center space-x-1.5 text-cyber-cyan">
-              <i data-lucide="radio" class="w-3.5 h-3.5 animate-pulse"></i>
+              <i data-lucide="radio" class="w-4 h-4 animate-pulse"></i>
               <span>Live Streaming Active</span>
             </span>
-            <span>Click to Expand ↗</span>
+            <span class="text-cyber-cyan group-hover:translate-x-1 transition-transform">Click to Expand ↗</span>
+          </div>
+          <div class="water-wave-bar"><div class="water-wave-glow"></div></div>
+        </div>
+
+        <!-- FLUID BRIDGE 2: CARD 1 ➔ CARD 2 -->
+        <div class="fluid-bridge">
+          <div class="fluid-tube">
+            <div class="fluid-tube-glow"></div>
+            <div class="fluid-tube-core" style="background: linear-gradient(90deg, #3b82f6, #6366f1, #a855f7); background-size: 200% 100%;"></div>
+            <div class="fluid-flowing-pulse"></div>
+            <div class="fluid-particle-stream">
+              <span class="fluid-dot d1"></span>
+              <span class="fluid-dot d2"></span>
+              <span class="fluid-dot d3"></span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyber-purple/10 border border-cyber-purple/30 text-[9px] font-mono text-cyber-purple shadow-[0_0_12px_rgba(168,85,247,0.4)]">
+            <i data-lucide="waves" class="w-3 h-3 animate-pulse"></i>
+            <span>FLOW</span>
           </div>
         </div>
 
         <!-- CARD 2: 5-TIER PIPELINE DAG -->
-        <div onclick="openSingular(2)" class="ribbon-card p-7 flex flex-col justify-between group" data-index="2">
+        <div onclick="openSingular(2)" class="ribbon-card p-8 flex flex-col justify-between group" data-index="2">
+          <div class="fluid-port-left"></div>
+          <div class="fluid-port-right"></div>
+
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30">
-              MODULE 03 • ARCHITECTURE
-            </span>
-            <div class="w-9 h-9 rounded-full bg-white/10 group-hover:bg-cyber-purple group-hover:text-white flex items-center justify-center transition text-slate-300">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono font-bold px-3 py-1.5 rounded-full bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30">
+                MODULE 03 • STATE MACHINE
+              </span>
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple mr-1.5 animate-pulse"></span>
+                Step 3 of 4
+              </span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-white/10 group-hover:bg-cyber-purple group-hover:text-white flex items-center justify-center transition text-slate-300">
               <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <h3 class="font-display font-extrabold text-2xl text-white group-hover:text-cyber-purple transition">
+          <div class="space-y-3">
+            <h3 class="font-display font-extrabold text-3xl text-white group-hover:text-cyber-purple transition tracking-tight">
               5-Tier DAG & State Machine
             </h3>
-            <p class="text-xs text-slate-400 font-sans leading-relaxed line-clamp-2">
-              Stateful LangGraph DAG with SQLite checkpointing, 3-tier risk authorization, and formal test benchmarks.
+            <p class="text-sm text-slate-400 font-sans leading-relaxed line-clamp-3">
+              Stateful LangGraph DAG with thread checkpointing, 3-tier risk authorization, and formal test benchmarks.
             </p>
+            <div class="flex items-center space-x-2 pt-2">
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">LangGraph StateGraph</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Human-in-the-Loop Gate</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Memory Checkpointer</span>
+            </div>
           </div>
 
-          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
             <span class="flex items-center space-x-1.5 text-cyber-purple">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
               <span>25 / 25 Passing Tests</span>
             </span>
-            <span>Click to Expand ↗</span>
+            <span class="text-cyber-purple group-hover:translate-x-1 transition-transform">Click to Expand ↗</span>
+          </div>
+          <div class="water-wave-bar"><div class="water-wave-glow"></div></div>
+        </div>
+
+        <!-- FLUID BRIDGE 3: CARD 2 ➔ CARD 3 -->
+        <div class="fluid-bridge">
+          <div class="fluid-tube">
+            <div class="fluid-tube-glow"></div>
+            <div class="fluid-tube-core" style="background: linear-gradient(90deg, #a855f7, #6366f1, #10b981); background-size: 200% 100%;"></div>
+            <div class="fluid-flowing-pulse"></div>
+            <div class="fluid-particle-stream">
+              <span class="fluid-dot d1"></span>
+              <span class="fluid-dot d2"></span>
+              <span class="fluid-dot d3"></span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/30 text-[9px] font-mono text-cyber-emerald shadow-[0_0_12px_rgba(16,185,129,0.4)]">
+            <i data-lucide="waves" class="w-3 h-3 animate-pulse"></i>
+            <span>FLOW</span>
           </div>
         </div>
 
         <!-- CARD 3: KNOWLEDGE VAULT & RAG -->
-        <div onclick="openSingular(3)" class="ribbon-card p-7 flex flex-col justify-between group" data-index="3">
+        <div onclick="openSingular(3)" class="ribbon-card p-8 flex flex-col justify-between group" data-index="3">
+          <div class="fluid-port-left"></div>
+
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-cyber-emerald/20 text-cyber-emerald border border-cyber-emerald/30">
-              MODULE 04 • MEMORY
-            </span>
-            <div class="w-9 h-9 rounded-full bg-white/10 group-hover:bg-cyber-emerald group-hover:text-obsidian-950 flex items-center justify-center transition text-slate-300">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono font-bold px-3 py-1.5 rounded-full bg-cyber-emerald/20 text-cyber-emerald border border-cyber-emerald/30">
+                MODULE 04 • MEMORY & RAG
+              </span>
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyber-emerald mr-1.5 animate-pulse"></span>
+                Step 4 of 4
+              </span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-white/10 group-hover:bg-cyber-emerald group-hover:text-obsidian-950 flex items-center justify-center transition text-slate-300">
               <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <h3 class="font-display font-extrabold text-2xl text-white group-hover:text-cyber-emerald transition">
+          <div class="space-y-3">
+            <h3 class="font-display font-extrabold text-3xl text-white group-hover:text-cyber-emerald transition tracking-tight">
               Knowledge Vault & Hybrid RAG
             </h3>
-            <p class="text-xs text-slate-400 font-sans leading-relaxed line-clamp-2">
+            <p class="text-sm text-slate-400 font-sans leading-relaxed line-clamp-3">
               Dense vector search + BM25 keyword matching + 14-day temporal decay over Obsidian and Qdrant memory.
             </p>
+            <div class="flex items-center space-x-2 pt-2">
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Dense 384d Embeddings</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">BM25 + RRF Fusion</span>
+              <span class="text-[10px] font-mono px-2 py-1 rounded bg-obsidian-800 text-slate-300 border border-white/5">Cross-Encoder Re-rank</span>
+            </div>
           </div>
 
-          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <div class="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
             <span class="flex items-center space-x-1.5 text-cyber-emerald">
-              <i data-lucide="database" class="w-3.5 h-3.5"></i>
+              <i data-lucide="database" class="w-4 h-4"></i>
               <span>HitRate@3: 80.0% • MRR: 0.73</span>
             </span>
-            <span>Click to Expand ↗</span>
+            <span class="text-cyber-emerald group-hover:translate-x-1 transition-transform">Click to Expand ↗</span>
           </div>
+          <div class="water-wave-bar"><div class="water-wave-glow"></div></div>
         </div>
 
       </div>
@@ -762,7 +1098,7 @@ DASHBOARD_HTML = """
     const ribbonTrack = document.getElementById('ribbon-track');
     const cards = Array.from(document.querySelectorAll('.ribbon-card'));
     const totalCards = cards.length;
-    const cardWidth = 540 + 50; // card width + gap
+    const cardWidth = 660 + 70; // card width + fluid connector bridge
     
     let currentX = 0;
     let targetX = 0;
