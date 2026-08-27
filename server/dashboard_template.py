@@ -408,6 +408,21 @@ DASHBOARD_HTML = """
       animation: topologyFlow 1.2s linear infinite;
     }
 
+    /* Text Selection Enablement */
+    body {
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+    .msg-content, .msg-content *, p, pre, code, .bubble-card, .user-bubble, .select-text {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      cursor: text;
+    }
+    .copy-btn, .workspace-pill, button {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+
     /* Modal Backdrop */
     .theme-modal-backdrop {
       background: rgba(0, 0, 0, 0.72);
@@ -415,7 +430,7 @@ DASHBOARD_HTML = """
     }
   </style>
 </head>
-<body class="flex flex-col h-screen w-screen select-none relative overflow-hidden">
+<body class="flex flex-col h-screen w-screen relative overflow-hidden">
 
   <!-- ─── 0. LIVE WALLPAPER, VIDEO & BACKGROUND LAYERS ──────────────── -->
   <!-- Live Canvas Engine (Matrix, Particles, Synthwave, Deep Space, Tokyo Rain, Aurora) -->
@@ -1057,6 +1072,10 @@ DASHBOARD_HTML = """
               </div>
 
               <div class="flex items-center space-x-2">
+                <button onclick="copyEntireActiveChat(this)" title="Copy Entire Conversation" class="px-2.5 py-1 rounded-lg theme-card border text-slate-300 text-xs flex items-center space-x-1 hover:text-white transition cursor-pointer">
+                  <i data-lucide="copy" class="w-3 h-3"></i>
+                  <span>Copy Chat</span>
+                </button>
                 <button onclick="exportActiveChatMarkdown()" title="Export Markdown" class="px-2.5 py-1 rounded-lg theme-card border text-slate-300 text-xs flex items-center space-x-1 hover:text-white transition cursor-pointer">
                   <i data-lucide="download" class="w-3 h-3"></i>
                   <span>Export</span>
@@ -2480,10 +2499,17 @@ DASHBOARD_HTML = """
 
     function createUserMessageBubble(text) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'flex items-start justify-end space-x-3';
+      wrapper.className = 'flex items-start justify-end space-x-3 group';
       wrapper.innerHTML = `
-        <div class="p-4 rounded-2xl bg-indigo-600 text-white max-w-2xl">
-          <p class="text-xs leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</p>
+        <div class="user-bubble p-4 rounded-2xl bg-indigo-600 text-white max-w-2xl space-y-1.5 relative shadow-md">
+          <div class="flex items-center justify-between border-b border-white/20 pb-1">
+            <span class="text-[10px] font-mono text-indigo-200">You</span>
+            <button onclick="copyMessageText(this)" title="Copy message" class="copy-btn text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 hover:bg-black/40 text-indigo-100 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+              <i data-lucide="copy" class="w-2.5 h-2.5"></i>
+              <span>Copy</span>
+            </button>
+          </div>
+          <p class="text-xs leading-relaxed whitespace-pre-wrap select-text msg-content">${escapeHtml(text)}</p>
         </div>
         <div class="w-8 h-8 rounded-xl bg-slate-700 flex items-center justify-center text-white flex-shrink-0">
           <i data-lucide="user" class="w-4 h-4"></i>
@@ -2494,14 +2520,22 @@ DASHBOARD_HTML = """
 
     function createAssistantMessageBubble(text = '', tool = null, runId = null) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'flex items-start space-x-3';
+      wrapper.className = 'flex items-start space-x-3 group';
       wrapper.innerHTML = `
         <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
           <i data-lucide="bot" class="w-4 h-4"></i>
         </div>
-        <div class="bubble-card p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2">
-          <div class="text-xs font-semibold text-cyan-300">Personal AI</div>
-          <div class="text-xs text-slate-200 leading-relaxed msg-content">${text ? formatMarkdownText(text) : ''}</div>
+        <div class="bubble-card p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2 relative">
+          <div class="flex items-center justify-between border-b border-white/5 pb-1.5">
+            <div class="text-xs font-semibold text-cyan-300 flex items-center space-x-1.5">
+              <span>Personal AI</span>
+            </div>
+            <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div class="text-xs text-slate-200 leading-relaxed msg-content select-text">${text ? formatMarkdownText(text) : ''}</div>
           ${runId ? `
             <div class="pt-2 flex items-center space-x-2 border-t border-white/5">
               <button onclick="inspectSpecificTrace('${runId}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
@@ -2737,6 +2771,70 @@ DASHBOARD_HTML = """
       a.download = safeTitle + '_chat.md';
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    async function copyEntireActiveChat(btn) {
+      if (!currentSessionMessages || currentSessionMessages.length === 0) {
+        return;
+      }
+      const title = document.getElementById('current-chat-title')?.textContent || 'Conversation';
+      let text = `# ${title}\n\n`;
+      currentSessionMessages.forEach(m => {
+        const role = m.role === 'user' ? 'User' : 'Personal AI';
+        text += `[${role}]:\n${m.content}\n\n`;
+      });
+
+      try {
+        await navigator.clipboard.writeText(text.trim());
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i><span class="text-emerald-400">Copied!</span>';
+        refreshIcons();
+        playHudBeep(1400);
+        setTimeout(() => {
+          btn.innerHTML = origHTML;
+          refreshIcons();
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy full chat:', err);
+      }
+    }
+
+    async function copyMessageText(btn) {
+      try {
+        const card = btn.closest('.bubble-card') || btn.closest('.user-bubble') || btn.closest('div');
+        const contentEl = card.querySelector('.msg-content') || card;
+        const textToCopy = (contentEl.innerText || contentEl.textContent || '').trim();
+        if (!textToCopy) return;
+        await navigator.clipboard.writeText(textToCopy);
+        
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i><span class="text-emerald-400 text-[10px]">Copied!</span>';
+        refreshIcons();
+        playHudBeep(1400);
+        setTimeout(() => {
+          btn.innerHTML = origHTML;
+          refreshIcons();
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy message:', err);
+      }
+    }
+
+    async function copyCodeSnippet(btn) {
+      try {
+        const container = btn.closest('.code-container') || btn.closest('div');
+        const pre = container ? container.querySelector('pre') : null;
+        if (!pre) return;
+        const textToCopy = (pre.innerText || pre.textContent || '').trim();
+        await navigator.clipboard.writeText(textToCopy);
+        
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Copied!';
+        playHudBeep(1400);
+        setTimeout(() => {
+          if (span) span.textContent = 'Copy';
+        }, 2000);
+      } catch (e) {}
     }
 
     // ── Traces (LangSmith Inspector) ──
@@ -3063,7 +3161,21 @@ DASHBOARD_HTML = """
 
       // 1. Basic formatting & code blocks
       text = text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
-      text = text.split('```').map(function(chunk, i) { return i % 2 === 1 ? '<pre class="p-3 my-2 rounded-xl bg-black/60 font-mono text-[11px] text-cyan-300 overflow-x-auto border border-white/10">' + chunk + '</pre>' : chunk; }).join('');
+      text = text.split('```').map(function(chunk, i) {
+        if (i % 2 === 1) {
+          return '<div class="code-container relative my-2.5 rounded-xl border border-white/10 overflow-hidden bg-black/70">' +
+            '<div class="flex items-center justify-between px-3 py-1 bg-black/60 border-b border-white/5 text-[10px] font-mono text-slate-400">' +
+              '<span class="text-cyan-400">code snippet</span>' +
+              '<button onclick="copyCodeSnippet(this)" class="copy-btn hover:text-white text-slate-400 flex items-center space-x-1 cursor-pointer transition">' +
+                '<i data-lucide="copy" class="w-3 h-3"></i>' +
+                '<span>Copy</span>' +
+              '</button>' +
+            '</div>' +
+            '<pre class="p-3 font-mono text-[11px] text-cyan-300 overflow-x-auto select-text">' + chunk + '</pre>' +
+          '</div>';
+        }
+        return chunk;
+      }).join('');
       text = text.split('`').map(function(chunk, i) { return i % 2 === 1 ? '<code class="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-mono text-[11px] border border-white/5">' + chunk + '</code>' : chunk; }).join('');
       text = text.split('**').map(function(chunk, i) { return i % 2 === 1 ? '<b>' + chunk + '</b>' : chunk; }).join('');
       text = text.split('*').map(function(chunk, i) { return i % 2 === 1 ? '<i>' + chunk + '</i>' : chunk; }).join('');
