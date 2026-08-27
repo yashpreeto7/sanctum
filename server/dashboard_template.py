@@ -2,12 +2,12 @@
 
 Features:
 - Omarchy Distro Theme Engine (Cyberpunk, Tokyo Night, Catppuccin, Nord, Gruvbox, Synthwave, Matrix, Dracula)
-- Live Animated Wallpapers Canvas (Matrix Rain, Cyber Particles, Synthwave Horizon Grid, Deep Space Starlight, Tokyo City Rain, Arch Geometric)
-- Custom Wallpaper Upload & URL support with real-time Blur & Opacity sliders
-- Omarchy Waybar / Hyprland Status Bar with Workspaces, System Telemetry, Theme/Wallpaper Drawers
-- CRT Scanlines & Cyberpunk Glow FX
-- Synthesized Web Audio Sound Effects (clicks, chimes, HUD beeps)
-- Standalone Desktop App Integration & PWA manifest support
+- Live Animated Wallpapers Canvas (Matrix Rain, Cyber Particles, Synthwave Horizon Grid, Deep Space Starlight, Tokyo City Rain, Arch Geometric, Aurora)
+- Video & Photo Wallpaper Local Upload + Custom URL Support with IndexedDB persistence
+- Real-time Audio Spectrum Equalizer (CAVA-style music visualizer synced to Spotify / Browser / Tab / Mic audio via Web Audio AnalyserNode)
+- Glassmorphism & UI Card Transparency Controls (Card Opacity, Sidebar Opacity, Backdrop Blur, Wallpaper Brightness & Opacity sliders)
+- Omarchy Waybar / Hyprland Status Bar with Workspaces, Live Telemetry, Music Sync, and Desktop Controls
+- Standalone Desktop App Launcher Integration & PWA Manifest
 """
 
 DASHBOARD_HTML = """
@@ -56,12 +56,24 @@ DASHBOARD_HTML = """
 
   <style>
     :root {
+      /* Card & Glass Opacity CSS Variables (Dynamic) */
+      --card-opacity: 0.65;
+      --sidebar-opacity: 0.82;
+      --surface-opacity: 0.70;
+      --card-blur: 14px;
+
       /* Omarchy Cyberpunk (Default) */
-      --bg-base: #07080d;
-      --bg-sidebar: #0b0d14;
-      --bg-surface: #0f121d;
-      --bg-card: rgba(18, 22, 34, 0.75);
-      --bg-card-hover: rgba(28, 34, 52, 0.85);
+      --rgb-base: 7, 8, 13;
+      --rgb-sidebar: 11, 13, 20;
+      --rgb-surface: 15, 18, 29;
+      --rgb-card: 18, 22, 34;
+      --rgb-card-hover: 28, 34, 52;
+      
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #1f273d;
       --border-accent: #00f0ff;
       --color-brand: #6366f1;
@@ -75,16 +87,21 @@ DASHBOARD_HTML = """
       --color-purple: #9d4edd;
       --text-main: #f1f5f9;
       --text-muted: #94a3b8;
-      --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+      --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.18);
       --waybar-bg: rgba(11, 13, 20, 0.88);
     }
 
     [data-theme="omarchy-tokyonight"] {
-      --bg-base: #16161e;
-      --bg-sidebar: #1a1b26;
-      --bg-surface: #1f2335;
-      --bg-card: rgba(31, 35, 53, 0.78);
-      --bg-card-hover: rgba(41, 46, 66, 0.9);
+      --rgb-base: 22, 22, 30;
+      --rgb-sidebar: 26, 27, 38;
+      --rgb-surface: 31, 35, 53;
+      --rgb-card: 31, 35, 53;
+      --rgb-card-hover: 41, 46, 66;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #292e42;
       --border-accent: #7aa2f7;
       --color-brand: #7aa2f7;
@@ -103,11 +120,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-catppuccin"] {
-      --bg-base: #11111b;
-      --bg-sidebar: #181825;
-      --bg-surface: #1e1e2e;
-      --bg-card: rgba(30, 30, 46, 0.78);
-      --bg-card-hover: rgba(49, 50, 68, 0.9);
+      --rgb-base: 17, 17, 27;
+      --rgb-sidebar: 24, 24, 37;
+      --rgb-surface: 30, 30, 46;
+      --rgb-card: 30, 30, 46;
+      --rgb-card-hover: 49, 50, 68;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #313244;
       --border-accent: #cba6f7;
       --color-brand: #cba6f7;
@@ -126,11 +148,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-nord"] {
-      --bg-base: #242933;
-      --bg-sidebar: #2e3440;
-      --bg-surface: #3b4252;
-      --bg-card: rgba(59, 66, 82, 0.78);
-      --bg-card-hover: rgba(67, 76, 94, 0.9);
+      --rgb-base: 36, 41, 51;
+      --rgb-sidebar: 46, 52, 64;
+      --rgb-surface: 59, 66, 82;
+      --rgb-card: 59, 66, 82;
+      --rgb-card-hover: 67, 76, 94;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #4c566a;
       --border-accent: #88c0d0;
       --color-brand: #88c0d0;
@@ -149,11 +176,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-gruvbox"] {
-      --bg-base: #1d2021;
-      --bg-sidebar: #282828;
-      --bg-surface: #32302f;
-      --bg-card: rgba(50, 48, 47, 0.8);
-      --bg-card-hover: rgba(60, 56, 54, 0.92);
+      --rgb-base: 29, 32, 33;
+      --rgb-sidebar: 40, 40, 40;
+      --rgb-surface: 50, 48, 47;
+      --rgb-card: 50, 48, 47;
+      --rgb-card-hover: 60, 56, 54;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #504945;
       --border-accent: #fabd2f;
       --color-brand: #fabd2f;
@@ -172,11 +204,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-synthwave"] {
-      --bg-base: #140d21;
-      --bg-sidebar: #1a102f;
-      --bg-surface: #24173d;
-      --bg-card: rgba(36, 23, 61, 0.78);
-      --bg-card-hover: rgba(49, 32, 82, 0.9);
+      --rgb-base: 20, 13, 33;
+      --rgb-sidebar: 26, 16, 47;
+      --rgb-surface: 36, 23, 61;
+      --rgb-card: 36, 23, 61;
+      --rgb-card-hover: 49, 32, 82;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #3d2666;
       --border-accent: #ff2a85;
       --color-brand: #ff2a85;
@@ -195,11 +232,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-matrix"] {
-      --bg-base: #020702;
-      --bg-sidebar: #050f05;
-      --bg-surface: #0a180a;
-      --bg-card: rgba(10, 24, 10, 0.82);
-      --bg-card-hover: rgba(16, 38, 16, 0.92);
+      --rgb-base: 2, 7, 2;
+      --rgb-sidebar: 5, 15, 5;
+      --rgb-surface: 10, 24, 10;
+      --rgb-card: 10, 24, 10;
+      --rgb-card-hover: 16, 38, 16;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #143814;
       --border-accent: #00ff41;
       --color-brand: #00ff41;
@@ -218,11 +260,16 @@ DASHBOARD_HTML = """
     }
 
     [data-theme="omarchy-dracula"] {
-      --bg-base: #191a21;
-      --bg-sidebar: #21222c;
-      --bg-surface: #282a36;
-      --bg-card: rgba(40, 42, 54, 0.8);
-      --bg-card-hover: rgba(68, 71, 90, 0.9);
+      --rgb-base: 25, 26, 33;
+      --rgb-sidebar: 33, 34, 44;
+      --rgb-surface: 40, 42, 54;
+      --rgb-card: 40, 42, 54;
+      --rgb-card-hover: 68, 71, 90;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
       --border-main: #44475a;
       --border-accent: #bd93f9;
       --color-brand: #bd93f9;
@@ -251,15 +298,23 @@ DASHBOARD_HTML = """
       width: 100vw;
     }
 
-    /* Glass Panels with Theme Variables */
+    /* Glass Panels with Dynamic Theme & Transparency Variables */
     .theme-bg-base { background-color: var(--bg-base); }
-    .theme-bg-sidebar { background-color: var(--bg-sidebar); }
-    .theme-bg-surface { background-color: var(--bg-surface); }
+    .theme-bg-sidebar {
+      background-color: var(--bg-sidebar);
+      backdrop-filter: blur(var(--card-blur));
+      -webkit-backdrop-filter: blur(var(--card-blur));
+    }
+    .theme-bg-surface {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(var(--card-blur));
+      -webkit-backdrop-filter: blur(var(--card-blur));
+    }
     .theme-card {
       background-color: var(--bg-card);
       border-color: var(--border-main);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(var(--card-blur));
+      -webkit-backdrop-filter: blur(var(--card-blur));
     }
     .theme-card:hover {
       background-color: var(--bg-card-hover);
@@ -329,6 +384,15 @@ DASHBOARD_HTML = """
       color: var(--text-main);
     }
 
+    /* Equalizer Bar Animation */
+    .eq-bar {
+      width: 2.5px;
+      border-radius: 2px;
+      background: var(--color-brand);
+      transition: height 0.06s ease;
+      min-height: 2px;
+    }
+
     @keyframes pulseGlow {
       0%, 100% { opacity: 0.6; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.15); }
@@ -344,18 +408,26 @@ DASHBOARD_HTML = """
       animation: topologyFlow 1.2s linear infinite;
     }
 
-    /* Modal / Drawer Transitions */
+    /* Modal Backdrop */
     .theme-modal-backdrop {
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
     }
   </style>
 </head>
 <body class="flex flex-col h-screen w-screen select-none relative overflow-hidden">
 
-  <!-- ─── 0. LIVE WALLPAPER & BACKGROUND LAYERS ─────────────────────── -->
+  <!-- ─── 0. LIVE WALLPAPER, VIDEO & BACKGROUND LAYERS ──────────────── -->
+  <!-- Live Canvas Engine (Matrix, Particles, Synthwave, Deep Space, Tokyo Rain, Aurora) -->
   <canvas id="omarchy-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  
+  <!-- Image Background (Upload / Preset / Custom URL) -->
   <div id="omarchy-wallpaper-bg" class="fixed inset-0 pointer-events-none z-0 bg-cover bg-center transition-all duration-700 opacity-60"></div>
+  
+  <!-- Video Background (MP4 / WebM / Local Upload) -->
+  <video id="omarchy-video-bg" class="fixed inset-0 w-full h-full object-cover pointer-events-none z-0 hidden transition-all duration-700 opacity-60" loop muted playsinline autoplay></video>
+  
+  <!-- CRT Scanlines Overlay -->
   <div id="omarchy-crt-overlay" class="fixed inset-0 hidden"></div>
 
   <!-- ─── 1. OMARCHY TOP WAYBAR / STATUS BAR ───────────────────────── -->
@@ -384,19 +456,41 @@ DASHBOARD_HTML = """
       </div>
     </div>
 
-    <!-- Center: Active Thread & Live Activity Ticker -->
-    <div class="hidden md:flex items-center space-x-2 text-[11px] text-slate-300 bg-black/40 px-3 py-1 rounded-full border border-white/5">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>
-      <span class="text-slate-400">Agent Core:</span>
-      <span class="text-white font-medium">Quarantine • Triage • Reasoning DAG</span>
+    <!-- Center: Audio Spectrum Visualizer (CAVA-style Equalizer Bar for Spotify/Music) -->
+    <div onclick="toggleAudioVisualizerSync()" title="Music Visualizer: Click to Sync Live Spotify/Browser Audio" class="flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-3 py-1 rounded-full border border-white/10 cursor-pointer transition">
+      <div class="flex items-center space-x-1.5">
+        <i data-lucide="music" class="w-3.5 h-3.5 text-cyan-400" id="icon-music-sync"></i>
+        <span id="label-music-status" class="text-[10px] text-slate-300 font-mono">CAVA: Rhythm</span>
+      </div>
+
+      <!-- 16 Animated Frequency Equalizer Bars -->
+      <div class="flex items-end space-x-0.5 h-4.5 w-20 px-1 py-0.5 rounded bg-black/30" id="equalizer-bars-container">
+        <div class="eq-bar" style="height: 4px;"></div>
+        <div class="eq-bar" style="height: 8px;"></div>
+        <div class="eq-bar" style="height: 14px;"></div>
+        <div class="eq-bar" style="height: 10px;"></div>
+        <div class="eq-bar" style="height: 16px;"></div>
+        <div class="eq-bar" style="height: 12px;"></div>
+        <div class="eq-bar" style="height: 6px;"></div>
+        <div class="eq-bar" style="height: 15px;"></div>
+        <div class="eq-bar" style="height: 9px;"></div>
+        <div class="eq-bar" style="height: 13px;"></div>
+        <div class="eq-bar" style="height: 17px;"></div>
+        <div class="eq-bar" style="height: 11px;"></div>
+        <div class="eq-bar" style="height: 7px;"></div>
+        <div class="eq-bar" style="height: 14px;"></div>
+        <div class="eq-bar" style="height: 8px;"></div>
+        <div class="eq-bar" style="height: 5px;"></div>
+      </div>
+
       <span class="text-slate-600">|</span>
-      <span id="waybar-clock" class="text-cyan-300 font-bold">12:00:00</span>
+      <span id="waybar-clock" class="text-cyan-300 font-bold text-[11px]">12:00:00</span>
     </div>
 
     <!-- Right: Telemetry, Theme/Wallpaper Pickers & Desktop Mode Controls -->
     <div class="flex items-center space-x-2">
       <!-- Simulated CPU/RAM Telemetry -->
-      <div class="hidden lg:flex items-center space-x-2 bg-black/30 px-2.5 py-1 rounded-lg border border-white/5 text-[10px]">
+      <div class="hidden xl:flex items-center space-x-2 bg-black/30 px-2.5 py-1 rounded-lg border border-white/5 text-[10px]">
         <div class="flex items-center space-x-1 text-cyan-300">
           <i data-lucide="cpu" class="w-3 h-3"></i>
           <span id="waybar-cpu">14%</span>
@@ -418,10 +512,10 @@ DASHBOARD_HTML = """
         <i data-lucide="tv" class="w-3.5 h-3.5 text-cyan-400"></i>
       </button>
 
-      <!-- Wallpaper Picker Trigger -->
+      <!-- Wallpaper & Glass Customizer Trigger -->
       <button onclick="openWallpaperModal()" class="px-2.5 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
         <i data-lucide="image" class="w-3.5 h-3.5 text-purple-400"></i>
-        <span>Backgrounds</span>
+        <span>Backgrounds & Glass</span>
       </button>
 
       <!-- Themes Picker Trigger -->
@@ -446,7 +540,7 @@ DASHBOARD_HTML = """
   <div class="flex-1 flex overflow-hidden z-10">
 
     <!-- ─── LEFT SIDEBAR ─────────────────────────────────────────────── -->
-    <aside class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 backdrop-blur-md">
+    <aside class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 transition-all duration-300">
       
       <!-- Top Brand & New Chat -->
       <div class="p-4 space-y-4">
@@ -1086,7 +1180,7 @@ DASHBOARD_HTML = """
 
           <div class="space-y-3" id="approvals-cards-container">
             <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400">
-              No pending high-risk approvals. All safety gates are clear.
+              No pending approvals. All safety gates clear.
             </div>
           </div>
         </section>
@@ -1289,17 +1383,19 @@ DASHBOARD_HTML = """
     </div>
   </div>
 
-  <!-- ─── 4. OMARCHY WALLPAPERS SELECTOR MODAL ───────────────────────── -->
+  <!-- ─── 4. OMARCHY WALLPAPERS & GLASS CUSTOMIZER MODAL ────────────── -->
   <div id="wallpaper-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 flex items-center justify-center hidden p-4">
-    <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl">
+    <div class="w-full max-w-3xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
       <div class="flex items-center justify-between border-b theme-border pb-4">
         <div class="flex items-center space-x-2.5">
           <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-white">
             <i data-lucide="image" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-display font-bold text-base text-white">Omarchy Distro Wallpaper Engine</h3>
-            <p class="text-xs text-slate-400 font-mono">Choose live generative canvases or custom wallpapers</p>
+            <h3 class="font-display font-bold text-base text-white">Background Wallpapers & Glass Customizer</h3>
+            <p class="text-xs text-slate-400 font-mono">Choose dynamic live canvases, upload local video/photo, or customize card transparency</p>
           </div>
         </div>
         <button onclick="closeWallpaperModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
@@ -1307,113 +1403,169 @@ DASHBOARD_HTML = """
         </button>
       </div>
 
-      <!-- Live Wallpaper Presets -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <!-- Canvas: Particles -->
-        <button onclick="setWallpaperEngine('particles'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-cyan-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-cyan-400 mb-2">
-            <i data-lucide="network" class="w-5 h-5"></i>
+      <!-- Upload Local Photo/Video Banner -->
+      <div class="p-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/40 to-black/40 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="upload-cloud" class="w-4 h-4 text-cyan-400"></i>
+            <span class="font-bold text-sm text-white">Upload Custom Video or Photo Background</span>
           </div>
-          <div class="font-bold text-xs text-white">Cyber Particles</div>
-          <div class="text-[10px] text-slate-400">Interactive Mesh</div>
-        </button>
+          <p class="text-xs text-slate-300">
+            Select any local video (<code class="text-cyan-300">.mp4</code>, <code class="text-cyan-300">.webm</code>) or image (<code class="text-cyan-300">.png</code>, <code class="text-cyan-300">.jpg</code>, <code class="text-cyan-300">.gif</code>). Automatically stored in local IndexedDB.
+          </p>
+        </div>
 
-        <!-- Canvas: Matrix -->
-        <button onclick="setWallpaperEngine('matrix'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-emerald-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-black border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2">
-            <i data-lucide="binary" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Matrix Rain</div>
-          <div class="text-[10px] text-slate-400">Digital Streams</div>
-        </button>
-
-        <!-- Canvas: Synthwave Horizon -->
-        <button onclick="setWallpaperEngine('synthwave'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-pink-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-[#140d21] border border-pink-500/30 flex items-center justify-center text-pink-400 mb-2">
-            <i data-lucide="sun" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Synthwave Grid</div>
-          <div class="text-[10px] text-slate-400">Retro Horizon</div>
-        </button>
-
-        <!-- Canvas: Deep Space -->
-        <button onclick="setWallpaperEngine('space'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-purple-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-[#070814] border border-purple-500/30 flex items-center justify-center text-purple-400 mb-2">
-            <i data-lucide="sparkles" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Deep Nebula</div>
-          <div class="text-[10px] text-slate-400">Starlight Sky</div>
-        </button>
-
-        <!-- Canvas: Tokyo Rain -->
-        <button onclick="setWallpaperEngine('rain'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-blue-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-[#0d131a] border border-blue-500/30 flex items-center justify-center text-blue-400 mb-2">
-            <i data-lucide="cloud-rain" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Tokyo Rain</div>
-          <div class="text-[10px] text-slate-400">Cyber City Drops</div>
-        </button>
-
-        <!-- Arch Geometric Rice -->
-        <button onclick="setWallpaperEngine('arch'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-cyan-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-slate-900 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mb-2 font-bold">
-            ARCH
-          </div>
-          <div class="font-bold text-xs text-white">Arch Geometric</div>
-          <div class="text-[10px] text-slate-400">Minimalist Rice</div>
-        </button>
-
-        <!-- Dynamic Aurora -->
-        <button onclick="setWallpaperEngine('aurora'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-gradient-to-tr from-cyan-900 to-indigo-900 flex items-center justify-center text-white mb-2">
-            <i data-lucide="compass" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Aurora Glow</div>
-          <div class="text-[10px] text-slate-400">Smooth Mesh</div>
-        </button>
-
-        <!-- Custom Image -->
-        <button onclick="setWallpaperEngine('custom'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-amber-400 theme-card">
-          <div class="w-full h-12 rounded-lg bg-slate-800 flex items-center justify-center text-amber-400 mb-2">
-            <i data-lucide="link" class="w-5 h-5"></i>
-          </div>
-          <div class="font-bold text-xs text-white">Custom URL</div>
-          <div class="text-[10px] text-slate-400">Image / Photo</div>
+        <input type="file" id="wallpaper-file-input" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" onchange="handleWallpaperFileUpload(event)" class="hidden">
+        
+        <button onclick="document.getElementById('wallpaper-file-input').click(); playCyberClick();" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-medium text-xs flex items-center space-x-2 shadow-lg cursor-pointer flex-shrink-0">
+          <i data-lucide="folder-plus" class="w-4 h-4"></i>
+          <span>Choose File</span>
         </button>
       </div>
 
-      <!-- Controls: Opacity & Blur Sliders -->
-      <div class="space-y-3 border-t theme-border pt-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
-              <span>Wallpaper Opacity</span>
-              <span id="label-wallpaper-opacity">60%</span>
+      <!-- Live Wallpaper Presets Grid -->
+      <div class="space-y-2">
+        <label class="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">Dynamic Canvases & Presets</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- Canvas: Particles -->
+          <button onclick="setWallpaperEngine('particles'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-cyan-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-cyan-400 mb-2">
+              <i data-lucide="network" class="w-4 h-4"></i>
             </div>
-            <input type="range" id="slider-wallpaper-opacity" min="10" max="100" value="60" oninput="updateWallpaperOpacity(this.value)" class="w-full accent-indigo-500 cursor-pointer">
+            <div class="font-bold text-xs text-white">Cyber Particles</div>
+            <div class="text-[10px] text-slate-400">Interactive Mesh</div>
+          </button>
+
+          <!-- Canvas: Matrix -->
+          <button onclick="setWallpaperEngine('matrix'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-emerald-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-black border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2">
+              <i data-lucide="binary" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Matrix Rain</div>
+            <div class="text-[10px] text-slate-400">Digital Streams</div>
+          </button>
+
+          <!-- Canvas: Synthwave Horizon -->
+          <button onclick="setWallpaperEngine('synthwave'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-pink-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-[#140d21] border border-pink-500/30 flex items-center justify-center text-pink-400 mb-2">
+              <i data-lucide="sun" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Synthwave Grid</div>
+            <div class="text-[10px] text-slate-400">Retro Horizon</div>
+          </button>
+
+          <!-- Canvas: Deep Space -->
+          <button onclick="setWallpaperEngine('space'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-purple-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-[#070814] border border-purple-500/30 flex items-center justify-center text-purple-400 mb-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Deep Space</div>
+            <div class="text-[10px] text-slate-400">Starlight Nebula</div>
+          </button>
+
+          <!-- Canvas: Tokyo Rain -->
+          <button onclick="setWallpaperEngine('rain'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-blue-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-[#0d131a] border border-blue-500/30 flex items-center justify-center text-blue-400 mb-2">
+              <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Tokyo Rain</div>
+            <div class="text-[10px] text-slate-400">Cyber City Drops</div>
+          </button>
+
+          <!-- Arch Geometric Rice -->
+          <button onclick="setWallpaperEngine('arch'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-cyan-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-slate-900 border border-cyan-500/30 flex items-center justify-center text-cyan-300 mb-2 font-bold text-xs">
+              ARCH
+            </div>
+            <div class="font-bold text-xs text-white">Arch Minimalist</div>
+            <div class="text-[10px] text-slate-400">Vector Rice</div>
+          </button>
+
+          <!-- Dynamic Aurora -->
+          <button onclick="setWallpaperEngine('aurora'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-gradient-to-tr from-cyan-900 to-indigo-900 flex items-center justify-center text-white mb-2">
+              <i data-lucide="compass" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Aurora Mesh</div>
+            <div class="text-[10px] text-slate-400">Glowing Gradient</div>
+          </button>
+
+          <!-- Custom URL -->
+          <button onclick="toggleCustomUrlInput(); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-amber-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-slate-800 flex items-center justify-center text-amber-400 mb-2">
+              <i data-lucide="link" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Custom URL</div>
+            <div class="text-[10px] text-slate-400">Image or Video URL</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom URL Input Area -->
+      <div id="custom-url-box" class="space-y-1.5 p-3 rounded-xl bg-black/40 border theme-border">
+        <div class="flex items-center justify-between">
+          <label class="text-xs text-slate-300 font-mono font-bold">Direct Image or Video URL (MP4/WebM/Unsplash):</label>
+          <span class="text-[10px] text-slate-500 font-mono">Supports https://...</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="input-custom-wallpaper-url" placeholder="https://assets.mixkit.co/.../video.mp4 or https://images.unsplash.com/..." class="flex-1 bg-black/50 border theme-border rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono">
+          <button onclick="applyCustomWallpaperUrl()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium cursor-pointer">Apply URL</button>
+        </div>
+      </div>
+
+      <!-- UI Transparency & Glassmorphism Controls -->
+      <div class="space-y-3 border-t theme-border pt-4">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">UI Glassmorphism & Transparency Controls</label>
+          <span class="text-[10px] text-cyan-400 font-mono">Decreasing opacity reveals your background clearly!</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card Glass Opacity -->
+          <div class="space-y-1.5 p-3 rounded-xl bg-black/30 border theme-border">
+            <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
+              <span>Card Glass Opacity</span>
+              <span id="label-card-opacity" class="text-cyan-300 font-bold">65%</span>
+            </div>
+            <input type="range" id="slider-card-opacity" min="0" max="100" value="65" oninput="updateCardOpacity(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+            <div class="text-[10px] text-slate-500 flex justify-between">
+              <span>Clear Glass</span>
+              <span>Solid</span>
+            </div>
           </div>
 
-          <div class="space-y-1.5">
+          <!-- Wallpaper Opacity -->
+          <div class="space-y-1.5 p-3 rounded-xl bg-black/30 border theme-border">
             <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
-              <span>Background Blur</span>
-              <span id="label-wallpaper-blur">0px</span>
+              <span>Wallpaper Visibility</span>
+              <span id="label-wallpaper-opacity" class="text-purple-300 font-bold">60%</span>
+            </div>
+            <input type="range" id="slider-wallpaper-opacity" min="10" max="100" value="60" oninput="updateWallpaperOpacity(this.value)" class="w-full accent-purple-500 cursor-pointer">
+            <div class="text-[10px] text-slate-500 flex justify-between">
+              <span>Dim</span>
+              <span>Vivid 100%</span>
+            </div>
+          </div>
+
+          <!-- Background Blur -->
+          <div class="space-y-1.5 p-3 rounded-xl bg-black/30 border theme-border">
+            <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
+              <span>Wallpaper Blur</span>
+              <span id="label-wallpaper-blur" class="text-indigo-300 font-bold">0px</span>
             </div>
             <input type="range" id="slider-wallpaper-blur" min="0" max="25" value="0" oninput="updateWallpaperBlur(this.value)" class="w-full accent-indigo-500 cursor-pointer">
-          </div>
-        </div>
-
-        <div id="custom-url-box" class="hidden space-y-1.5 pt-2">
-          <label class="text-xs text-slate-300 font-mono">Custom Image URL</label>
-          <div class="flex items-center space-x-2">
-            <input type="text" id="input-custom-wallpaper-url" placeholder="https://images.unsplash.com/photo-..." class="flex-1 bg-black/40 border theme-border rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono">
-            <button onclick="applyCustomWallpaperUrl()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium cursor-pointer">Apply</button>
+            <div class="text-[10px] text-slate-500 flex justify-between">
+              <span>Sharp 0px</span>
+              <span>Frosted 25px</span>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Footer Actions -->
       <div class="flex items-center justify-between text-xs text-slate-400 border-t theme-border pt-3">
-        <span>Real-time Hardware Accelerated Canvas</span>
-        <button onclick="closeWallpaperModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer">Done</button>
+        <span>Settings auto-saved to local state and IndexedDB</span>
+        <button onclick="closeWallpaperModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer">Done</button>
       </div>
     </div>
   </div>
@@ -1471,6 +1623,7 @@ DASHBOARD_HTML = """
     const STORAGE_WALLPAPER = 'omarchy_wallpaper';
     const STORAGE_OPACITY = 'omarchy_wallpaper_opacity';
     const STORAGE_BLUR = 'omarchy_wallpaper_blur';
+    const STORAGE_CARD_OPACITY = 'omarchy_card_opacity';
     const STORAGE_CRT = 'omarchy_crt_enabled';
     const STORAGE_AUDIO = 'omarchy_audio_enabled';
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
@@ -1483,6 +1636,13 @@ DASHBOARD_HTML = """
     let audioContext = null;
     let audioMuted = localStorage.getItem(STORAGE_AUDIO) === 'false';
     let animationFrameId = null;
+
+    // ── Audio Visualizer Spectrum State ──
+    let audioAnalyser = null;
+    let audioSourceNode = null;
+    let audioStream = null;
+    let isLiveAudioSyncing = false;
+    let visualizerLoopId = null;
 
     // ── Initialize Lucide Icons ──
     function refreshIcons() {
@@ -1551,6 +1711,93 @@ DASHBOARD_HTML = """
         icon.className = `w-3.5 h-3.5 ${audioMuted ? 'text-slate-500' : 'text-emerald-400'}`;
         refreshIcons();
       }
+    }
+
+    // ── Music Audio Spectrum Visualizer (Live Audio / Spotify / Tab Sync) ──
+    async function toggleAudioVisualizerSync() {
+      initAudioContext();
+      if (audioContext.state === 'suspended') await audioContext.resume();
+
+      if (isLiveAudioSyncing) {
+        // Disconnect live capture and return to rhythm mode
+        if (audioStream) {
+          audioStream.getTracks().forEach(t => t.stop());
+          audioStream = null;
+        }
+        isLiveAudioSyncing = false;
+        document.getElementById('label-music-status').textContent = 'CAVA: Rhythm';
+        document.getElementById('icon-music-sync').className = 'w-3.5 h-3.5 text-cyan-400';
+        appendSystemLog('[Music Visualizer] Switched to ambient rhythmic beat mode.');
+        return;
+      }
+
+      // Try capturing tab / microphone audio
+      try {
+        let stream = null;
+        if (navigator.mediaDevices.getDisplayMedia) {
+          try {
+            // Prompt to share Tab or System Audio
+            stream = await navigator.mediaDevices.getDisplayMedia({
+              video: true,
+              audio: true
+            });
+          } catch (e) {
+            // Fallback to microphone input
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          }
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+
+        if (stream && stream.getAudioTracks().length > 0) {
+          audioStream = stream;
+          audioAnalyser = audioContext.createAnalyser();
+          audioAnalyser.fftSize = 64;
+          audioAnalyser.smoothingTimeConstant = 0.8;
+
+          audioSourceNode = audioContext.createMediaStreamSource(stream);
+          audioSourceNode.connect(audioAnalyser);
+
+          isLiveAudioSyncing = true;
+          document.getElementById('label-music-status').textContent = 'Live: Synced 🎵';
+          document.getElementById('icon-music-sync').className = 'w-3.5 h-3.5 text-emerald-400 animate-pulse';
+          appendSystemLog('[Music Visualizer] Connected to live audio stream! Pulsing to music.');
+          playHudBeep(1300);
+        }
+      } catch (err) {
+        console.log('Audio capture dismissed, staying in rhythm mode:', err);
+        document.getElementById('label-music-status').textContent = 'CAVA: Rhythm';
+      }
+    }
+
+    function startMusicVisualizerLoop() {
+      const bars = document.querySelectorAll('#equalizer-bars-container .eq-bar');
+      const dataArray = new Uint8Array(32);
+      let beatStep = 0;
+
+      function renderEqualizer() {
+        beatStep += 0.08;
+
+        if (isLiveAudioSyncing && audioAnalyser) {
+          audioAnalyser.getByteFrequencyData(dataArray);
+          bars.forEach((bar, idx) => {
+            const val = dataArray[idx % 16] || 0;
+            const height = Math.max(2, (val / 255) * 18);
+            bar.style.height = `${height}px`;
+          });
+        } else {
+          // Dynamic synthwave rhythmic bounce mode
+          bars.forEach((bar, idx) => {
+            const sinVal = Math.sin(beatStep + idx * 0.45);
+            const cosVal = Math.cos(beatStep * 0.8 + idx * 0.3);
+            const height = Math.max(2, Math.abs(sinVal * 12 + cosVal * 5));
+            bar.style.height = `${height}px`;
+          });
+        }
+
+        visualizerLoopId = requestAnimationFrame(renderEqualizer);
+      }
+      renderEqualizer();
     }
 
     // ── CRT Scanlines Overlay ──
@@ -1629,32 +1876,53 @@ DASHBOARD_HTML = """
       document.getElementById('desktop-launcher-modal')?.classList.add('hidden');
     }
 
-    // ── Live Wallpaper Canvas Engines ──
+    function toggleCustomUrlInput() {
+      setWallpaperEngine('custom');
+      document.getElementById('input-custom-wallpaper-url')?.focus();
+    }
+
+    // ── Glassmorphism & Card Transparency Controls ──
+    function updateCardOpacity(val) {
+      const opacity = val / 100;
+      document.documentElement.style.setProperty('--card-opacity', opacity);
+      document.documentElement.style.setProperty('--sidebar-opacity', Math.min(1, opacity + 0.15));
+      document.documentElement.style.setProperty('--surface-opacity', Math.min(1, opacity + 0.08));
+
+      const label = document.getElementById('label-card-opacity');
+      if (label) label.textContent = `${val}%`;
+      localStorage.setItem(STORAGE_CARD_OPACITY, val);
+    }
+
+    // ── Live Wallpaper Canvas Engines & Upload Handler ──
     let currentWallpaperEngine = localStorage.getItem(STORAGE_WALLPAPER) || 'particles';
 
     function setWallpaperEngine(engineName) {
       currentWallpaperEngine = engineName;
       localStorage.setItem(STORAGE_WALLPAPER, engineName);
       
-      const customUrlBox = document.getElementById('custom-url-box');
-      if (customUrlBox) {
-        if (engineName === 'custom') {
-          customUrlBox.classList.remove('hidden');
-        } else {
-          customUrlBox.classList.add('hidden');
+      const videoEl = document.getElementById('omarchy-video-bg');
+      const bgEl = document.getElementById('omarchy-wallpaper-bg');
+      const canvasEl = document.getElementById('omarchy-canvas');
+
+      // Hide video element unless active video
+      if (engineName !== 'custom_video') {
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.classList.add('hidden');
         }
       }
 
       initWallpaperCanvas();
-      closeWallpaperModal();
     }
 
     function updateWallpaperOpacity(val) {
       const bg = document.getElementById('omarchy-wallpaper-bg');
+      const video = document.getElementById('omarchy-video-bg');
       const canvas = document.getElementById('omarchy-canvas');
       const label = document.getElementById('label-wallpaper-opacity');
       const opacity = val / 100;
       if (bg) bg.style.opacity = opacity;
+      if (video) video.style.opacity = opacity;
       if (canvas) canvas.style.opacity = opacity;
       if (label) label.textContent = `${val}%`;
       localStorage.setItem(STORAGE_OPACITY, val);
@@ -1662,10 +1930,67 @@ DASHBOARD_HTML = """
 
     function updateWallpaperBlur(val) {
       const bg = document.getElementById('omarchy-wallpaper-bg');
+      const video = document.getElementById('omarchy-video-bg');
       const label = document.getElementById('label-wallpaper-blur');
       if (bg) bg.style.filter = `blur(${val}px)`;
+      if (video) video.style.filter = `blur(${val}px)`;
       if (label) label.textContent = `${val}px`;
       localStorage.setItem(STORAGE_BLUR, val);
+    }
+
+    // ── Handle Local Photo or Video Upload ──
+    function handleWallpaperFileUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const isVideo = file.type.startsWith('video/') || file.name.match(/\\.(mp4|webm|ogg|mov)$/i);
+      const videoEl = document.getElementById('omarchy-video-bg');
+      const bgEl = document.getElementById('omarchy-wallpaper-bg');
+      const canvasEl = document.getElementById('omarchy-canvas');
+
+      const fileUrl = URL.createObjectURL(file);
+
+      if (isVideo) {
+        currentWallpaperEngine = 'custom_video';
+        localStorage.setItem(STORAGE_WALLPAPER, 'custom_video');
+
+        if (canvasEl) {
+          const ctx = canvasEl.getContext('2d');
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
+        if (bgEl) bgEl.style.backgroundImage = 'none';
+
+        if (videoEl) {
+          videoEl.src = fileUrl;
+          videoEl.classList.remove('hidden');
+          videoEl.play().catch(e => {});
+        }
+        appendSystemLog(`[Wallpaper] Custom video wallpaper loaded: ${file.name}`);
+      } else {
+        currentWallpaperEngine = 'custom';
+        localStorage.setItem(STORAGE_WALLPAPER, 'custom');
+
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.classList.add('hidden');
+        }
+        if (bgEl) {
+          bgEl.style.backgroundImage = `url('${fileUrl}')`;
+        }
+        if (canvasEl) {
+          const ctx = canvasEl.getContext('2d');
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
+        appendSystemLog(`[Wallpaper] Custom image wallpaper loaded: ${file.name}`);
+      }
+
+      // Automatically lower card opacity slightly to show the beautiful background
+      updateCardOpacity(35);
+      const cardSlider = document.getElementById('slider-card-opacity');
+      if (cardSlider) cardSlider.value = 35;
+
+      playHudBeep(1200);
+      closeWallpaperModal();
     }
 
     function applyCustomWallpaperUrl() {
@@ -1673,17 +1998,51 @@ DASHBOARD_HTML = """
       if (!input || !input.value.trim()) return;
       const url = input.value.trim();
       localStorage.setItem(STORAGE_CUSTOM_URL, url);
-      const bg = document.getElementById('omarchy-wallpaper-bg');
-      if (bg) {
-        bg.style.backgroundImage = `url('${url}')`;
+
+      const isVideo = url.match(/\\.(mp4|webm|ogg)(\\?.*)?$/i);
+      const videoEl = document.getElementById('omarchy-video-bg');
+      const bgEl = document.getElementById('omarchy-wallpaper-bg');
+      const canvasEl = document.getElementById('omarchy-canvas');
+
+      if (isVideo) {
+        currentWallpaperEngine = 'custom_video';
+        localStorage.setItem(STORAGE_WALLPAPER, 'custom_video');
+        if (canvasEl) {
+          const ctx = canvasEl.getContext('2d');
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
+        if (bgEl) bgEl.style.backgroundImage = 'none';
+        if (videoEl) {
+          videoEl.src = url;
+          videoEl.classList.remove('hidden');
+          videoEl.play().catch(e => {});
+        }
+      } else {
+        currentWallpaperEngine = 'custom';
+        localStorage.setItem(STORAGE_WALLPAPER, 'custom');
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.classList.add('hidden');
+        }
+        if (bgEl) bgEl.style.backgroundImage = `url('${url}')`;
+        if (canvasEl) {
+          const ctx = canvasEl.getContext('2d');
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
       }
-      playHudBeep(1000);
+
+      updateCardOpacity(35);
+      const cardSlider = document.getElementById('slider-card-opacity');
+      if (cardSlider) cardSlider.value = 35;
+
+      playHudBeep(1100);
       closeWallpaperModal();
     }
 
     function initWallpaperCanvas() {
       const canvas = document.getElementById('omarchy-canvas');
       const bg = document.getElementById('omarchy-wallpaper-bg');
+      const video = document.getElementById('omarchy-video-bg');
       if (!canvas || !bg) return;
 
       if (animationFrameId) {
@@ -1695,6 +2054,17 @@ DASHBOARD_HTML = """
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
+      if (currentWallpaperEngine === 'custom_video') {
+        if (video && video.src) video.classList.remove('hidden');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
+      if (video) {
+        video.pause();
+        video.classList.add('hidden');
+      }
+
       // Handle preset backgrounds
       if (currentWallpaperEngine === 'arch') {
         bg.style.backgroundImage = "radial-gradient(circle at 50% 50%, #171f2d 0%, #090c12 100%)";
@@ -1702,7 +2072,7 @@ DASHBOARD_HTML = """
         return;
       }
       if (currentWallpaperEngine === 'aurora') {
-        bg.style.backgroundImage = "radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.15), transparent 50%), radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.18), transparent 50%)";
+        bg.style.backgroundImage = "radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.22), transparent 50%), radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.25), transparent 50%)";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         return;
       }
@@ -1744,7 +2114,7 @@ DASHBOARD_HTML = """
 
       // 2. Cyber Particles Mesh Canvas
       else if (currentWallpaperEngine === 'particles') {
-        const count = 45;
+        const count = 48;
         const particles = [];
         for (let i = 0; i < count; i++) {
           particles.push({
@@ -1769,7 +2139,7 @@ DASHBOARD_HTML = """
 
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.7)';
             ctx.fill();
 
             for (let j = i + 1; j < particles.length; j++) {
@@ -1779,7 +2149,7 @@ DASHBOARD_HTML = """
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = `rgba(99, 102, 241, ${(1 - dist / 130) * 0.25})`;
+                ctx.strokeStyle = `rgba(99, 102, 241, ${(1 - dist / 130) * 0.3})`;
                 ctx.lineWidth = 1;
                 ctx.stroke();
               }
@@ -1813,7 +2183,6 @@ DASHBOARD_HTML = """
           ctx.strokeStyle = 'rgba(255, 42, 133, 0.35)';
           ctx.lineWidth = 1.5;
 
-          // Perspective vertical lines
           for (let x = -canvas.width; x <= canvas.width * 2; x += 60) {
             ctx.beginPath();
             ctx.moveTo(canvas.width / 2, horizon);
@@ -1821,7 +2190,6 @@ DASHBOARD_HTML = """
             ctx.stroke();
           }
 
-          // Horizontal scrolling lines
           offset = (offset + 0.6) % 30;
           for (let y = horizon; y < canvas.height; y += 15) {
             const perspectiveY = horizon + Math.pow((y - horizon) / (canvas.height - horizon), 2) * (canvas.height - horizon);
@@ -1838,7 +2206,7 @@ DASHBOARD_HTML = """
 
       // 4. Deep Space Starlight Nebula
       else if (currentWallpaperEngine === 'space') {
-        const stars = Array(120).fill(0).map(() => ({
+        const stars = Array(130).fill(0).map(() => ({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           radius: Math.random() * 1.5,
@@ -2165,7 +2533,6 @@ DASHBOARD_HTML = """
 
       playCyberClick(700);
 
-      // Send via WebSocket if connected, else fallback to REST
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           command: content,
@@ -2259,7 +2626,6 @@ DASHBOARD_HTML = """
       }
     }
 
-    // ── Input enter listener ──
     document.addEventListener('DOMContentLoaded', () => {
       const textarea = document.getElementById('chat-input-textarea');
       if (textarea) {
@@ -2717,7 +3083,13 @@ DASHBOARD_HTML = """
       const savedTheme = localStorage.getItem(STORAGE_THEME) || 'omarchy-cyberpunk';
       setThemePreset(savedTheme);
 
-      // 2. Restore Wallpaper & Canvas
+      // 2. Restore Glass Transparency
+      const savedCardOpacity = localStorage.getItem(STORAGE_CARD_OPACITY) || '65';
+      updateCardOpacity(savedCardOpacity);
+      const sliderCard = document.getElementById('slider-card-opacity');
+      if (sliderCard) sliderCard.value = savedCardOpacity;
+
+      // 3. Restore Wallpaper & Canvas
       const savedOpacity = localStorage.getItem(STORAGE_OPACITY) || '60';
       const savedBlur = localStorage.getItem(STORAGE_BLUR) || '0';
       updateWallpaperOpacity(savedOpacity);
@@ -2727,17 +3099,26 @@ DASHBOARD_HTML = """
       if (sliderOp) sliderOp.value = savedOpacity;
       if (sliderBl) sliderBl.value = savedBlur;
 
+      const savedCustomUrl = localStorage.getItem(STORAGE_CUSTOM_URL);
+      if (savedCustomUrl) {
+        const inputUrl = document.getElementById('input-custom-wallpaper-url');
+        if (inputUrl) inputUrl.value = savedCustomUrl;
+      }
+
       initWallpaperCanvas();
 
-      // 3. Restore CRT Scanline setting
+      // 4. Start Equalizer Visualizer Loop
+      startMusicVisualizerLoop();
+
+      // 5. Restore CRT Scanline setting
       if (localStorage.getItem(STORAGE_CRT) === 'true') {
         document.getElementById('omarchy-crt-overlay')?.classList.remove('hidden');
       }
 
-      // 4. Restore Audio Setting
+      // 6. Restore Audio Setting
       updateAudioIcon();
 
-      // 5. Connect WebSocket & Load Data
+      // 7. Connect WebSocket & Load Data
       initWebSocket();
       fetchChatSessions(true);
       fetchTraces();
