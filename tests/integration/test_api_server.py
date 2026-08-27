@@ -68,4 +68,4 @@ async def test_dashboard_html_render():
         res = await client.get("/")
         assert res.status_code == 200
         assert "Personal AI OS" in res.text
-        assert "Smart Inbound Stream" in res.text
+        assert "Operations Overview" in res.text
