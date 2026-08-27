@@ -2555,10 +2555,16 @@ DASHBOARD_HTML = """
             <div class="text-xs font-semibold text-cyan-300 flex items-center space-x-1.5">
               <span>Personal AI</span>
             </div>
-            <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 flex items-center space-x-1 cursor-pointer transition">
-              <i data-lucide="copy" class="w-3 h-3"></i>
-              <span>Copy</span>
-            </button>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="speakMessageBubble(this)" title="Read message aloud (TTS)" class="speak-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-cyan-300 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+                <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
+                <span>Listen</span>
+              </button>
+              <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Copy</span>
+              </button>
+            </div>
           </div>
           <div class="text-xs text-slate-200 leading-relaxed msg-content select-text">${text ? formatMarkdownText(text) : ''}</div>
           ${runId ? `
@@ -2701,9 +2707,25 @@ DASHBOARD_HTML = """
 
     // ── JARVIS Speech Synthesis (TTS) ──
     let isTtsEnabled = localStorage.getItem('personal_ai_tts_enabled') === 'true';
+    let availableVoices = [];
+
+    function populateVoices() {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        availableVoices = window.speechSynthesis.getVoices() || [];
+      } catch (e) {
+        console.warn("[TTS] Error populating voices:", e);
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      populateVoices();
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
 
     function initTtsState() {
       updateTtsButtonUi();
+      populateVoices();
     }
 
     function toggleSpeechTTS() {
@@ -2711,7 +2733,7 @@ DASHBOARD_HTML = """
       localStorage.setItem('personal_ai_tts_enabled', isTtsEnabled ? 'true' : 'false');
       updateTtsButtonUi();
       if (isTtsEnabled) {
-        speakAssistantResponse("Voice synthesis active. Ready for hands-free intelligence.");
+        speakAssistantResponse("Voice synthesis enabled. I will read responses aloud.", true);
         appendSystemLog("[TTS] JARVIS Voice Synthesis enabled.");
       } else {
         if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -2772,21 +2794,64 @@ DASHBOARD_HTML = """
       return clean.trim();
     }
 
-    function speakAssistantResponse(text) {
-      if (!isTtsEnabled || !('speechSynthesis' in window)) return;
+    function speakAssistantResponse(text, forceSpeak = false) {
+      if ((!isTtsEnabled && !forceSpeak) || !('speechSynthesis' in window)) return;
       const clean = cleanTextForSpeech(text);
       if (!clean) return;
 
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(clean);
-      utterance.rate = 1.05;
-      utterance.pitch = 1.0;
-      
-      const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('Samantha')));
-      if (englishVoice) utterance.voice = englishVoice;
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
 
-      window.speechSynthesis.speak(utterance);
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        if (availableVoices.length === 0) {
+          availableVoices = window.speechSynthesis.getVoices() || [];
+        }
+
+        const bestVoice = availableVoices.find(v => (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('David') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Mark')) && v.lang.startsWith('en')) || availableVoices.find(v => v.lang.startsWith('en')) || availableVoices[0];
+
+        if (bestVoice) {
+          utterance.voice = bestVoice;
+        }
+
+        utterance.onstart = () => {
+          const ttsIcon = document.getElementById('icon-tts-state');
+          if (ttsIcon) ttsIcon.classList.add('animate-pulse');
+        };
+        utterance.onend = () => {
+          const ttsIcon = document.getElementById('icon-tts-state');
+          if (ttsIcon) ttsIcon.classList.remove('animate-pulse');
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn("[TTS] Speech error:", err);
+      }
+    }
+
+    function speakMessageBubble(btn) {
+      const bubbleCard = btn.closest('.bubble-card');
+      if (!bubbleCard) return;
+      const contentEl = bubbleCard.querySelector('.msg-content');
+      if (!contentEl) return;
+      const rawText = contentEl.innerText || contentEl.textContent || '';
+      
+      const span = btn.querySelector('span');
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        if (span) span.textContent = 'Listen';
+        return;
+      }
+
+      speakAssistantResponse(rawText, true);
+      if (span) {
+        span.textContent = 'Playing...';
+        setTimeout(() => { span.textContent = 'Listen'; }, 4000);
+      }
     }
 
     // ── Speech Recognition (STT Voice Input) ──

@@ -268,9 +268,9 @@ Available tools:
         reasoning_system_prompt = (
             "You are Personal AI OS, Yashpreet's intelligent, conversational AI assistant and local automation system.\n\n"
             "INSTRUCTIONS FOR YOUR OUTPUT:\n"
-            "• `response_to_user`: This is the direct message that Yashpreet reads. Always provide a natural, articulate, comprehensive, and friendly reply. If asked a question (e.g. 'what is next js', 'what is scheduling', 'explain python'), write a full, clear explanation with markdown. NEVER say 'no response needed' or speak in third person about the prompt.\n"
-            "• `plan_rationale`: Brief internal reasoning for your chosen action.\n"
-            "• `tool_name`: Choose the matching tool from below, or choose 'no_action' for general conversation, greetings, questions, explanations, coding, and architecture queries.\n\n"
+            "• `response_to_user`: This is the direct message that Yashpreet reads. Always provide a natural, articulate, comprehensive, and friendly reply with clear markdown headings, bullet points, and clean syntax. If asked a question (e.g. 'what is YouTube', 'what is Next.js', 'explain quantum computing', 'how does python work'), write a high-quality, comprehensive explanation directly in `response_to_user`.\n"
+            "• `tool_name`: Choose `no_action` for general conversation, greetings, definitions, explanations, conceptual questions, coding, and architecture queries. Only select `web.search` when the user explicitly asks to search the web (e.g. 'search web for...', 'look up online...') or when recent live web facts are strictly requested.\n"
+            "• `plan_rationale`: Brief internal reasoning for your chosen action.\n\n"
             f"{tool_schema}"
         )
 
@@ -454,6 +454,26 @@ Available tools:
             )
 
         # ── 2. Explicit Explanations & Conceptual Questions ────────────────
+        # Question: What is YouTube?
+        if "youtube" in cmd_lower and any(w in cmd_lower for w in ["what is", "what's", "explain", "tell me about", "who made", "history of", "about"]):
+            return ReasoningPlan(
+                tool_name="no_action",
+                tool_args={},
+                plan_rationale="YouTube encyclopedic explanation.",
+                response_to_user=(
+                    "### 🎥 What is YouTube?\n\n"
+                    "**YouTube** is the world's leading online video-sharing and streaming platform. Founded in **February 2005** by Steve Chen, Chad Hurley, and Jawed Karim (former PayPal engineers), it was acquired by **Google** in 2006 for $1.65 billion.\n\n"
+                    "**Key Highlights:**\n"
+                    "• **Global Scale**: Over **2.5 billion monthly active users**, making it the second most-visited website globally.\n"
+                    "• **Creator Economy**: Pioneered revenue-sharing via the YouTube Partner Program (YPP), Super Chats, and channel memberships.\n"
+                    "• **Ecosystem Features**:\n"
+                    "  - **YouTube Shorts**: High-growth short-form vertical video feed.\n"
+                    "  - **YouTube Music & Premium**: Background playback, ad-free streaming, and offline downloads.\n"
+                    "  - **Live Streaming**: Real-time broadcasts, events, and gaming streams.\n\n"
+                    "It is the central destination for worldwide education, tech tutorials, music, and entertainment."
+                ),
+            )
+
         # Question: What is Next.js?
         if "next js" in cmd_lower or "nextjs" in cmd_lower:
             return ReasoningPlan(
@@ -991,11 +1011,24 @@ Available tools:
 
         elif tool_name == "web.search":
             query = args.get("query", "")
-            results = search_web(query=query, max_results=5)
+            results = search_web(query=query, max_results=4)
             if results:
-                lines = [f"### 🌐 Live Web Search: **\"{query}\"**\n"]
-                for idx, r in enumerate(results, 1):
-                    lines.append(f"{idx}. [{r['title']}]({r['url']})\n   {r['snippet']}\n")
+                lines = [f"### 🌐 Web Summary: **\"{query}\"**\n"]
+                clean_insights = []
+                for r in results:
+                    snippet = r.get("snippet", "")
+                    clean_s = re.sub(r"\[\d+\]", "", snippet).strip()
+                    if clean_s and len(clean_s) > 15:
+                        clean_insights.append(f"• **{r['title']}**: {clean_s}")
+                    elif r.get("title"):
+                        clean_insights.append(f"• **{r['title']}**")
+
+                lines.extend(clean_insights[:4])
+                lines.append("\n**Sources & References:**")
+                for r in results:
+                    if r.get("url"):
+                        lines.append(f"- [{r['title']}]({r['url']})")
+
                 output_message = "\n".join(lines)
             else:
                 output_message = f"🌐 No web search results found for query: \"{query}\""
