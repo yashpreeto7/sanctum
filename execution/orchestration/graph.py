@@ -216,20 +216,28 @@ class PersonalAIEngine:
         t0 = time.perf_counter()
         facts = state.get("clean_facts", {})
         run_id = state.get("run_id")
-        query = f"{facts.get('clean_subject', '')} {facts.get('factual_summary', '')}".strip()
-        if not query or query == "User Command":
-            query = state.get("raw_body", "")
+        raw_b = state.get("raw_body", "").strip().lower().strip(" .!?,")
+        
+        # Skip RAG context retrieval for casual acknowledgements and short greetings to prevent vector noise
+        trivial_chatter = {"ok", "okay", "k", "yes", "no", "cool", "sure", "thanks", "thank you", "thx", "hello", "hi", "hey", "sup", "yo", "got it", "fine", "great", "nice", "perfect", "done"}
+        if raw_b in trivial_chatter or len(raw_b) < 3:
+            context_list = []
+        else:
+            query = f"{facts.get('clean_subject', '')} {facts.get('factual_summary', '')}".strip()
+            if not query or query == "User Command":
+                query = state.get("raw_body", "")
 
-        candidates = self.retriever.search(query=query, top_k=10)
-        reranked = self.reranker.rerank(query=query, candidates=candidates, top_n=3)
-        context_list = [c.model_dump() for c in reranked]
+            candidates = self.retriever.search(query=query, top_k=10)
+            reranked = self.reranker.rerank(query=query, candidates=candidates, top_n=3)
+            context_list = [c.model_dump() for c in reranked]
+            
         duration_ms = (time.perf_counter() - t0) * 1000.0
 
         if run_id:
             trace_store.record_node_step(
                 run_id=run_id,
                 node_name="retrieval_node",
-                inputs={"query": query},
+                inputs={"raw_body": raw_b},
                 outputs={"top_k_results": len(context_list), "context_snippets": [c["text"][:100] for c in context_list]},
                 duration_ms=duration_ms,
                 status="COMPLETED",
@@ -428,6 +436,22 @@ Available tools:
                     "You can ask me technical questions, search your emails and calendar, "
                     "draft messages, or explore your knowledge base. What's on your mind today?"
                 ),
+            )
+
+        if cmd_lower in ["ok", "okay", "k", "cool", "got it", "sure", "sounds good", "alright", "all right", "great", "nice", "perfect", "done"]:
+            return ReasoningPlan(
+                tool_name="no_action",
+                tool_args={},
+                plan_rationale="Conversational acknowledgement.",
+                response_to_user="Got it! Let me know if you need anything or have a task for me.",
+            )
+
+        if any(p in cmd_lower for p in ["thank you", "thanks", "thx", "appreciate it"]):
+            return ReasoningPlan(
+                tool_name="no_action",
+                tool_args={},
+                plan_rationale="Gratitude response.",
+                response_to_user="You're welcome! Always here to help.",
             )
 
         if any(p in cmd_lower for p in ["how are you", "how's it going", "how r u", "how do you do"]):
