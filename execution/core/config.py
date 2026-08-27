@@ -23,11 +23,17 @@ class Settings(BaseSettings):
 
     # Local LLM (Ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    DEFAULT_REASONING_MODEL: str = "qwen2.5:7b"
+    DEFAULT_REASONING_MODEL: str = "qwen2.5:1.5b"
     DEFAULT_FAST_MODEL: str = "qwen2.5:1.5b"
     DEFAULT_EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
-    LLM_TEMPERATURE: float = 0.1
+    LLM_TEMPERATURE: float = 0.2
     LLM_TIMEOUT_SECONDS: float = 60.0
+
+    # Optional Cloud API Keys for instant high-intelligence fallback
+    GEMINI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
+    OPENAI_BASE_URL: Optional[str] = None
 
     # ML & RAG Configuration
     QDRANT_HOST: str = "localhost"

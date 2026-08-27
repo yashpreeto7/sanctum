@@ -2,12 +2,16 @@
 
 import math
 import time
+from pathlib import Path
 from typing import List, Optional
 import numpy as np
 from rank_bm25 import BM25Okapi
 
 from execution.core.config import settings
 from execution.rag.vector_store import DocumentChunk, LocalVectorStore, vector_store
+
+
+KNOWLEDGE_VAULT_DIR = Path(__file__).resolve().parent.parent.parent / "directives" / "knowledge_vault"
 
 
 class HybridRetriever:
@@ -27,6 +31,46 @@ class HybridRetriever:
         self.gamma = gamma_recency
         self.half_life_days = half_life_days or settings.TEMPORAL_DECAY_HALF_LIFE_DAYS
         self.decay_lambda = math.log(2.0) / max(0.1, self.half_life_days)
+        self._ensure_sample_vault_indexed()
+
+    def _ensure_sample_vault_indexed(self) -> None:
+        """Indexes sample knowledge from directives/knowledge_vault if collection is empty."""
+        if not KNOWLEDGE_VAULT_DIR.exists():
+            return
+        chunks: List[DocumentChunk] = []
+        for file_path in KNOWLEDGE_VAULT_DIR.glob("*.*"):
+            if file_path.suffix.lower() in [".txt", ".md", ".json"]:
+                try:
+                    content = file_path.read_text(encoding="utf-8").strip()
+                    if not content:
+                        continue
+                    sections = content.split("\n\n")
+                    current_block = ""
+                    for sec in sections:
+                        if len(current_block) + len(sec) < 500:
+                            current_block += "\n\n" + sec if current_block else sec
+                        else:
+                            if current_block:
+                                chunks.append(
+                                    DocumentChunk(
+                                        text=current_block.strip(),
+                                        source_type=f"file:{file_path.name}",
+                                        metadata={"filename": file_path.name, "path": str(file_path)},
+                                    )
+                                )
+                            current_block = sec
+                    if current_block:
+                        chunks.append(
+                            DocumentChunk(
+                                text=current_block.strip(),
+                                source_type=f"file:{file_path.name}",
+                                metadata={"filename": file_path.name, "path": str(file_path)},
+                            )
+                        )
+                except Exception:
+                    pass
+        if chunks:
+            self.store.insert_chunks(chunks)
 
     def calculate_temporal_score(self, created_at_timestamp: float, current_timestamp: Optional[float] = None) -> float:
         """Calculates exponential decay factor e^(-lambda * delta_days)."""
@@ -62,11 +106,10 @@ class HybridRetriever:
         scored_chunks: List[DocumentChunk] = []
 
         for idx, chunk in enumerate(candidates):
-            dense_score = chunk.score or 0.0  # Cosine similarity in [0, 1]
+            dense_score = chunk.score or 0.0
             bm25_score = bm25_norm_scores[idx]
             recency_score = self.calculate_temporal_score(chunk.created_at_timestamp, current_timestamp=now)
 
-            # Combined 3-way hybrid score
             hybrid_score = (self.alpha * dense_score) + (self.beta * bm25_score) + (self.gamma * recency_score)
 
             chunk.score = round(hybrid_score, 4)
@@ -77,7 +120,6 @@ class HybridRetriever:
             }
             scored_chunks.append(chunk)
 
-        # 3. Sort by final hybrid score
         scored_chunks.sort(key=lambda c: (c.score or 0.0), reverse=True)
         return scored_chunks[:top_k]
 

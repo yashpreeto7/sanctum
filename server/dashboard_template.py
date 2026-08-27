@@ -2733,7 +2733,8 @@ DASHBOARD_HTML = """
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${title.replace(/[^a-zA-Z0-9_-]/g, '_')}_chat.md`;
+      const safeTitle = title.replace(new RegExp('[^a-zA-Z0-9_-]', 'g'), '_');
+      a.download = safeTitle + '_chat.md';
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -3055,26 +3056,109 @@ DASHBOARD_HTML = """
       }
     }
 
-    function formatMarkdownText(text) {
-      if (!text) return '';
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/```([\\s\\S]*?)```/g, '<pre class="p-3 my-2 rounded-xl bg-black/60 font-mono text-[11px] text-cyan-300 overflow-x-auto">$1</pre>')
-        .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/40 text-cyan-300 font-mono text-[11px]">$1</code>')
-        .replace(/\\*\\*([^\\*]+)\\*\\*/g, '<b>$1</b>')
-        .replace(/\\*([^\\*]+)\\*/g, '<i>$1</i>')
-        .replace(/\\n/g, '<br/>');
+    function formatMarkdownText(rawText) {
+      if (!rawText) return '';
+      var text = String(rawText);
+      var nl = String.fromCharCode(10);
+
+      // 1. Basic formatting & code blocks
+      text = text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
+      text = text.split('```').map(function(chunk, i) { return i % 2 === 1 ? '<pre class="p-3 my-2 rounded-xl bg-black/60 font-mono text-[11px] text-cyan-300 overflow-x-auto border border-white/10">' + chunk + '</pre>' : chunk; }).join('');
+      text = text.split('`').map(function(chunk, i) { return i % 2 === 1 ? '<code class="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-mono text-[11px] border border-white/5">' + chunk + '</code>' : chunk; }).join('');
+      text = text.split('**').map(function(chunk, i) { return i % 2 === 1 ? '<b>' + chunk + '</b>' : chunk; }).join('');
+      text = text.split('*').map(function(chunk, i) { return i % 2 === 1 ? '<i>' + chunk + '</i>' : chunk; }).join('');
+      text = text.split(nl).map(function(line) {
+        if (line.indexOf('### ') === 0) return '<h3 class="text-sm font-bold text-cyan-300 mt-2 mb-1">' + line.replace('### ', '') + '</h3>';
+        return line;
+      }).join('<br/>');
+
+      // 2. Email cards
+      if (text.indexOf(':::email-card') !== -1) {
+        var cardParts = text.split(':::email-card');
+        var out = cardParts[0];
+        for (var ci = 1; ci < cardParts.length; ci++) {
+          var subParts = cardParts[ci].split(':::');
+          var cardBody = subParts[0];
+          var remainder = subParts.slice(1).join(':::');
+          // Replace <br/> back to newlines for parsing lines
+          var lines = cardBody.replace(new RegExp('<br/>', 'g'), nl).trim().split(nl);
+          var index = '', id = '', sender = '', subject = '', date = '', preview = '';
+          lines.forEach(function(l) {
+            l = l.trim();
+            if (l.indexOf('index:') === 0) index = l.replace('index:', '').trim();
+            else if (l.indexOf('id:') === 0) id = l.replace('id:', '').trim();
+            else if (l.indexOf('sender:') === 0) sender = l.replace('sender:', '').trim();
+            else if (l.indexOf('subject:') === 0) subject = l.replace('subject:', '').trim();
+            else if (l.indexOf('date:') === 0) date = l.replace('date:', '').trim();
+            else if (l.indexOf('preview:') === 0) preview = l.replace('preview:', '').trim();
+          });
+          out += '<div class="my-2.5 p-3.5 rounded-xl bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500/50 transition space-y-2 shadow-md">' +
+            '<div class="flex items-center justify-between">' +
+              '<div class="flex items-center space-x-2">' +
+                '<span class="w-5 h-5 rounded-full bg-indigo-600/50 text-indigo-300 font-mono text-[10px] flex items-center justify-center font-bold">#' + index + '</span>' +
+                '<span class="text-xs font-semibold text-slate-200">' + sender + '</span>' +
+              '</div>' +
+              '<span class="text-[10px] font-mono text-slate-400">' + date + '</span>' +
+            '</div>' +
+            '<div class="text-xs font-medium text-cyan-300">' + subject + '</div>' +
+            '<div class="text-[11px] text-slate-300 leading-relaxed">' + preview + '</div>' +
+            '<div class="pt-1.5 flex items-center space-x-2 border-t border-white/5">' +
+              '<button data-cmd="read email ' + index + '" onclick="setChatPrompt(this.dataset.cmd); sendChatMessage();" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 cursor-pointer transition">' +
+                '📖 Read Full Email' +
+              '</button>' +
+            '</div>' +
+          '</div>' + remainder;
+        }
+        text = out;
+      }
+
+      // 3. Email full
+      if (text.indexOf(':::email-full') !== -1) {
+        var fullParts = text.split(':::email-full');
+        var fullOut = fullParts[0];
+        for (var fi = 1; fi < fullParts.length; fi++) {
+          var subFullParts = fullParts[fi].split(':::');
+          var fullBodyText = subFullParts[0];
+          var fullRemainder = subFullParts.slice(1).join(':::');
+          var fullLines = fullBodyText.replace(new RegExp('<br/>', 'g'), nl).trim().split(nl);
+          var fId = '', fSender = '', fSubject = '', fDate = '', fBody = '';
+          var fReadingBody = false;
+          fullLines.forEach(function(l) {
+            l = l.trim();
+            if (fReadingBody) {
+              fBody += l + '<br/>';
+            } else if (l.indexOf('id:') === 0) fId = l.replace('id:', '').trim();
+            else if (l.indexOf('sender:') === 0) fSender = l.replace('sender:', '').trim();
+            else if (l.indexOf('subject:') === 0) fSubject = l.replace('subject:', '').trim();
+            else if (l.indexOf('date:') === 0) fDate = l.replace('date:', '').trim();
+            else if (l.indexOf('body:') === 0) {
+              fReadingBody = true;
+            }
+          });
+          fullOut += '<div class="my-3 p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 space-y-3 shadow-lg">' +
+            '<div class="flex items-center justify-between border-b border-white/10 pb-2">' +
+              '<div>' +
+                '<div class="text-xs font-bold text-white">' + fSubject + '</div>' +
+                '<div class="text-[11px] text-cyan-300">From: ' + fSender + '</div>' +
+              '</div>' +
+              '<span class="text-[10px] font-mono text-slate-400">' + fDate + '</span>' +
+            '</div>' +
+            '<div class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans max-h-80 overflow-y-auto pr-1">' + fBody + '</div>' +
+          '</div>' + fullRemainder;
+        }
+        text = fullOut;
+      }
+
+      return text;
     }
 
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .split('&').join('&amp;')
+        .split('<').join('&lt;')
+        .split('>').join('&gt;')
+        .split('"').join('&quot;');
     }
 
     // ── App Boot Lifecycle ──

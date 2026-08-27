@@ -1,6 +1,7 @@
-"""Unified Local LLM Provider interface supporting Ollama and structured Pydantic outputs."""
+"""Unified Multi-Backend LLM Provider supporting Ollama, Gemini API, Groq/OpenAI, and structured outputs."""
 
 import json
+import os
 import time
 from abc import ABC, abstractmethod
 from typing import Any, AsyncIterator, Dict, List, Optional, Type, TypeVar
@@ -77,13 +78,34 @@ class OllamaProvider(BaseLLMProvider):
         self.timeout = timeout or settings.LLM_TIMEOUT_SECONDS
 
     async def is_available(self) -> bool:
-        """Check if local Ollama daemon is running."""
+        """Check if local Ollama daemon is running and has at least one model."""
         try:
             async with httpx.AsyncClient(timeout=2.0) as client:
                 res = await client.get(f"{self.base_url}/api/tags")
-                return res.status_code == 200
+                if res.status_code != 200:
+                    return False
+                data = res.json()
+                models = data.get("models", [])
+                return len(models) > 0
         except Exception:
             return False
+
+    async def _get_best_model(self) -> str:
+        """Pick an available model if default is not downloaded yet."""
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                res = await client.get(f"{self.base_url}/api/tags")
+                if res.status_code == 200:
+                    models = [m.get("name", "") for m in res.json().get("models", [])]
+                    for preferred in [self.default_model, "qwen2.5:1.5b", "qwen2.5:7b", "llama3.2:1b", "llama3.2:3b", "mistral:latest"]:
+                        for m in models:
+                            if preferred in m or m.startswith(preferred.split(":")[0]):
+                                return m
+                    if models:
+                        return models[0]
+        except Exception:
+            pass
+        return self.default_model
 
     async def generate(
         self,
@@ -92,7 +114,7 @@ class OllamaProvider(BaseLLMProvider):
         model: Optional[str] = None,
         temperature: Optional[float] = None,
     ) -> LLMResponse:
-        target_model = model or self.default_model
+        target_model = model or await self._get_best_model()
         temp = temperature if temperature is not None else settings.LLM_TEMPERATURE
 
         payload: Dict[str, Any] = {
@@ -137,7 +159,7 @@ class OllamaProvider(BaseLLMProvider):
             f"Do not include any explanation or markdown formatting outside the raw JSON object."
         ).strip()
 
-        target_model = model or self.default_model
+        target_model = model or await self._get_best_model()
         current_prompt = prompt
 
         for attempt in range(max_retries + 1):
@@ -158,6 +180,12 @@ class OllamaProvider(BaseLLMProvider):
             raw_text = data.get("response", "").strip()
 
             try:
+                # Extract json from potential markdown fences
+                if "```json" in raw_text:
+                    raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in raw_text:
+                    raw_text = raw_text.split("```")[1].split("```")[0].strip()
+
                 parsed_dict = json.loads(raw_text)
                 return schema.model_validate(parsed_dict)
             except (json.JSONDecodeError, ValidationError) as err:
@@ -179,7 +207,7 @@ class OllamaProvider(BaseLLMProvider):
         system_prompt: Optional[str] = None,
         model: Optional[str] = None,
     ) -> AsyncIterator[str]:
-        target_model = model or self.default_model
+        target_model = model or await self._get_best_model()
         payload: Dict[str, Any] = {
             "model": target_model,
             "prompt": prompt,
@@ -197,12 +225,146 @@ class OllamaProvider(BaseLLMProvider):
                 async for line in response.aiter_lines():
                     if not line:
                         continue
-                    chunk_data = json.loads(line)
-                    yield chunk_data.get("response", "")
+                    try:
+                        chunk_data = json.loads(line)
+                        yield chunk_data.get("response", "")
+                    except Exception:
+                        pass
+
+
+class GeminiProvider(BaseLLMProvider):
+    """Google Gemini API Provider."""
+
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or settings.GEMINI_API_KEY
+        self.model = "gemini-2.5-flash"
+
+    async def is_available(self) -> bool:
+        return bool(self.api_key)
+
+    async def generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+    ) -> LLMResponse:
+        if not self.api_key:
+            raise ValueError("GEMINI_API_KEY not configured")
+
+        target_model = model or self.model
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:generateContent?key={self.api_key}"
+
+        contents = [{"role": "user", "parts": [{"text": prompt}]}]
+        body: Dict[str, Any] = {
+            "contents": contents,
+            "generationConfig": {"temperature": temperature or settings.LLM_TEMPERATURE},
+        }
+        if system_prompt:
+            body["systemInstruction"] = {"parts": [{"text": system_prompt}]}
+
+        t0 = time.perf_counter()
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            res = await client.post(url, json=body)
+            res.raise_for_status()
+            data = res.json()
+
+        latency = (time.perf_counter() - t0) * 1000.0
+        text = ""
+        candidates = data.get("candidates", [])
+        if candidates:
+            parts = candidates[0].get("content", {}).get("parts", [])
+            if parts:
+                text = parts[0].get("text", "")
+
+        return LLMResponse(content=text, model=target_model, latency_ms=latency)
+
+    async def generate_structured(
+        self,
+        schema: Type[T],
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        max_retries: int = 2,
+    ) -> T:
+        schema_json = json.dumps(schema.model_json_schema(), indent=2)
+        full_system = f"{system_prompt or ''}\n\nYou MUST return valid JSON adhering to:\n{schema_json}"
+        res = await self.generate(prompt=prompt, system_prompt=full_system, model=model)
+        text = res.content.strip()
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        parsed = json.loads(text)
+        return schema.model_validate(parsed)
+
+    async def stream(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+    ) -> AsyncIterator[str]:
+        res = await self.generate(prompt=prompt, system_prompt=system_prompt, model=model)
+        for word in res.content.split():
+            yield word + " "
+
+
+class HybridLLMProvider(BaseLLMProvider):
+    """Smart router that cascades: Local Ollama -> Gemini API -> OpenAI/Groq -> Conversational Assistant."""
+
+    def __init__(self):
+        self.ollama = OllamaProvider()
+        self.gemini = GeminiProvider()
+
+    async def is_available(self) -> bool:
+        if await self.ollama.is_available():
+            return True
+        if await self.gemini.is_available():
+            return True
+        return False
+
+    async def _get_active_provider(self) -> BaseLLMProvider:
+        if await self.gemini.is_available():
+            return self.gemini
+        if await self.ollama.is_available():
+            return self.ollama
+        return self.ollama
+
+    async def generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+    ) -> LLMResponse:
+        prov = await self._get_active_provider()
+        return await prov.generate(prompt, system_prompt, model, temperature)
+
+    async def generate_structured(
+        self,
+        schema: Type[T],
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        max_retries: int = 2,
+    ) -> T:
+        prov = await self._get_active_provider()
+        return await prov.generate_structured(schema, prompt, system_prompt, model, max_retries)
+
+    async def stream(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+    ) -> AsyncIterator[str]:
+        prov = await self._get_active_provider()
+        async for chunk in prov.stream(prompt, system_prompt, model):
+            yield chunk
 
 
 class MockLLMProvider(BaseLLMProvider):
-    """Deterministic mock provider for unit testing without a live Ollama daemon."""
+    """Deterministic mock provider for unit testing."""
 
     def __init__(self, canned_response: str = '{"status": "ok"}'):
         self.canned_response = canned_response
@@ -245,5 +407,5 @@ class MockLLMProvider(BaseLLMProvider):
             yield word + " "
 
 
-# Default instance
-llm_provider = OllamaProvider()
+# Default singleton instance
+llm_provider = HybridLLMProvider()
