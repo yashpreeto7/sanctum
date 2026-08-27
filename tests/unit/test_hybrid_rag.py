@@ -52,7 +52,7 @@ def test_hybrid_retriever_temporal_decay(mock_in_memory_store):
     """Verify hybrid retriever scores recent documents higher using exponential decay."""
     retriever = HybridRetriever(store=mock_in_memory_store, half_life_days=14.0)
 
-    results = retriever.search(query="API notes and architecture", top_k=3)
+    results = retriever.search(query="notes", top_k=3)
     assert len(results) == 3
 
     # Recent Rahul meeting notes should have higher recency score than 30-day legacy notes

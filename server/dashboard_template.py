@@ -522,9 +522,16 @@ DASHBOARD_HTML = """
         <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="icon-audio-sfx"></i>
       </button>
 
-      <!-- CRT Scanline Toggle -->
-      <button onclick="toggleCRTScanlines()" id="btn-crt-toggle" title="Toggle CRT Terminal Scanlines" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer">
-        <i data-lucide="tv" class="w-3.5 h-3.5 text-cyan-400"></i>
+      <!-- TTS Speech Output Toggle (JARVIS Mode) -->
+      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle JARVIS Speech Synthesis (TTS Voice Output)" class="px-2 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
+        <i data-lucide="volume-x" class="w-3.5 h-3.5 text-slate-400" id="icon-tts-state"></i>
+        <span id="label-tts-state" class="text-[10px] font-mono text-slate-400">Voice: OFF</span>
+      </button>
+
+      <!-- Document Ingestion Trigger -->
+      <button onclick="triggerDocUploadDialog()" title="Upload & Index Document (PDF, TXT, MD, JSON)" class="px-2.5 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
+        <i data-lucide="file-up" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span class="hidden md:inline">Ingest Doc</span>
       </button>
 
       <!-- Wallpaper & Glass Customizer Trigger -->
@@ -1099,16 +1106,34 @@ DASHBOARD_HTML = """
             </div>
 
             <!-- Input Box -->
-            <div class="p-3 border-t theme-border bg-black/30">
+            <div class="p-3 border-t theme-border bg-black/30 relative">
+              <input type="file" id="chat-doc-file-input" accept=".pdf,.txt,.md,.json" style="display:none;" onchange="handleDocFileUpload(event)">
+              
               <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl p-2 focus-within:border-cyan-400 transition">
+                <!-- Attach Document Button -->
+                <button type="button" onclick="triggerDocUploadDialog()" title="Upload & Index Document (PDF, TXT, MD, JSON)" class="p-2 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-white/5 transition cursor-pointer">
+                  <i data-lucide="paperclip" class="w-4 h-4"></i>
+                </button>
+
                 <textarea id="chat-input-textarea" rows="1" placeholder="Ask Personal AI or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
                 
-                <button onclick="sendChatMessage(); playCyberClick();" id="chat-send-btn" class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition cursor-pointer">
+                <!-- Voice Input Microphone Button -->
+                <button type="button" onclick="toggleVoiceRecording()" id="btn-voice-input" title="Voice Input (Speech-to-Text)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative">
+                  <i data-lucide="mic" class="w-4 h-4" id="icon-voice-input"></i>
+                  <span id="voice-pulse-ring" class="hidden absolute inset-0 rounded-lg border-2 border-rose-500 animate-ping"></span>
+                </button>
+
+                <!-- Send Button -->
+                <button type="button" onclick="sendChatMessage(); playCyberClick();" id="chat-send-btn" class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition cursor-pointer">
                   <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
               </div>
               <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 mt-2 px-1">
-                <span>Model: gemini-3.7-flash (Local Dual-LLM Quarantine + Hybrid RAG)</span>
+                <div class="flex items-center space-x-2">
+                  <span id="voice-status-indicator" class="text-slate-500">🎙️ Ready for voice/text</span>
+                  <span class="text-slate-700">•</span>
+                  <span>Model: gemini-3.7-flash (Local Dual-LLM + Hybrid RAG)</span>
+                </div>
                 <span>Enter: Send • Shift+Enter: Multiline</span>
               </div>
             </div>
@@ -2657,7 +2682,298 @@ DASHBOARD_HTML = """
         fetchChatSessions(false);
         playHudBeep(1200);
         refreshIcons();
+
+        // Speak aloud assistant response if JARVIS voice mode is enabled
+        speakAssistantResponse(data.content);
       }
+      else if (data.type === 'proactive_alert') {
+        showProactiveToast(
+          data.title || '📬 Proactive Inbox Alert',
+          data.message || 'New inbound message received.',
+          'Open & Search in Chat',
+          () => {
+            setChatPrompt(`Find emails from: ${data.sender || ''}`);
+            sendChatMessage();
+          }
+        );
+      }
+    }
+
+    // ── JARVIS Speech Synthesis (TTS) ──
+    let isTtsEnabled = localStorage.getItem('personal_ai_tts_enabled') === 'true';
+
+    function initTtsState() {
+      updateTtsButtonUi();
+    }
+
+    function toggleSpeechTTS() {
+      isTtsEnabled = !isTtsEnabled;
+      localStorage.setItem('personal_ai_tts_enabled', isTtsEnabled ? 'true' : 'false');
+      updateTtsButtonUi();
+      if (isTtsEnabled) {
+        speakAssistantResponse("Voice synthesis active. Ready for hands-free intelligence.");
+        appendSystemLog("[TTS] JARVIS Voice Synthesis enabled.");
+      } else {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        appendSystemLog("[TTS] Voice Synthesis disabled.");
+      }
+      playHudBeep(isTtsEnabled ? 1300 : 700);
+    }
+
+    function updateTtsButtonUi() {
+      const btn = document.getElementById('btn-toggle-tts');
+      const icon = document.getElementById('icon-tts-state');
+      const label = document.getElementById('label-tts-state');
+      if (!btn || !icon || !label) return;
+
+      if (isTtsEnabled) {
+        btn.className = "px-2 py-1 rounded-lg bg-indigo-600/40 hover:bg-indigo-600/60 text-cyan-300 border border-indigo-500/50 text-[11px] flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+        icon.setAttribute('data-lucide', 'volume-2');
+        icon.className = "w-3.5 h-3.5 text-cyan-300";
+        label.textContent = "Voice: ON";
+        label.className = "text-[10px] font-mono text-cyan-300 font-bold";
+      } else {
+        btn.className = "px-2 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[11px] flex items-center space-x-1.5 transition cursor-pointer";
+        icon.setAttribute('data-lucide', 'volume-x');
+        icon.className = "w-3.5 h-3.5 text-slate-400";
+        label.textContent = "Voice: OFF";
+        label.className = "text-[10px] font-mono text-slate-400";
+      }
+      refreshIcons();
+    }
+
+    function cleanTextForSpeech(rawText) {
+      if (!rawText) return "";
+      let clean = rawText;
+      while (clean.indexOf(':::email-') !== -1) {
+        const start = clean.indexOf(':::email-');
+        const end = clean.indexOf(':::', start + 9);
+        if (end !== -1) {
+          clean = clean.substring(0, start) + clean.substring(end + 3);
+        } else {
+          break;
+        }
+      }
+      while (clean.indexOf('```') !== -1) {
+        const start = clean.indexOf('```');
+        const end = clean.indexOf('```', start + 3);
+        if (end !== -1) {
+          clean = clean.substring(0, start) + clean.substring(end + 3);
+        } else {
+          break;
+        }
+      }
+      clean = clean.split('`').join('');
+      clean = clean.split('#').join('');
+      clean = clean.split('*').join('');
+      clean = clean.split('>').join('');
+      clean = clean.split('_').join('');
+      clean = clean.split('•').join('');
+      return clean.trim();
+    }
+
+    function speakAssistantResponse(text) {
+      if (!isTtsEnabled || !('speechSynthesis' in window)) return;
+      const clean = cleanTextForSpeech(text);
+      if (!clean) return;
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('Samantha')));
+      if (englishVoice) utterance.voice = englishVoice;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ── Speech Recognition (STT Voice Input) ──
+    let speechRecognition = null;
+    let isVoiceRecording = false;
+
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        console.warn("[Voice] Web SpeechRecognition API is not supported in this browser.");
+        return;
+      }
+
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.continuous = false;
+      speechRecognition.interimResults = true;
+      speechRecognition.lang = 'en-US';
+
+      speechRecognition.onstart = () => {
+        isVoiceRecording = true;
+        updateVoiceButtonUi(true);
+        appendSystemLog("[Voice] Listening to microphone input...");
+      };
+
+      speechRecognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        const textarea = document.getElementById('chat-input-textarea');
+        if (textarea) {
+          textarea.value = transcript;
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        }
+        const statusEl = document.getElementById('voice-status-indicator');
+        if (statusEl) statusEl.textContent = `🎙️ "${transcript}"`;
+      };
+
+      speechRecognition.onerror = (event) => {
+        console.warn("[Voice] Recognition error:", event.error);
+        stopVoiceRecording();
+      };
+
+      speechRecognition.onend = () => {
+        stopVoiceRecording();
+      };
+    }
+
+    function toggleVoiceRecording() {
+      if (!speechRecognition) {
+        initSpeechRecognition();
+      }
+      if (!speechRecognition) {
+        alert("Speech Recognition is not supported by your current browser engine.");
+        return;
+      }
+
+      if (isVoiceRecording) {
+        speechRecognition.stop();
+        stopVoiceRecording();
+      } else {
+        try {
+          speechRecognition.start();
+          playHudBeep(1400);
+        } catch (e) {
+          stopVoiceRecording();
+        }
+      }
+    }
+
+    function stopVoiceRecording() {
+      isVoiceRecording = false;
+      updateVoiceButtonUi(false);
+    }
+
+    function updateVoiceButtonUi(active) {
+      const btn = document.getElementById('btn-voice-input');
+      const icon = document.getElementById('icon-voice-input');
+      const ring = document.getElementById('voice-pulse-ring');
+      const statusEl = document.getElementById('voice-status-indicator');
+      if (!btn) return;
+
+      if (active) {
+        btn.className = "p-2 rounded-lg bg-rose-600/30 text-rose-400 border border-rose-500/50 transition cursor-pointer relative shadow-md shadow-rose-500/20";
+        if (ring) ring.classList.remove('hidden');
+        if (statusEl) statusEl.textContent = "🎙️ Listening... (speak now)";
+      } else {
+        btn.className = "p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative";
+        if (ring) ring.classList.add('hidden');
+        if (statusEl) statusEl.textContent = "🎙️ Ready for voice/text";
+      }
+    }
+
+    // ── Document Knowledge Ingestion ──
+    function triggerDocUploadDialog() {
+      const input = document.getElementById('chat-doc-file-input');
+      if (input) {
+        input.value = '';
+        input.click();
+      }
+    }
+
+    async function handleDocFileUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      await uploadDocumentFile(file);
+    }
+
+    async function uploadDocumentFile(file) {
+      const statusEl = document.getElementById('voice-status-indicator');
+      if (statusEl) statusEl.textContent = `⏳ Indexing '${file.name}' into vector store...`;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          appendSystemLog(`[RAG] Document ingested: ${data.filename} (${data.chunks_indexed} chunks)`);
+          showProactiveToast(
+            `📄 Document Ingested: ${data.filename}`,
+            `Successfully indexed ${data.chunks_indexed} vector chunks into your hybrid knowledge vault.`
+          );
+          if (statusEl) statusEl.textContent = `✅ Ingested '${file.name}' (${data.chunks_indexed} chunks)`;
+          playHudBeep(1500);
+          fetchKnowledgeVaultFiles();
+        } else {
+          alert(`Upload failed: ${data.detail || 'Unknown error'}`);
+          if (statusEl) statusEl.textContent = `❌ Upload failed`;
+        }
+      } catch (err) {
+        alert(`Failed to upload document: ${err.message}`);
+        if (statusEl) statusEl.textContent = `❌ Upload error`;
+      }
+    }
+
+    // ── Proactive HUD Glass Toast Notifications ──
+    function showProactiveToast(title, message, actionLabel, actionCallback) {
+      const container = document.getElementById('proactive-toast-container') || createToastContainer();
+      const toast = document.createElement('div');
+      toast.className = "p-4 rounded-xl theme-card border border-cyan-400/40 bg-black/90 backdrop-blur-xl shadow-2xl shadow-cyan-500/20 text-white max-w-sm space-y-2 pointer-events-auto transition-all duration-300";
+      
+      toast.innerHTML = `
+        <div class="flex items-start justify-between space-x-2">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <h4 class="text-xs font-bold font-display text-cyan-300">${title}</h4>
+          </div>
+          <button onclick="this.closest('.p-4').remove()" class="text-slate-400 hover:text-white text-xs cursor-pointer">&times;</button>
+        </div>
+        <p class="text-[11px] text-slate-300 font-sans leading-relaxed whitespace-pre-wrap">${message}</p>
+      `;
+
+      if (actionLabel && actionCallback) {
+        const btn = document.createElement('button');
+        btn.className = "mt-2 px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-300 text-[10px] font-mono border border-cyan-500/30 transition cursor-pointer";
+        btn.textContent = actionLabel;
+        btn.onclick = () => {
+          actionCallback();
+          toast.remove();
+        };
+        toast.appendChild(btn);
+      }
+
+      container.appendChild(toast);
+      playHudBeep(1600);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+      }, 9000);
+    }
+
+    function createToastContainer() {
+      let c = document.getElementById('proactive-toast-container');
+      if (!c) {
+        c = document.createElement('div');
+        c.id = 'proactive-toast-container';
+        c.className = "fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none";
+        document.body.appendChild(c);
+      }
+      return c;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -3311,10 +3627,30 @@ DASHBOARD_HTML = """
         document.getElementById('omarchy-crt-overlay')?.classList.remove('hidden');
       }
 
-      // 6. Restore Audio Setting
+      // 6. Restore Audio & TTS Voice Setting
       updateAudioIcon();
+      initTtsState();
+      initSpeechRecognition();
 
-      // 7. Connect WebSocket & Load Data
+      // 7. Setup Window Drag & Drop Document Ingestion
+      window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      });
+      window.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          const file = e.dataTransfer.files[0];
+          const ext = file.name.split('.').pop().toLowerCase();
+          if (['pdf', 'txt', 'md', 'json'].includes(ext)) {
+            await uploadDocumentFile(file);
+          } else {
+            showProactiveToast('Unsupported File Type', 'Please drop a .pdf, .txt, .md, or .json document to index.');
+          }
+        }
+      });
+
+      // 8. Connect WebSocket & Load Data
       initWebSocket();
       fetchChatSessions(true);
       fetchTraces();

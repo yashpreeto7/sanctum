@@ -31,7 +31,8 @@ class HybridRetriever:
         self.gamma = gamma_recency
         self.half_life_days = half_life_days or settings.TEMPORAL_DECAY_HALF_LIFE_DAYS
         self.decay_lambda = math.log(2.0) / max(0.1, self.half_life_days)
-        self._ensure_sample_vault_indexed()
+        if store is None:
+            self._ensure_sample_vault_indexed()
 
     def _ensure_sample_vault_indexed(self) -> None:
         """Indexes sample knowledge from directives/knowledge_vault if collection is empty."""

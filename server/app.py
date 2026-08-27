@@ -1,11 +1,11 @@
-"""FastAPI Backend Server for Personal AI OS Command Center."""
-
+import asyncio
+import io
 import json
 import time
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
@@ -408,14 +408,135 @@ async def list_sample_knowledge_files():
     """List sample knowledge files available in directives/knowledge_vault/."""
     files = []
     if KNOWLEDGE_VAULT_DIR.exists():
-        for f in KNOWLEDGE_VAULT_DIR.glob("*.*"):
-            if f.suffix.lower() in [".txt", ".md"]:
-                files.append({
-                    "name": f.name,
-                    "size_bytes": f.stat().st_size,
-                    "preview": f.read_text(encoding="utf-8")[:200] + "...",
-                })
+        for fp in KNOWLEDGE_VAULT_DIR.glob("*.*"):
+            if fp.suffix.lower() in [".txt", ".md", ".json", ".pdf"]:
+                files.append({"name": fp.name, "size": fp.stat().st_size, "path": str(fp)})
     return {"files": files}
+
+
+@app.post("/api/documents/upload")
+async def upload_document(file: UploadFile = File(...)):
+    """Uploads a document (PDF, TXT, MD, JSON), extracts text, chunks, and indexes it into the vector store."""
+    filename = file.filename or "uploaded_doc.txt"
+    content_bytes = await file.read()
+
+    extracted_text = ""
+    if filename.lower().endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+            pdf_file = io.BytesIO(content_bytes)
+            reader = PdfReader(pdf_file)
+            extracted_text = "\n\n".join([page.extract_text() or "" for page in reader.pages])
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to parse PDF: {str(e)}")
+    else:
+        try:
+            extracted_text = content_bytes.decode("utf-8", errors="replace")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to decode text: {str(e)}")
+
+    extracted_text = extracted_text.strip()
+    if not extracted_text:
+        raise HTTPException(status_code=400, detail="Uploaded file contains no readable text.")
+
+    # Save to knowledge vault
+    KNOWLEDGE_VAULT_DIR.mkdir(parents=True, exist_ok=True)
+    saved_path = KNOWLEDGE_VAULT_DIR / filename
+    saved_path.write_bytes(content_bytes)
+
+    # Split text into chunks
+    sections = [s.strip() for s in extracted_text.split("\n\n") if s.strip()]
+    chunks: List[DocumentChunk] = []
+    curr_block = ""
+    for sec in sections:
+        if len(curr_block) + len(sec) < 500:
+            curr_block += "\n\n" + sec if curr_block else sec
+        else:
+            if curr_block:
+                chunks.append(DocumentChunk(
+                    text=curr_block.strip(),
+                    source_type=f"upload:{filename}",
+                    metadata={"filename": filename, "source": "user_upload", "timestamp": time.time()}
+                ))
+            curr_block = sec
+    if curr_block:
+        chunks.append(DocumentChunk(
+            text=curr_block.strip(),
+            source_type=f"upload:{filename}",
+            metadata={"filename": filename, "source": "user_upload", "timestamp": time.time()}
+        ))
+
+    if chunks:
+        vector_store.insert_chunks(chunks)
+
+    return {
+        "status": "success",
+        "filename": filename,
+        "total_chars": len(extracted_text),
+        "chunks_indexed": len(chunks),
+        "preview": extracted_text[:300] + ("..." if len(extracted_text) > 300 else "")
+    }
+
+
+# ── Active WebSocket Connection Manager & Broadcast ────────────────────────
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: Dict[str, Any]):
+        dead_connections = []
+        for connection in list(self.active_connections):
+            try:
+                await connection.send_json(message)
+            except Exception:
+                dead_connections.append(connection)
+        for dc in dead_connections:
+            self.disconnect(dc)
+
+
+ws_manager = ConnectionManager()
+
+
+# ── Proactive Background Autonomous Worker ─────────────────────────────────
+
+_alerted_email_ids = set()
+
+async def proactive_background_worker():
+    """Periodically scans for urgent inbox items or calendar events and pushes proactive alerts."""
+    await asyncio.sleep(8)
+    while True:
+        try:
+            from execution.tools.gmail_connector import gmail_connector
+            unread = gmail_connector.list_unread(max_results=3)
+            for em in unread:
+                if em.id not in _alerted_email_ids:
+                    _alerted_email_ids.add(em.id)
+                    # Broadcast proactive alert to all connected dashboard sessions
+                    await ws_manager.broadcast({
+                        "type": "proactive_alert",
+                        "title": f"📬 Inbound Email: {em.subject[:45]}",
+                        "message": f"From: {em.sender}\n{em.body[:140]}...",
+                        "sender": em.sender,
+                        "email_id": em.id,
+                        "timestamp": time.time()
+                    })
+        except Exception:
+            pass
+        await asyncio.sleep(60)
+
+
+@app.on_event("startup")
+async def start_background_tasks():
+    asyncio.create_task(proactive_background_worker())
 
 
 @app.post("/api/rag/ingest_samples")
@@ -443,7 +564,7 @@ async def get_trace_detail(run_id: str):
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
     """WebSocket endpoint for real-time streaming chat with token-by-token LLM output."""
-    await websocket.accept()
+    await ws_manager.connect(websocket)
     try:
         while True:
             raw = await websocket.receive_text()

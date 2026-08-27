@@ -21,6 +21,8 @@ from execution.security.quarantine_parser import DualLLMQuarantine, quarantine_p
 from execution.tools.calendar_connector import CalendarConnector, CalendarEvent, calendar_connector
 from execution.tools.gmail_connector import GmailConnector, OutboundEmail, gmail_connector
 from execution.tools.obsidian_connector import ObsidianConnector, ObsidianNote, obsidian_connector
+from execution.tools.web_search_tool import search_web
+from execution.tools.workspace_tool import list_workspace_files, read_workspace_file, write_workspace_file
 
 
 # ── Structured output schema for LLM reasoning ─────────────────────────────
@@ -37,6 +39,10 @@ class ReasoningPlan(BaseModel):
         "obsidian.search_notes",
         "email.list_unread",
         "calendar.list_events",
+        "web.search",
+        "workspace.list_files",
+        "workspace.read_file",
+        "workspace.write_file",
         "no_action",
     ] = Field(..., description="The most appropriate tool for the user's request")
     tool_args: Dict[str, Any] = Field(
@@ -244,6 +250,10 @@ class PersonalAIEngine:
         # ── Build reasoning prompt with full context ──────────────────────
         tool_schema = """
 Available tools:
+- web.search: Search the live web using DuckDuckGo for breaking news, docs, live facts, and external links. Args: {query: str}
+- workspace.list_files: List files and directories in the local project workspace. Args: {subpath: str}
+- workspace.read_file: Read contents of a local file in the workspace. Args: {file_path: str}
+- workspace.write_file: Write or create a file in the workspace (triggers safety approval). Args: {file_path: str, content: str}
 - email.search: Search emails by sender or keyword query (e.g. 'linkedin', 'udemy', 'invoice'). Args: {query: str}
 - email.get_email: Read full details of a specific email by number ('1', '2', 'first', 'latest') or ID. Args: {identifier: str}
 - email.list_unread: List recent unread emails from Gmail. Args: {query: str}
@@ -391,6 +401,21 @@ Available tools:
         words = set(re.findall(r"\b\w+\b", cmd_lower))
         email_regex_match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", raw_cmd)
 
+        # ── Inbound Urgent/Important Email Auto-Note (Background Ingestion) ─
+        if not state.get("is_interactive_command", False) and state.get("raw_subject") != "User Command":
+            subj = state.get("raw_subject", "")
+            if any(w in (subj + " " + raw_cmd).lower() for w in ["urgent", "outage", "asap", "incident", "critical", "alert"]):
+                return ReasoningPlan(
+                    tool_name="obsidian.create_note",
+                    tool_args={
+                        "title": f"Incident - {subj or 'Urgent Notice'}",
+                        "content": f"# {subj}\n\n**Sender:** {sender}\n\n{raw_cmd}",
+                        "tags": ["incident", "urgent", "email_ingest"],
+                    },
+                    plan_rationale="Urgent inbound email automatically logged to Obsidian.",
+                    response_to_user=f"⚠️ Urgent incident note saved to Obsidian: '{subj}'",
+                )
+
         # ── 1. Conversational Greetings & Small Talk ───────────────────────
         greetings = {"hlo", "hello", "hi", "hey", "sup", "yo", "good morning", "good evening", "good afternoon", "greetings", "howdy", "hola"}
         if cmd_lower in greetings or any(cmd_lower.startswith(g + " ") for g in ["hi", "hey", "hello", "hlo", "yo"]):
@@ -529,7 +554,49 @@ Available tools:
                 ),
             )
 
-        # ── 3. Notes Intent (Obsidian) ─────────────────────────────────────
+        # ── 3. Web Search Intent ──────────────────────────────────────────
+        if any(cmd_lower.startswith(p) for p in ["search web", "search the web", "web search", "google ", "search online", "search internet", "browse web", "search for "]):
+            q = cmd_lower
+            for p in ["search the web for", "search web for", "search online for", "search internet for", "browse web for", "web search for", "web search", "google", "search for"]:
+                if q.startswith(p):
+                    q = q[len(p):].strip()
+                    break
+            q = q.strip(" :?.,\"'") or raw_cmd
+            return ReasoningPlan(
+                tool_name="web.search",
+                tool_args={"query": q},
+                plan_rationale=f"Web search intent for '{q}'.",
+                response_to_user=f"🌐 Searching the live web for **\"{q}\"**...",
+            )
+
+        # ── 4. Workspace Files Intent ──────────────────────────────────────
+        if any(w in cmd_lower for w in ["list files", "show files", "workspace files", "list directory", "show directory", "dir"]):
+            subp = ""
+            if " in " in cmd_lower:
+                subp = cmd_lower.split(" in ")[-1].strip(" '\"`")
+            return ReasoningPlan(
+                tool_name="workspace.list_files",
+                tool_args={"subpath": subp},
+                plan_rationale="List workspace files.",
+                response_to_user=f"📂 Listing workspace directory `{subp or '.'}`...",
+            )
+
+        if any(w in cmd_lower for w in ["read file", "view file", "show file", "cat file", "open file"]) and ("." in cmd_lower or "/" in cmd_lower or "\\" in cmd_lower):
+            parts = cmd_lower.split()
+            fpath = ""
+            for p in parts:
+                if "." in p or "/" in p or "\\" in p:
+                    fpath = p.strip(" '\"`")
+                    break
+            if fpath:
+                return ReasoningPlan(
+                    tool_name="workspace.read_file",
+                    tool_args={"file_path": fpath},
+                    plan_rationale=f"Read file '{fpath}'.",
+                    response_to_user=f"📄 Reading workspace file `{fpath}`...",
+                )
+
+        # ── 5. Notes Intent (Obsidian) ─────────────────────────────────────
         if any(w in cmd_lower for w in ["note", "notes", "obsidian"]):
             if any(w in cmd_lower for w in ["search notes", "find note", "look up note", "search obsidian", "search note"]):
                 search_query = cmd_lower
@@ -921,6 +988,51 @@ Available tools:
             else:
                 output_message = "📬 No unread emails found in your inbox right now. Everything is clear!"
             result = {"emails": [e.model_dump() for e in unread_emails]}
+
+        elif tool_name == "web.search":
+            query = args.get("query", "")
+            results = search_web(query=query, max_results=5)
+            if results:
+                lines = [f"### 🌐 Live Web Search: **\"{query}\"**\n"]
+                for idx, r in enumerate(results, 1):
+                    lines.append(f"{idx}. [{r['title']}]({r['url']})\n   {r['snippet']}\n")
+                output_message = "\n".join(lines)
+            else:
+                output_message = f"🌐 No web search results found for query: \"{query}\""
+            result = {"results": results}
+
+        elif tool_name == "workspace.list_files":
+            subpath = args.get("subpath", "")
+            items = list_workspace_files(subpath=subpath)
+            if items:
+                lines = [f"### 📂 Workspace Files: `{subpath or '.'}`\n"]
+                for it in items[:25]:
+                    icon = "📁" if it.get("is_dir") else "📄"
+                    size_str = f" ({it['size']} bytes)" if it.get("size") is not None else ""
+                    lines.append(f"• {icon} `{it['path']}`{size_str}")
+                output_message = "\n".join(lines)
+            else:
+                output_message = f"📂 No files found in `{subpath or '.'}`."
+            result = {"items": items}
+
+        elif tool_name == "workspace.read_file":
+            path = args.get("file_path", "")
+            res = read_workspace_file(file_path=path)
+            if "error" in res:
+                output_message = f"❌ {res['error']}"
+            else:
+                output_message = f"### 📄 File: `{res['path']}` ({res['total_chars']} chars)\n\n```\n{res['content']}\n```"
+            result = res
+
+        elif tool_name == "workspace.write_file":
+            path = args.get("file_path", "")
+            content = args.get("content", "")
+            res = write_workspace_file(file_path=path, content=content)
+            if "error" in res:
+                output_message = f"❌ {res['error']}"
+            else:
+                output_message = f"✅ File `{res['path']}` written ({res['bytes_written']} bytes)."
+            result = res
 
         return result, output_message
 

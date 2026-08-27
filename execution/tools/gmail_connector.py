@@ -228,6 +228,7 @@ class GmailConnector:
                 draft = service.users().drafts().create(
                     userId="me", body={"message": {"raw": raw}}
                 ).execute()
+                self._drafts.append(email)
                 return {
                     "status": "draft_created",
                     "to": email.to,
@@ -258,6 +259,7 @@ class GmailConnector:
                 sent = service.users().messages().send(
                     userId="me", body={"raw": raw}
                 ).execute()
+                self._sent_emails.append(email)
                 return {
                     "status": "sent",
                     "to": email.to,

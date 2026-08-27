@@ -1,6 +1,6 @@
 """Deterministic Calendar Tool supporting live Google Calendar API and local offline testing."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
@@ -42,10 +42,11 @@ class CalendarConnector:
 
     def list_upcoming_events(self, days_ahead: int = 7) -> List[CalendarEvent]:
         """Lists events occurring in the next N days."""
+        all_events = list(self._mock_events)
         service = self._get_service()
         if service is not None:
             try:
-                now_iso = datetime.utcnow().isoformat() + "Z"
+                now_iso = datetime.now(timezone.utc).isoformat()
                 events_result = service.events().list(
                     calendarId="primary",
                     timeMin=now_iso,
@@ -54,11 +55,10 @@ class CalendarConnector:
                     orderBy="startTime",
                 ).execute()
                 items = events_result.get("items", [])
-                live_events = []
                 for i in items:
                     start = i.get("start", {}).get("dateTime") or i.get("start", {}).get("date")
                     end = i.get("end", {}).get("dateTime") or i.get("end", {}).get("date")
-                    live_events.append(
+                    all_events.append(
                         CalendarEvent(
                             id=i.get("id"),
                             summary=i.get("summary", "Untitled"),
@@ -68,11 +68,9 @@ class CalendarConnector:
                             location=i.get("location"),
                         )
                     )
-                if live_events:
-                    return live_events
             except Exception:
                 pass
-        return self._mock_events
+        return all_events
 
     def check_conflicts(self, start_time_iso: str, end_time_iso: str) -> List[CalendarEvent]:
         """Checks for overlapping events in the given time window."""
@@ -105,6 +103,8 @@ class CalendarConnector:
             }
             try:
                 created = service.events().insert(calendarId="primary", body=body).execute()
+                event.id = created.get("id")
+                self._mock_events.append(event)
                 return {"status": "success", "event_id": created.get("id"), "summary": event.summary, "provider": "google_calendar_api"}
             except Exception as e:
                 return {"status": "error", "message": str(e)}
