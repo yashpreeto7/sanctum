@@ -73,6 +73,7 @@ class AgentState(TypedDict, total=False):
     approval_status: Optional[str]
     execution_result: Optional[Dict[str, Any]]
     final_output: str
+    chat_history: Optional[List[Dict[str, Any]]]
 
 
 class PersonalAIEngine:
@@ -282,11 +283,26 @@ Available tools:
             f"{tool_schema}"
         )
 
+        # Include conversation history if available
+        history = state.get("chat_history") or []
+        history_str = ""
+        if history:
+            history_lines = []
+            for h in history[-8:]:
+                r_name = "User" if h.get("role") == "user" else "Personal AI"
+                c_text = (h.get("content") or "").strip().replace("\n", " ")
+                if len(c_text) > 250:
+                    c_text = c_text[:250] + "..."
+                history_lines.append(f"[{r_name}]: {c_text}")
+            if history_lines:
+                history_str = "Recent Prior Conversation Turns:\n" + "\n".join(history_lines) + "\n\n"
+
         reasoning_prompt = (
-            f"User Request: \"{raw_cmd}\"\n\n"
+            f"{history_str}"
+            f"Current User Request: \"{raw_cmd}\"\n\n"
             f"Factual Summary: {summary}\n"
             f"Sender: {sender}\n"
-            f"Retrieved Vault Context:\n{context_str or 'None'}\n\n"
+            f"Retrieved Vault & Chat Memory Context:\n{context_str or 'None'}\n\n"
             f"Respond directly to the user in `response_to_user` and choose the appropriate `tool_name`."
         )
 

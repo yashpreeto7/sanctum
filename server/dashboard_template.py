@@ -298,6 +298,10 @@ DASHBOARD_HTML = """
       width: 100vw;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     /* Glass Panels with Dynamic Theme & Transparency Variables */
     .theme-bg-base { background-color: var(--bg-base); }
     .theme-bg-sidebar {
@@ -1157,7 +1161,7 @@ DASHBOARD_HTML = """
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left 1 Column: Traces List -->
-            <div class="p-4 rounded-2xl theme-card border space-y-3 h-[600px] flex flex-col">
+            <div class="p-4 rounded-2xl theme-card border space-y-3 h-[680px] flex flex-col">
               <div class="flex items-center justify-between text-xs font-mono text-slate-400 border-b theme-border pb-2">
                 <span>EXECUTION RUNS</span>
                 <span id="traces-list-badge">0 Runs</span>
@@ -1167,18 +1171,36 @@ DASHBOARD_HTML = """
               </div>
             </div>
 
-            <!-- Right 2 Columns: Selected Trace Details & Nodes -->
-            <div class="lg:col-span-2 p-5 rounded-2xl theme-card border space-y-4 h-[600px] flex flex-col overflow-y-auto">
-              <div class="border-b theme-border pb-3 flex items-center justify-between">
-                <div>
+            <!-- Right 2 Columns: Selected Trace Details, Visual DAG Flow & Expandable Nodes -->
+            <div class="lg:col-span-2 p-5 rounded-2xl theme-card border space-y-4 h-[680px] flex flex-col overflow-y-auto">
+              <!-- Top Trace Header & Controls -->
+              <div class="border-b theme-border pb-3 flex items-center justify-between flex-wrap gap-2">
+                <div class="space-y-0.5">
                   <h3 id="trace-selected-title" class="font-display font-bold text-sm text-white">Select a Trace Run</h3>
-                  <span id="trace-selected-sub" class="text-[11px] font-mono text-slate-400">Click any execution run on the left to inspect step inputs & outputs</span>
+                  <span id="trace-selected-sub" class="text-[11px] font-mono text-slate-400">Click any execution run on the left to inspect step DAG nodes & inputs</span>
                 </div>
-                <span id="trace-selected-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hidden">STATUS</span>
+                <div class="flex items-center space-x-2">
+                  <button id="btn-expand-all-nodes" onclick="toggleAllTraceNodes()" class="hidden px-2.5 py-1 rounded-lg theme-card border text-[11px] font-mono text-slate-300 hover:text-cyan-300 transition cursor-pointer flex items-center space-x-1">
+                    <i data-lucide="chevrons-down-up" class="w-3 h-3"></i>
+                    <span id="label-expand-all">Expand All</span>
+                  </button>
+                  <span id="trace-selected-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hidden">STATUS</span>
+                </div>
               </div>
 
-              <!-- Node Cards Stream -->
-              <div class="space-y-3" id="trace-nodes-container">
+              <!-- Visual Interactive DAG Pipeline Graph Strip -->
+              <div id="trace-dag-visual-strip" class="hidden p-3.5 rounded-xl bg-black/40 border theme-border space-y-2">
+                <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                  <span class="flex items-center space-x-1.5"><i data-lucide="git-fork" class="w-3 h-3 text-cyan-400"></i><span>Interactive Execution DAG Flow</span></span>
+                  <span id="trace-dag-meta" class="text-cyan-300">Click node to expand details</span>
+                </div>
+                <div class="flex items-center space-x-2 overflow-x-auto py-2 px-1 select-none" id="trace-dag-nodes-row">
+                  <!-- Dynamically rendered DAG pipeline nodes -->
+                </div>
+              </div>
+
+              <!-- Node Cards Stream & Expanded Inspector -->
+              <div class="space-y-3 flex-1" id="trace-nodes-container">
                 <div class="p-8 rounded-xl bg-black/30 border theme-border text-center text-xs text-slate-500">
                   Select a workflow run from the left panel to inspect LangGraph step DAG nodes.
                 </div>
@@ -1190,7 +1212,7 @@ DASHBOARD_HTML = """
         <!-- ══════════════════ TAB 4: INBOX & TRIAGE ══════════════════ -->
         <section id="view-inbox" class="hidden space-y-4 max-w-7xl mx-auto">
           <!-- Top Control Header -->
-          <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+          <div class="p-4 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-0.5">
               <div class="flex items-center space-x-2">
                 <div class="w-6 h-6 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center">
@@ -1200,7 +1222,15 @@ DASHBOARD_HTML = """
               </div>
               <p class="text-[11px] text-slate-400 font-mono">Live Gmail stream sanitized via Dual-LLM quarantine and classified by ML.</p>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 flex-wrap gap-1.5">
+              <button onclick="markAllInboxAsRead(); playCyberClick();" title="Mark all displayed emails as read" class="px-3 py-1.5 rounded-xl theme-card border hover:border-amber-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="mail-open" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Mark All Read</span>
+              </button>
+              <button onclick="archiveAllReadEmails(); playCyberClick();" title="Archive all read messages" class="px-3 py-1.5 rounded-xl theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Archive Read</span>
+              </button>
               <button onclick="fetchInbox(true); playCyberClick();" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                 <span>Sync Live Gmail</span>
@@ -1383,7 +1413,7 @@ DASHBOARD_HTML = """
   </div>
 
   <!-- ─── 3. OMARCHY THEMES SELECTOR MODAL ──────────────────────────── -->
-  <div id="theme-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 flex items-center justify-center hidden p-4">
+  <div id="theme-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
     <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl">
       <div class="flex items-center justify-between border-b theme-border pb-4">
         <div class="flex items-center space-x-2.5">
@@ -1467,7 +1497,7 @@ DASHBOARD_HTML = """
   </div>
 
   <!-- ─── 4. OMARCHY WALLPAPERS & GLASS CUSTOMIZER MODAL ────────────── -->
-  <div id="wallpaper-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 flex items-center justify-center hidden p-4">
+  <div id="wallpaper-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
     <div class="w-full max-w-3xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       
       <!-- Modal Header -->
@@ -1654,7 +1684,7 @@ DASHBOARD_HTML = """
   </div>
 
   <!-- ─── 5. DESKTOP APP LAUNCHER MODAL ─────────────────────────────── -->
-  <div id="desktop-launcher-modal" class="fixed inset-0 theme-modal-backdrop z-50 flex items-center justify-center hidden p-4">
+  <div id="desktop-launcher-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
     <div class="w-full max-w-xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-5 shadow-2xl">
       <div class="flex items-center justify-between border-b theme-border pb-3">
         <div class="flex items-center space-x-2.5">
@@ -1695,6 +1725,79 @@ DASHBOARD_HTML = """
 
       <div class="flex items-center justify-end space-x-2 border-t theme-border pt-3">
         <button onclick="closeDesktopLauncherModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium cursor-pointer">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.5 AI SMART REPLY COMPOSER MODAL ────────────────────────── -->
+  <div id="ai-reply-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+    <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-4 h-4 text-cyan-300"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display">AI Smart Reply Assistant</h3>
+            <p class="text-[10px] font-mono text-slate-400">Contextual draft generator & 1-click sender via Gmail API</p>
+          </div>
+        </div>
+        <button onclick="closeAiReplyModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Recipient & Subject Header -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+        <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+          <span class="text-[10px] text-slate-400 uppercase">To:</span>
+          <input type="text" id="reply-to-input" class="w-full bg-transparent text-cyan-300 font-semibold focus:outline-none" />
+        </div>
+        <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+          <span class="text-[10px] text-slate-400 uppercase">Subject:</span>
+          <input type="text" id="reply-subject-input" class="w-full bg-transparent text-white font-semibold focus:outline-none" />
+        </div>
+      </div>
+
+      <!-- Tone Selector & Custom Directive -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-300">Tone & Style:</span>
+          <div class="flex items-center space-x-1.5" id="reply-tone-selector">
+            <button type="button" onclick="selectReplyTone('professional')" id="tone-btn-professional" class="px-2.5 py-1 rounded-lg text-[10px] border bg-indigo-600/40 border-indigo-500 text-white font-bold cursor-pointer transition">Professional</button>
+            <button type="button" onclick="selectReplyTone('concise')" id="tone-btn-concise" class="px-2.5 py-1 rounded-lg text-[10px] border theme-card border-transparent text-slate-400 hover:text-white cursor-pointer transition">Concise (2-line)</button>
+            <button type="button" onclick="selectReplyTone('casual')" id="tone-btn-casual" class="px-2.5 py-1 rounded-lg text-[10px] border theme-card border-transparent text-slate-400 hover:text-white cursor-pointer transition">Casual</button>
+            <button type="button" onclick="selectReplyTone('friendly')" id="tone-btn-friendly" class="px-2.5 py-1 rounded-lg text-[10px] border theme-card border-transparent text-slate-400 hover:text-white cursor-pointer transition">Friendly</button>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="reply-custom-directive" placeholder="Optional directive (e.g. 'Accept meeting for Tuesday 3pm', 'Ask for quotation')..." class="flex-1 px-3 py-2 rounded-xl bg-black/40 border theme-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono" />
+          <button onclick="generateReplyDraft()" id="btn-generate-draft" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer shadow-sm transition flex-shrink-0">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-300"></i>
+            <span>Generate Draft</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editable Body Textarea -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-mono text-slate-400 uppercase">Draft Body (Review & Edit):</label>
+        <textarea id="reply-body-textarea" rows="6" placeholder="Click 'Generate Draft' above or type your reply draft here directly..." class="w-full p-3.5 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 font-sans leading-relaxed resize-none"></textarea>
+      </div>
+
+      <!-- Hidden Metadata Fields -->
+      <input type="hidden" id="reply-email-id" />
+      <input type="hidden" id="reply-original-body" />
+
+      <!-- Bottom Actions -->
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeAiReplyModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+        <div class="flex items-center space-x-2">
+          <button onclick="sendApprovedReply()" id="btn-send-reply" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center space-x-2 cursor-pointer shadow-md transition">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>Send Email via Gmail API</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1933,30 +2036,42 @@ DASHBOARD_HTML = """
     }
 
     function openThemeModal() {
-      document.getElementById('theme-picker-modal')?.classList.remove('hidden');
-      playCyberClick();
-      refreshIcons();
+      const m = document.getElementById('theme-picker-modal');
+      if (m) {
+        m.style.display = 'flex';
+        playCyberClick();
+        refreshIcons();
+      }
     }
     function closeThemeModal() {
-      document.getElementById('theme-picker-modal')?.classList.add('hidden');
+      const m = document.getElementById('theme-picker-modal');
+      if (m) m.style.display = 'none';
     }
 
     function openWallpaperModal() {
-      document.getElementById('wallpaper-picker-modal')?.classList.remove('hidden');
-      playCyberClick();
-      refreshIcons();
+      const m = document.getElementById('wallpaper-picker-modal');
+      if (m) {
+        m.style.display = 'flex';
+        playCyberClick();
+        refreshIcons();
+      }
     }
     function closeWallpaperModal() {
-      document.getElementById('wallpaper-picker-modal')?.classList.add('hidden');
+      const m = document.getElementById('wallpaper-picker-modal');
+      if (m) m.style.display = 'none';
     }
 
     function openDesktopLauncherModal() {
-      document.getElementById('desktop-launcher-modal')?.classList.remove('hidden');
-      playCyberClick();
-      refreshIcons();
+      const m = document.getElementById('desktop-launcher-modal');
+      if (m) {
+        m.style.display = 'flex';
+        playCyberClick();
+        refreshIcons();
+      }
     }
     function closeDesktopLauncherModal() {
-      document.getElementById('desktop-launcher-modal')?.classList.add('hidden');
+      const m = document.getElementById('desktop-launcher-modal');
+      if (m) m.style.display = 'none';
     }
 
     function toggleCustomUrlInput() {
@@ -2444,7 +2559,12 @@ DASHBOARD_HTML = """
         const countBadge = document.getElementById('chat-sessions-count');
         if (countBadge) countBadge.textContent = `${allChatSessions.length} sessions`;
 
-        if (autoSelectFirst && allChatSessions.length > 0 && !currentSessionId) {
+        const savedSessionId = localStorage.getItem('personal_ai_os_active_session');
+        const sessionExists = allChatSessions.some(s => s.id === savedSessionId);
+
+        if (sessionExists && !currentSessionId) {
+          selectChatSession(savedSessionId);
+        } else if (autoSelectFirst && allChatSessions.length > 0 && !currentSessionId) {
           selectChatSession(allChatSessions[0].id);
         } else if (allChatSessions.length === 0 && !currentSessionId) {
           await createNewChatSession();
@@ -2494,6 +2614,9 @@ DASHBOARD_HTML = """
 
     async function selectChatSession(sessionId) {
       currentSessionId = sessionId;
+      try {
+        localStorage.setItem('personal_ai_os_active_session', sessionId);
+      } catch (e) {}
       renderChatSessionsList(allChatSessions);
 
       try {
@@ -2734,6 +2857,9 @@ DASHBOARD_HTML = """
         // Speak aloud assistant response if JARVIS voice mode is enabled
         speakAssistantResponse(data.content);
       }
+      else if (data.type === 'trace_event') {
+        handleRealtimeTraceEvent(data.event, data.data);
+      }
       else if (data.type === 'proactive_alert') {
         showProactiveToast(
           data.title || '📬 Proactive Inbox Alert',
@@ -2747,6 +2873,24 @@ DASHBOARD_HTML = """
       }
       else if (data.type === 'inbox_update') {
         fetchInbox(false);
+      }
+    }
+
+    function handleRealtimeTraceEvent(eventType, eventData) {
+      if (eventType === 'node_step') {
+        appendSystemLog(`[DAG Step] ${eventData.node_name} completed in ${eventData.duration_ms}ms`);
+        // If on traces view, refresh active trace view or list
+        if (selectedRunId && selectedRunId === eventData.run_id) {
+          inspectSpecificTrace(selectedRunId, false);
+        } else {
+          fetchTraces(false);
+        }
+      } else if (eventType === 'trace_started') {
+        appendSystemLog(`[DAG Run] Started workflow execution (${eventData.trace?.run_id || ''})`);
+        fetchTraces(false);
+      } else if (eventType === 'trace_completed') {
+        appendSystemLog(`[DAG Run] Completed in ${eventData.trace?.total_duration_ms || 0}ms`);
+        fetchTraces(false);
       }
     }
 
@@ -3334,57 +3478,218 @@ DASHBOARD_HTML = """
       } catch (e) {}
     }
 
+    let allTraceNodesExpanded = false;
+    let currentTraceData = null;
+
+    function getNodeIconAndMeta(nodeName) {
+      const name = (nodeName || '').toLowerCase();
+      if (name.includes('quarantine') || name.includes('sanitize')) {
+        return { icon: 'shield-check', label: 'Quarantine & Sanitize', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' };
+      }
+      if (name.includes('triage') || name.includes('classify')) {
+        return { icon: 'zap', label: 'ML Gatekeeper & Triage', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' };
+      }
+      if (name.includes('retriev') || name.includes('rag') || name.includes('vector')) {
+        return { icon: 'database', label: 'Hybrid RAG Retrieval', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30' };
+      }
+      if (name.includes('reason') || name.includes('plan') || name.includes('agent')) {
+        return { icon: 'brain', label: 'LLM Reasoning & Planner', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' };
+      }
+      if (name.includes('tool') || name.includes('action') || name.includes('exec')) {
+        return { icon: 'wrench', label: 'Tool Execution', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30' };
+      }
+      if (name.includes('approval') || name.includes('gate') || name.includes('hitl')) {
+        return { icon: 'lock', label: 'HITL Security Gate', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/30' };
+      }
+      return { icon: 'activity', label: nodeName || 'Pipeline Step', color: 'text-slate-300', bg: 'bg-slate-500/10', border: 'border-slate-500/30' };
+    }
+
+    function toggleAllTraceNodes() {
+      allTraceNodesExpanded = !allTraceNodesExpanded;
+      const btnLabel = document.getElementById('label-expand-all');
+      if (btnLabel) btnLabel.textContent = allTraceNodesExpanded ? 'Collapse All' : 'Expand All';
+
+      const bodies = document.querySelectorAll('.trace-node-collapsible');
+      const icons = document.querySelectorAll('.trace-node-chevron');
+      bodies.forEach(b => {
+        if (allTraceNodesExpanded) b.classList.remove('hidden');
+        else b.classList.add('hidden');
+      });
+      icons.forEach(ic => {
+        ic.style.transform = allTraceNodesExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+      });
+    }
+
+    function toggleTraceNode(idx) {
+      const body = document.getElementById(`trace-node-body-${idx}`);
+      const chevron = document.getElementById(`trace-node-chevron-${idx}`);
+      if (!body) return;
+      const isHidden = body.classList.contains('hidden');
+      if (isHidden) {
+        body.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+      } else {
+        body.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function scrollToAndExpandTraceNode(idx) {
+      const card = document.getElementById(`trace-node-card-${idx}`);
+      const body = document.getElementById(`trace-node-body-${idx}`);
+      const chevron = document.getElementById(`trace-node-chevron-${idx}`);
+      if (body && body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+      }
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ring-2', 'ring-cyan-400');
+        setTimeout(() => card.classList.remove('ring-2', 'ring-cyan-400'), 1800);
+      }
+    }
+
     function renderTraceDetail(trace) {
+      currentTraceData = trace;
       const title = document.getElementById('trace-selected-title');
       const sub = document.getElementById('trace-selected-sub');
       const badge = document.getElementById('trace-selected-badge');
+      const expandBtn = document.getElementById('btn-expand-all-nodes');
+      const dagStrip = document.getElementById('trace-dag-visual-strip');
+      const dagRow = document.getElementById('trace-dag-nodes-row');
       const container = document.getElementById('trace-nodes-container');
 
       if (title) title.textContent = `Run ${trace.run_id}: "${trace.query}"`;
-      if (sub) sub.textContent = `Thread: ${trace.thread_id} • Total Latency: ${trace.total_duration_ms}ms • Nodes: ${trace.nodes.length}`;
+      if (sub) sub.textContent = `Thread: ${trace.thread_id} • Total Latency: ${trace.total_duration_ms}ms • ${trace.nodes.length} Executed Nodes`;
       if (badge) {
         badge.classList.remove('hidden');
+        const statusColors = {
+          SUCCESS: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+          AWAITING_APPROVAL: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+          ERROR: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+        };
+        badge.className = `text-[10px] font-mono px-2 py-0.5 rounded border ${statusColors[trace.status] || 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'}`;
         badge.textContent = trace.status;
       }
+      if (expandBtn) expandBtn.classList.remove('hidden');
 
+      // ── Render Visual Interactive DAG Flow Strip ──
+      if (dagStrip && dagRow) {
+        dagStrip.classList.remove('hidden');
+        dagRow.innerHTML = '';
+
+        if (!trace.nodes || trace.nodes.length === 0) {
+          dagRow.innerHTML = `<div class="text-[11px] text-slate-500 py-2">No DAG nodes captured for this run</div>`;
+        } else {
+          trace.nodes.forEach((node, idx) => {
+            const meta = getNodeIconAndMeta(node.node_name);
+            const isLast = idx === trace.nodes.length - 1;
+
+            const nodePill = document.createElement('div');
+            nodePill.className = 'flex items-center space-x-1.5 flex-shrink-0';
+            nodePill.innerHTML = `
+              <div onclick="scrollToAndExpandTraceNode(${idx}); playCyberClick();" class="group flex items-center space-x-2 px-3 py-1.5 rounded-xl border ${meta.bg} ${meta.border} hover:border-cyan-400 transition cursor-pointer shadow-sm hover:scale-[1.02]">
+                <div class="w-5 h-5 rounded-md bg-black/40 flex items-center justify-center ${meta.color}">
+                  <i data-lucide="${meta.icon}" class="w-3 h-3"></i>
+                </div>
+                <div class="text-left">
+                  <div class="text-[11px] font-mono font-bold text-white group-hover:text-cyan-300 transition">${idx + 1}. ${meta.label}</div>
+                  <div class="text-[9px] font-mono text-slate-400">${node.duration_ms}ms • <span class="${node.status === 'COMPLETED' ? 'text-emerald-400' : 'text-amber-400'}">${node.status}</span></div>
+                </div>
+              </div>
+              ${!isLast ? `
+                <div class="flex items-center text-slate-600 px-1">
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 animate-pulse text-cyan-500/70"></i>
+                </div>
+              ` : ''}
+            `;
+            dagRow.appendChild(nodePill);
+          });
+        }
+      }
+
+      // ── Render Expandable Step Detail Cards ──
       if (!container) return;
       container.innerHTML = '';
 
+      if (!trace.nodes || trace.nodes.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">No steps recorded in this execution run.</div>`;
+        return;
+      }
+
       trace.nodes.forEach((node, idx) => {
-        const stepCard = document.createElement('div');
-        stepCard.className = 'p-4 rounded-xl theme-card border space-y-2';
-        stepCard.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <div class="w-6 h-6 rounded-lg bg-black/40 flex items-center justify-center text-cyan-400 text-xs font-mono">
-                ${idx + 1}
+        const meta = getNodeIconAndMeta(node.node_name);
+        const card = document.createElement('div');
+        card.id = `trace-node-card-${idx}`;
+        card.className = `p-4 rounded-xl theme-card border transition space-y-3 ${meta.border}`;
+
+        card.innerHTML = `
+          <!-- Collapsible Header Bar -->
+          <div onclick="toggleTraceNode(${idx}); playCyberClick();" class="flex items-center justify-between cursor-pointer select-none">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg ${meta.bg} border ${meta.border} flex items-center justify-center ${meta.color}">
+                <i data-lucide="${meta.icon}" class="w-3.5 h-3.5"></i>
               </div>
-              <span class="font-mono text-xs font-bold text-white">${node.node_name}</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 text-slate-300">${node.duration_ms}ms</span>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold font-display text-white">${idx + 1}. ${node.node_name}</span>
+                  <span class="text-[10px] font-mono px-2 py-0.2 rounded bg-black/40 text-cyan-300">${node.duration_ms}ms</span>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">${meta.label}</div>
+              </div>
             </div>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded ${node.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${node.status}</span>
+
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${node.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'}">${node.status}</span>
+              <div class="w-6 h-6 rounded-md bg-black/30 flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i data-lucide="chevron-down" id="trace-node-chevron-${idx}" class="trace-node-chevron w-3.5 h-3.5 transition-transform duration-200"></i>
+              </div>
+            </div>
           </div>
 
-          ${node.tool_call ? `
-            <div class="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 font-mono flex items-center justify-between">
-              <span>Tool Call: <b>${node.tool_call}</b></span>
-              <span>Args: ${JSON.stringify(node.tool_args || {})}</span>
-            </div>
-          ` : ''}
+          <!-- Expandable Details Body -->
+          <div id="trace-node-body-${idx}" class="trace-node-collapsible hidden pt-3 border-t border-white/5 space-y-3">
+            ${node.tool_call ? `
+              <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 space-y-1.5 font-mono text-xs">
+                <div class="flex items-center justify-between text-indigo-300 font-bold">
+                  <span class="flex items-center space-x-1.5"><i data-lucide="wrench" class="w-3 h-3"></i><span>Tool Invocation: ${escapeHtml(node.tool_call)}</span></span>
+                  <span class="text-[10px] text-slate-400">Target Action</span>
+                </div>
+                <div class="p-2 rounded-lg bg-black/50 text-[11px] text-slate-300 overflow-x-auto max-h-32">
+                  <pre>${JSON.stringify(node.tool_args || {}, null, 2)}</pre>
+                </div>
+              </div>
+            ` : ''}
 
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <div>
-              <div class="text-[10px] font-mono text-slate-500 uppercase">Inputs</div>
-              <pre class="p-2 rounded-lg bg-black/50 text-[10px] font-mono text-slate-400 overflow-x-auto max-h-24">${JSON.stringify(node.inputs, null, 2)}</pre>
-            </div>
-            <div>
-              <div class="text-[10px] font-mono text-slate-500 uppercase">Outputs</div>
-              <pre class="p-2 rounded-lg bg-black/50 text-[10px] font-mono text-slate-400 overflow-x-auto max-h-24">${JSON.stringify(node.outputs, null, 2)}</pre>
+            <!-- Inputs & Outputs Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- Inputs -->
+              <div class="p-3 rounded-xl bg-black/40 border theme-border space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] font-mono uppercase text-slate-400">
+                  <span class="flex items-center space-x-1"><i data-lucide="arrow-down-left" class="w-3 h-3 text-cyan-400"></i><span>Node Inputs</span></span>
+                  <button onclick="navigator.clipboard.writeText(JSON.stringify(${JSON.stringify(node.inputs || {})}, null, 2)); showProactiveToast('Copied', 'Inputs copied to clipboard');" class="text-slate-500 hover:text-cyan-300 transition cursor-pointer" title="Copy Inputs">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <pre class="p-2 rounded-lg bg-black/60 text-[10px] font-mono text-slate-300 overflow-x-auto max-h-36">${JSON.stringify(node.inputs || {}, null, 2)}</pre>
+              </div>
+
+              <!-- Outputs -->
+              <div class="p-3 rounded-xl bg-black/40 border theme-border space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] font-mono uppercase text-slate-400">
+                  <span class="flex items-center space-x-1"><i data-lucide="arrow-up-right" class="w-3 h-3 text-emerald-400"></i><span>Node Outputs</span></span>
+                  <button onclick="navigator.clipboard.writeText(JSON.stringify(${JSON.stringify(node.outputs || {})}, null, 2)); showProactiveToast('Copied', 'Outputs copied to clipboard');" class="text-slate-500 hover:text-emerald-300 transition cursor-pointer" title="Copy Outputs">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <pre class="p-2 rounded-lg bg-black/60 text-[10px] font-mono text-slate-300 overflow-x-auto max-h-36">${JSON.stringify(node.outputs || {}, null, 2)}</pre>
+              </div>
             </div>
           </div>
         `;
-        container.appendChild(stepCard);
+        container.appendChild(card);
       });
+
       refreshIcons();
     }
 
@@ -3519,29 +3824,48 @@ DASHBOARD_HTML = """
           senderDisplay = senderDisplay.split('<')[0].trim().replace(/['"]/g, '');
         }
 
+        const isRead = !!em.is_read;
+
         const row = document.createElement('div');
-        row.className = 'group transition';
+        row.id = `inbox-item-row-${em.id}`;
+        row.className = `group transition ${isRead ? 'opacity-85' : 'bg-white/[0.02]'}`;
         row.innerHTML = `
           <!-- Concise Header Row (Gmail Style) -->
-          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition">
+          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.05] flex items-center justify-between cursor-pointer space-x-3 transition">
             <!-- Left: Sender -->
             <div class="flex items-center space-x-3 w-56 flex-shrink-0">
-              <div class="w-6 h-6 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-mono text-[10px] flex items-center justify-center font-bold">
+              <div class="w-6 h-6 rounded-lg ${isRead ? 'bg-slate-700/30 text-slate-400 border border-slate-700/40' : 'bg-indigo-600/30 text-cyan-300 border border-indigo-500/50'} font-mono text-[10px] flex items-center justify-center font-bold">
                 ${escapeHtml((senderDisplay[0] || 'M').toUpperCase())}
               </div>
-              <span class="text-xs font-semibold text-white truncate max-w-[170px]" title="${escapeHtml(em.sender)}">
+              <span class="text-xs ${isRead ? 'text-slate-300' : 'font-bold text-white'} truncate max-w-[170px]" title="${escapeHtml(em.sender)}">
                 ${escapeHtml(senderDisplay)}
               </span>
             </div>
 
             <!-- Middle: Subject & 1-line Snippet (Crisp Layout) -->
             <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
-              <span class="font-medium text-slate-100 flex-shrink-0 truncate max-w-[280px]">${escapeHtml(em.subject || 'No Subject')}</span>
+              <span class="${isRead ? 'text-slate-200' : 'font-bold text-white'} flex-shrink-0 truncate max-w-[280px]">${escapeHtml(em.subject || 'No Subject')}</span>
               <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${escapeHtml(snippetText)}</span>
             </div>
 
-            <!-- Right: Category Badge + Timestamp + Expand -->
-            <div class="flex items-center space-x-3 flex-shrink-0">
+            <!-- Right: Category Badge + Floating Hover Quick Actions + Timestamp + Expand -->
+            <div class="flex items-center space-x-2 flex-shrink-0">
+              <!-- Floating Hover Quick Actions (Gmail-style) -->
+              <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-1" onclick="event.stopPropagation()">
+                <button onclick="openAiReplyModal('${em.id}')" title="AI Smart Reply" class="p-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 transition cursor-pointer shadow-sm">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive Email" class="p-1.5 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition cursor-pointer">
+                  <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="performEmailAction('${em.id}', '${isRead ? 'mark_unread' : 'mark_read'}')" title="${isRead ? 'Mark as Unread' : 'Mark as Read'}" class="p-1.5 rounded-lg theme-card border hover:border-amber-400 text-slate-300 hover:text-amber-300 transition cursor-pointer">
+                  <i data-lucide="${isRead ? 'mail-open' : 'mail'}" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="performEmailAction('${em.id}', 'trash')" title="Move to Trash" class="p-1.5 rounded-lg theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 transition cursor-pointer">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
               ${badgeMarkup}
               <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
               <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
@@ -3549,25 +3873,55 @@ DASHBOARD_HTML = """
           </div>
 
           <!-- Expandable Detail Drawer -->
-          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/40 border-t border-white/5 space-y-3">
+          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3">
             <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
               <div class="space-y-0.5">
                 <div class="text-slate-300 font-mono text-[11px]">From: <span class="text-white">${escapeHtml(em.sender)}</span></div>
                 <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-cyan-300 font-bold">${escapeHtml(em.subject)}</span></div>
               </div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">🛡️ Dual-LLM Sanitized</span>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">🛡️ Dual-LLM Sanitized</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded ${isRead ? 'bg-slate-700/40 text-slate-300' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${isRead ? 'READ' : 'UNREAD'}</span>
+              </div>
             </div>
 
             <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
               ${escapeHtml(em.body || em.final_output || '')}
             </div>
 
-            <div class="flex items-center justify-between pt-1 text-xs font-mono">
-              <span class="text-[10px] text-slate-500">Message ID: ${em.id}</span>
+            <!-- Triage Quick Action Buttons Toolbar -->
+            <div class="flex items-center justify-between pt-1 text-xs font-mono flex-wrap gap-2">
+              <span class="text-[10px] text-slate-500">ID: ${em.id}</span>
+              
               <div class="flex items-center space-x-2">
-                <button onclick="openEmailInChat('${escapeHtml(em.subject.replace(/'/g, "\\'"))}')" class="px-3 py-1.5 rounded-xl bg-indigo-600/40 hover:bg-indigo-600/70 text-cyan-300 border border-indigo-500/50 text-xs flex items-center space-x-1.5 cursor-pointer transition shadow-sm">
+                <!-- 1. AI Smart Reply Button -->
+                <button onclick="openAiReplyModal('${em.id}')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-300"></i>
+                  <span>✨ AI Reply</span>
+                </button>
+
+                <!-- 2. Archive Button -->
+                <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive Email" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
+                  <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
+                  <span>Archive</span>
+                </button>
+
+                <!-- 3. Mark Read / Unread Toggle -->
+                <button onclick="performEmailAction('${em.id}', '${isRead ? 'mark_unread' : 'mark_read'}')" title="Toggle Read Status" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-slate-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
+                  <i data-lucide="${isRead ? 'mail' : 'mail-open'}" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>${isRead ? 'Mark Unread' : 'Mark Read'}</span>
+                </button>
+
+                <!-- 4. Trash Button -->
+                <button onclick="performEmailAction('${em.id}', 'trash')" title="Move to Trash" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 text-xs flex items-center space-x-1 cursor-pointer transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <span>Trash</span>
+                </button>
+
+                <!-- 5. Process in Chat -->
+                <button onclick="openEmailInChat('${em.id}')" class="px-2.5 py-1.5 rounded-xl bg-black/40 hover:bg-white/10 text-cyan-300 border theme-border text-xs flex items-center space-x-1.5 cursor-pointer transition">
                   <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                  <span>Reply & Process in Chat</span>
+                  <span>Chat</span>
                 </button>
               </div>
             </div>
@@ -3594,10 +3948,224 @@ DASHBOARD_HTML = """
       }
     }
 
-    function openEmailInChat(subject) {
+    function openEmailInChat(emailId) {
+      const em = cachedInboxItems.find(i => i.id === emailId) || {};
+      const subject = em.subject || 'No Subject';
       switchTab('chat');
       setChatPrompt(`check full email with subject "${subject}"`);
       sendChatMessage();
+    }
+
+    // ── Batch Actions ──
+    async function markAllInboxAsRead() {
+      if (!cachedInboxItems.length) return;
+      for (const em of cachedInboxItems) {
+        if (!em.is_read) {
+          await fetch('/api/inbox/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: em.id, action: 'mark_read' })
+          });
+        }
+      }
+      showProactiveToast('All Read', 'Marked all displayed inbox messages as read.');
+      fetchInbox(false);
+    }
+
+    async function archiveAllReadEmails() {
+      const readEmails = cachedInboxItems.filter(e => e.is_read);
+      if (!readEmails.length) {
+        showProactiveToast('No Read Messages', 'There are no read messages to archive.');
+        return;
+      }
+      for (const em of readEmails) {
+        await fetch('/api/inbox/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: em.id, action: 'archive' })
+        });
+      }
+      showProactiveToast('Archived', `Archived ${readEmails.length} read message(s).`);
+      fetchInbox(false);
+    }
+
+    // ── Email Triage Actions (Archive, Read/Unread, Trash) ──
+    async function performEmailAction(emailId, action) {
+      try {
+        playCyberClick(900);
+        const res = await fetch('/api/inbox/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: emailId, action: action })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          const actionLabels = {
+            archive: 'Archived',
+            mark_read: 'Marked as Read',
+            mark_unread: 'Marked as Unread',
+            trash: 'Moved to Trash'
+          };
+          showProactiveToast(
+            `Email ${actionLabels[action] || 'Updated'}`,
+            `Message ${emailId} was successfully processed.`
+          );
+          appendSystemLog(`[Inbox] ${actionLabels[action] || action}: Message ${emailId}`);
+          fetchInbox(false);
+        } else {
+          alert(`Action failed: ${data.detail || 'Error'}`);
+        }
+      } catch (err) {
+        console.error('Failed to perform email action:', err);
+      }
+    }
+
+    // ── AI Smart Reply Modal Logic ──
+    let currentReplyTone = 'professional';
+
+    function openAiReplyModal(emailId) {
+      playCyberClick(1100);
+      const em = cachedInboxItems.find(i => i.id === emailId) || {};
+      const sender = em.sender || 'Unknown';
+      const subject = em.subject || 'No Subject';
+      const body = em.body || em.final_output || '';
+
+      document.getElementById('reply-email-id').value = emailId;
+      document.getElementById('reply-to-input').value = sender;
+      
+      const sub = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
+      document.getElementById('reply-subject-input').value = sub;
+      document.getElementById('reply-original-body').value = body;
+      document.getElementById('reply-custom-directive').value = '';
+      document.getElementById('reply-body-textarea').value = '';
+      
+      selectReplyTone('professional');
+      const m = document.getElementById('ai-reply-modal');
+      if (m) {
+        m.style.display = 'flex';
+        refreshIcons();
+      }
+
+      // Auto-trigger fast initial AI draft generation
+      generateReplyDraft();
+    }
+
+    function closeAiReplyModal() {
+      const m = document.getElementById('ai-reply-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function selectReplyTone(tone) {
+      currentReplyTone = tone;
+      playCyberClick(700);
+      const tones = ['professional', 'concise', 'casual', 'friendly'];
+      tones.forEach(t => {
+        const btn = document.getElementById(`tone-btn-${t}`);
+        if (!btn) return;
+        if (t === tone) {
+          btn.className = "px-2.5 py-1 rounded-lg text-[10px] border bg-indigo-600/40 border-indigo-500 text-white font-bold cursor-pointer transition";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg text-[10px] border theme-card border-transparent text-slate-400 hover:text-white cursor-pointer transition";
+        }
+      });
+    }
+
+    async function generateReplyDraft() {
+      const emailId = document.getElementById('reply-email-id').value;
+      const sender = document.getElementById('reply-to-input').value;
+      const subject = document.getElementById('reply-subject-input').value;
+      const body = document.getElementById('reply-original-body').value;
+      const customDirective = document.getElementById('reply-custom-directive').value;
+      const textarea = document.getElementById('reply-body-textarea');
+      const btn = document.getElementById('btn-generate-draft');
+
+      if (!textarea) return;
+      textarea.value = "⏳ AI is drafting response based on context & tone...";
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/inbox/draft-reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: emailId,
+            sender: sender,
+            subject: subject,
+            body: body,
+            user_instructions: customDirective,
+            tone: currentReplyTone
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          textarea.value = data.body || '';
+          playHudBeep(1200);
+          appendSystemLog(`[AI Smart Reply] Generated ${currentReplyTone} draft for ${sender}`);
+        } else {
+          textarea.value = `⚠️ Could not generate draft: ${data.detail || 'Error'}`;
+        }
+      } catch (err) {
+        textarea.value = `⚠️ Error generating draft: ${err.message}`;
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function sendApprovedReply() {
+      const emailId = document.getElementById('reply-email-id').value;
+      const to = document.getElementById('reply-to-input').value.trim();
+      const subject = document.getElementById('reply-subject-input').value.trim();
+      const body = document.getElementById('reply-body-textarea').value.trim();
+      const btn = document.getElementById('btn-send-reply');
+
+      if (!to || !body) {
+        alert('Please ensure recipient and email body are not empty.');
+        return;
+      }
+
+      if (!confirm(`Confirm sending reply to ${to}?\n\nSubject: ${subject}`)) {
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Sending via Gmail...</span>`;
+        refreshIcons();
+      }
+
+      try {
+        const res = await fetch('/api/inbox/send-reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: to,
+            subject: subject,
+            body: body,
+            msg_id: emailId
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          playHudBeep(1600);
+          showProactiveToast(
+            `🚀 Email Sent Successfully!`,
+            `Your reply to ${to} has been dispatched via Gmail API.`
+          );
+          appendSystemLog(`[Gmail API] Reply successfully sent to ${to} (${subject})`);
+          closeAiReplyModal();
+          fetchInbox(false);
+        } else {
+          alert(`Failed to send email: ${data.detail || 'Error'}`);
+        }
+      } catch (err) {
+        alert(`Error sending email: ${err.message}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i><span>Send Email via Gmail API</span>`;
+          refreshIcons();
+        }
+      }
     }
 
     // ── HITL Approvals ──

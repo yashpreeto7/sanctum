@@ -49,10 +49,10 @@ def start_backend_server():
         stderr=subprocess.DEVNULL,
     )
 
-    # Wait for server to become responsive
-    max_retries = 30
+    # Wait for server to become responsive (allow up to 45s for model warmup)
+    max_retries = 90
     for _ in range(max_retries):
-        time.sleep(0.3)
+        time.sleep(0.5)
         if is_server_running(PORT):
             print(f"[Desktop App] Backend server is ready at {APP_URL}")
             return proc

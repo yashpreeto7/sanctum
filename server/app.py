@@ -29,7 +29,8 @@ from execution.orchestration.trace_manager import trace_store
 from execution.rag.hybrid_retriever import hybrid_retriever
 from execution.rag.reranker import reranker
 from execution.rag.vector_store import DocumentChunk, vector_store
-from execution.tools.gmail_connector import gmail_connector
+from execution.tools.calendar_connector import CalendarEvent, calendar_connector
+from execution.tools.gmail_connector import OutboundEmail, gmail_connector
 
 app = FastAPI(
     title="Personal AI OS",
@@ -124,6 +125,37 @@ class InboundEmailPayload(BaseModel):
     is_known_contact: bool = False
 
 
+class EmailActionPayload(BaseModel):
+    id: str
+    action: str = Field(..., description="archive | mark_read | mark_unread | trash")
+
+
+class DraftReplyRequest(BaseModel):
+    id: Optional[str] = None
+    sender: str
+    subject: str
+    body: str
+    user_instructions: Optional[str] = None
+    tone: Optional[str] = "professional"  # professional | concise | casual | friendly
+
+
+class SendReplyPayload(BaseModel):
+    to: str
+    subject: str
+    body: str
+    thread_id: Optional[str] = None
+    msg_id: Optional[str] = None
+
+
+class CreateCalendarEventPayload(BaseModel):
+    summary: str
+    start_time: str
+    end_time: str
+    description: Optional[str] = None
+    location: Optional[str] = None
+    attendees: List[str] = Field(default_factory=list)
+
+
 class ResolveApprovalPayload(BaseModel):
     approved: bool
     modified_args: Optional[Dict[str, Any]] = None
@@ -132,6 +164,7 @@ class ResolveApprovalPayload(BaseModel):
 class FeedbackPayload(BaseModel):
     text: str
     user_label: int = Field(..., description="1 = Important, 0 = Unimportant")
+
 
 
 # API Endpoints
@@ -219,6 +252,10 @@ async def handle_chat_command(payload: ChatCommandRequest):
     thread_id = payload.thread_id or session_id
     config = {"configurable": {"thread_id": thread_id}}
 
+    # Retrieve prior conversation turns for stateful multi-turn reasoning
+    past_messages = chat_history_store.get_session_messages(session_id)
+    history_tuples = [{"role": m.role, "content": m.content} for m in past_messages[-10:]]
+
     # Record user message in local SQLite history
     chat_history_store.add_message(session_id=session_id, role="user", content=payload.command)
 
@@ -231,6 +268,7 @@ async def handle_chat_command(payload: ChatCommandRequest):
         "sender": "user",
         "is_known_contact": True,
         "is_interactive_command": True,
+        "chat_history": history_tuples,
     }
 
     try:
@@ -262,6 +300,26 @@ async def handle_chat_command(payload: ChatCommandRequest):
             approval_required=approval_req,
             approval_request_id=approval_id,
         )
+
+        # Continuously ingest conversation Q&A into hybrid vector RAG store
+        try:
+            qa_summary = f"User Query: {payload.command}\nPersonal AI Response: {final_output}"
+            if planned_tool and planned_tool != "no_action":
+                qa_summary += f"\nAction Performed: {planned_tool} with parameters {tool_args}"
+            vector_store.insert_chunks([
+                DocumentChunk(
+                    text=qa_summary,
+                    source_type="chat_interaction",
+                    metadata={
+                        "session_id": session_id,
+                        "run_id": trace.run_id,
+                        "timestamp": time.time(),
+                        "query": payload.command,
+                    },
+                )
+            ])
+        except Exception:
+            pass
 
         return {
             "session_id": session_id,
@@ -342,13 +400,13 @@ async def ingest_inbound_email(payload: InboundEmailPayload):
 
 @app.post("/api/inbox/sync")
 async def sync_live_gmail():
-    """Fetches unread emails directly from Gmail API, runs triage & quarantine, and populates inbox."""
+    """Fetches emails directly from Gmail API (inbox + unread), runs triage & quarantine, and populates inbox."""
     try:
-        unread_emails = gmail_connector.list_unread(max_results=15)
+        inbox_emails = gmail_connector.list_inbox_messages(max_results=35)
         existing_ids = {item.get("id") for item in inbox_store}
         new_count = 0
 
-        for em in unread_emails:
+        for em in inbox_emails:
             if em.id in existing_ids:
                 continue
 
@@ -371,6 +429,7 @@ async def sync_live_gmail():
                 "category": pred.predicted_category,
                 "category_label": pred.category_label,
                 "badge_color": pred.badge_color,
+                "is_read": getattr(em, "is_read", False),
                 "clean_facts": {
                     "clean_subject": em.subject,
                     "factual_summary": pred.clean_snippet,
@@ -402,6 +461,124 @@ async def list_inbox():
         except Exception:
             pass
     return {"inbox": inbox_store}
+
+
+@app.post("/api/inbox/action")
+async def handle_inbox_action(payload: EmailActionPayload):
+    """Performs archive, mark_read, mark_unread, or trash on an inbox email."""
+    act = payload.action.lower()
+    msg_id = payload.id
+    res = {}
+    if act == "archive":
+        res = gmail_connector.archive_message(msg_id)
+        for item in inbox_store:
+            if item.get("id") == msg_id:
+                item["is_archived"] = True
+    elif act == "mark_read":
+        res = gmail_connector.mark_as_read(msg_id)
+        for item in inbox_store:
+            if item.get("id") == msg_id:
+                item["is_read"] = True
+    elif act == "mark_unread":
+        res = gmail_connector.mark_as_unread(msg_id)
+        for item in inbox_store:
+            if item.get("id") == msg_id:
+                item["is_read"] = False
+    elif act == "trash":
+        res = gmail_connector.trash_message(msg_id)
+        inbox_store[:] = [item for item in inbox_store if item.get("id") != msg_id]
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported action: {payload.action}")
+
+    await ws_manager.broadcast({"type": "inbox_update"})
+    return {"status": "success", "action": act, "result": res}
+
+
+@app.post("/api/inbox/draft-reply")
+async def draft_ai_reply(payload: DraftReplyRequest):
+    """Generates an intelligent context-aware reply draft using the fast/reasoning LLM."""
+    try:
+        tone_guide = {
+            "professional": "Polite, clear, concise, professional tone.",
+            "concise": "Extremely brief, direct to the point, no fluff (2-3 sentences max).",
+            "casual": "Warm, conversational, and helpful tone.",
+            "friendly": "Encouraging, friendly, and collaborative tone.",
+        }.get(payload.tone or "professional", "Polite, professional tone.")
+
+        prompt = (
+            f"You are the AI Executive Assistant for the user. Draft an email reply.\n"
+            f"Original Sender: {payload.sender}\n"
+            f"Original Subject: {payload.subject}\n"
+            f"Original Email Body:\n{payload.body[:1500]}\n\n"
+            f"Style/Tone: {tone_guide}\n"
+        )
+        if payload.user_instructions:
+            prompt += f"User Directives: {payload.user_instructions}\n"
+        prompt += (
+            "\nOutput ONLY the body text of the draft email response. Do not include placeholder brackets like [Your Name] if possible (sign off simply or as 'Best regards')."
+        )
+
+        try:
+            res = await llm_provider.generate(prompt=prompt)
+            draft_text = res.content.strip()
+        except Exception:
+            draft_text = f"Hi,\n\nThank you for reaching out regarding '{payload.subject}'. I have received your message and will follow up shortly.\n\nBest regards,\nYashpreet"
+
+        reply_subject = payload.subject if payload.subject.lower().startswith("re:") else f"Re: {payload.subject}"
+        return {
+            "status": "success",
+            "to": payload.sender,
+            "subject": reply_subject,
+            "body": draft_text.strip(),
+            "tone": payload.tone,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate draft: {str(e)}")
+
+
+@app.post("/api/inbox/send-reply")
+async def send_inbox_reply(payload: SendReplyPayload):
+    """Sends a threaded email reply directly via Gmail API."""
+    try:
+        res = gmail_connector.send_reply(
+            to=payload.to,
+            subject=payload.subject,
+            body=payload.body,
+            thread_id=payload.thread_id,
+        )
+        if payload.msg_id:
+            gmail_connector.mark_as_read(payload.msg_id)
+            for item in inbox_store:
+                if item.get("id") == payload.msg_id:
+                    item["is_read"] = True
+                    item["has_replied"] = True
+
+        await ws_manager.broadcast({"type": "inbox_update"})
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send reply: {str(e)}")
+
+
+@app.get("/api/calendar/events")
+async def list_calendar_events(days_ahead: int = 14):
+    """Lists upcoming Google Calendar events."""
+    events = calendar_connector.list_upcoming_events(days_ahead=days_ahead)
+    return {"events": [e.model_dump() for e in events]}
+
+
+@app.post("/api/calendar/create")
+async def create_calendar_event(payload: CreateCalendarEventPayload):
+    """Creates a new event in Google Calendar."""
+    ev = CalendarEvent(
+        summary=payload.summary,
+        start_time=payload.start_time,
+        end_time=payload.end_time,
+        description=payload.description,
+        location=payload.location,
+        attendees=payload.attendees,
+    )
+    res = calendar_connector.create_event(ev)
+    return {"status": "success", "result": res}
 
 
 @app.get("/api/approvals")
@@ -565,37 +742,54 @@ class ConnectionManager:
 ws_manager = ConnectionManager()
 
 
+# Register TraceStore listener to push real-time DAG node executions across WebSockets
+def _broadcast_trace_event(event_type: str, data: Dict[str, Any]):
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.create_task(ws_manager.broadcast({
+                "type": "trace_event",
+                "event": event_type,
+                "data": data,
+            }))
+    except Exception:
+        pass
+
+trace_store.add_listener(_broadcast_trace_event)
+
+
 # ── Proactive Background Autonomous Worker ─────────────────────────────────
 
 _alerted_email_ids = set()
 
 async def proactive_background_worker():
     """Periodically scans for urgent inbox items, syncs them to inbox_store, and pushes proactive alerts."""
-    await asyncio.sleep(5)
+    await asyncio.sleep(4)
     while True:
         try:
             from execution.tools.gmail_connector import gmail_connector
-            unread = gmail_connector.list_unread(max_results=6)
+            recent = gmail_connector.list_inbox_messages(max_results=15)
             new_incoming = False
-            for em in unread:
+            for em in recent:
                 if em.id not in _alerted_email_ids:
                     _alerted_email_ids.add(em.id)
                     new_incoming = True
-                    # Broadcast proactive toast alert to dashboard
-                    await ws_manager.broadcast({
-                        "type": "proactive_alert",
-                        "title": f"📬 Inbound Email: {em.subject[:45]}",
-                        "message": f"From: {em.sender}\n{em.body[:140]}...",
-                        "sender": em.sender,
-                        "email_id": em.id,
-                        "timestamp": time.time()
-                    })
+                    # Broadcast proactive toast alert to dashboard if unread
+                    if not getattr(em, "is_read", False):
+                        await ws_manager.broadcast({
+                            "type": "proactive_alert",
+                            "title": f"📬 Inbound Email: {em.subject[:45]}",
+                            "message": f"From: {em.sender}\n{em.body[:140]}...",
+                            "sender": em.sender,
+                            "email_id": em.id,
+                            "timestamp": time.time()
+                        })
             if new_incoming:
                 await sync_live_gmail()
                 await ws_manager.broadcast({"type": "inbox_update"})
         except Exception:
             pass
-        await asyncio.sleep(12)
+        await asyncio.sleep(10)
 
 
 @app.on_event("startup")
@@ -650,6 +844,10 @@ async def websocket_chat(websocket: WebSocket):
             thread_id = payload.get("thread_id") or session_id
             config = {"configurable": {"thread_id": thread_id}}
 
+            # Retrieve prior conversation turns for stateful multi-turn reasoning
+            past_messages = chat_history_store.get_session_messages(session_id)
+            history_tuples = [{"role": m.role, "content": m.content} for m in past_messages[-10:]]
+
             # Record user message in local SQLite history
             chat_history_store.add_message(session_id=session_id, role="user", content=command)
 
@@ -662,6 +860,7 @@ async def websocket_chat(websocket: WebSocket):
                 "sender": "user",
                 "is_known_contact": True,
                 "is_interactive_command": True,
+                "chat_history": history_tuples,
             }
 
             try:
@@ -693,6 +892,26 @@ async def websocket_chat(websocket: WebSocket):
                     approval_required=approval_required,
                     approval_request_id=approval_request_id,
                 )
+
+                # Continuously ingest conversation Q&A into hybrid vector RAG store
+                try:
+                    qa_summary = f"User Query: {command}\nPersonal AI Response: {pipeline_output}"
+                    if planned_tool and planned_tool != "no_action":
+                        qa_summary += f"\nAction Performed: {planned_tool} with parameters {tool_args}"
+                    vector_store.insert_chunks([
+                        DocumentChunk(
+                            text=qa_summary,
+                            source_type="chat_interaction",
+                            metadata={
+                                "session_id": session_id,
+                                "run_id": trace.run_id,
+                                "timestamp": time.time(),
+                                "query": command,
+                            },
+                        )
+                    ])
+                except Exception:
+                    pass
             except Exception as exc:
                 trace_store.complete_trace(run_id=trace.run_id, status="ERROR", error=str(exc))
                 chat_history_store.add_message(session_id=session_id, role="assistant", content=f"⚠️ Error: {str(exc)}")
