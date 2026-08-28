@@ -573,13 +573,31 @@ async def send_inbox_reply(payload: SendReplyPayload):
 
 
 @app.get("/api/calendar/events")
-async def list_calendar_events(days_ahead: int = 30):
-    """Lists upcoming Google Calendar events."""
+async def list_calendar_events(
+    days_back: int = 120,
+    days_ahead: int = 365,
+    include_festivals: bool = True,
+):
+    """Lists calendar events and cultural festivals across past, present, and future ranges."""
     try:
-        events = calendar_connector.list_upcoming_events(days_ahead=days_ahead)
+        events = calendar_connector.list_upcoming_events(
+            days_back=days_back,
+            days_ahead=days_ahead,
+            include_festivals=include_festivals,
+        )
         return {"status": "success", "events": [e.model_dump() for e in events]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch calendar events: {str(e)}")
+
+
+@app.get("/api/calendar/festivals")
+async def list_festivals(year: Optional[int] = None):
+    """Returns curated cultural and public festivals for a year."""
+    try:
+        festivals = calendar_connector.list_festivals(year=year)
+        return {"status": "success", "festivals": [f.model_dump() for f in festivals]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch festivals: {str(e)}")
 
 
 @app.post("/api/calendar/create")

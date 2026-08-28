@@ -1,10 +1,10 @@
-"""Deterministic Calendar Tool supporting live Google Calendar API and local offline persistent storage."""
+"""Deterministic Calendar Tool supporting live Google Calendar API, past/future schedule retrieval, and cultural festival tracking."""
 
 import json
 import os
 import uuid
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
@@ -24,6 +24,90 @@ class CalendarEvent(BaseModel):
     end_time: str = Field(..., description="ISO format datetime string")
     location: Optional[str] = None
     attendees: List[str] = Field(default_factory=list)
+    event_type: str = Field(default="schedule", description="'schedule', 'festival', or 'holiday'")
+    emoji: Optional[str] = None
+    is_all_day: bool = False
+
+
+# Curated dataset of major national, cultural, and seasonal festivals
+FESTIVALS_DATA: Dict[int, List[Dict[str, str]]] = {
+    2025: [
+        {"summary": "New Year's Day", "date": "2025-01-01", "emoji": "🎉", "description": "Global celebration of the first day of the year."},
+        {"summary": "Lohri", "date": "2025-01-13", "emoji": "🔥", "description": "Punjabi winter harvest festival celebrated with bonfires and folk songs."},
+        {"summary": "Makar Sankranti / Pongal", "date": "2025-01-14", "emoji": "🪁", "description": "Solar cycle harvest festival celebrated with kite flying."},
+        {"summary": "Republic Day", "date": "2025-01-26", "emoji": "🇮🇳", "description": "National holiday honoring the Constitution of India."},
+        {"summary": "Maha Shivratri", "date": "2025-02-26", "emoji": "🔱", "description": "Auspicious festival honoring Lord Shiva."},
+        {"summary": "Holi (Festival of Colors)", "date": "2025-03-14", "emoji": "🎨", "description": "Joyous celebration of spring, love, and colors."},
+        {"summary": "Eid ul-Fitr", "date": "2025-03-31", "emoji": "🌙", "description": "Islamic festival marking the end of Ramadan fast."},
+        {"summary": "Baisakhi", "date": "2025-04-13", "emoji": "🌾", "description": "Spring harvest festival and Sikh New Year."},
+        {"summary": "Good Friday", "date": "2025-04-18", "emoji": "✝️", "description": "Christian holiday commemorating the crucifixion of Jesus."},
+        {"summary": "Easter Sunday", "date": "2025-04-20", "emoji": "🐣", "description": "Christian celebration of the resurrection of Jesus Christ."},
+        {"summary": "Labour Day", "date": "2025-05-01", "emoji": "🛠️", "description": "International Workers' Day."},
+        {"summary": "Eid al-Adha (Bakrid)", "date": "2025-06-07", "emoji": "🐑", "description": "Feast of the Sacrifice in Islamic tradition."},
+        {"summary": "Independence Day", "date": "2025-08-15", "emoji": "🇮🇳", "description": "Commemorates the nation's independence in 1947."},
+        {"summary": "Raksha Bandhan", "date": "2025-08-09", "emoji": "🧵", "description": "Celebration of sibling bond and protection."},
+        {"summary": "Janmashtami", "date": "2025-08-16", "emoji": "🦚", "description": "Birth celebration of Lord Krishna."},
+        {"summary": "Ganesh Chaturthi", "date": "2025-08-27", "emoji": "🐘", "description": "Festival welcoming Lord Ganesha."},
+        {"summary": "Gandhi Jayanti", "date": "2025-10-02", "emoji": "🕊️", "description": "National holiday commemorating Mahatma Gandhi's birthday."},
+        {"summary": "Dussehra (Vijayadashami)", "date": "2025-10-02", "emoji": "🏹", "description": "Celebration of victory over evil."},
+        {"summary": "Diwali (Festival of Lights)", "date": "2025-10-20", "emoji": "🪔", "description": "Grand festival of lights, prosperity, and joy."},
+        {"summary": "Bhai Dooj", "date": "2025-10-22", "emoji": "🎁", "description": "Auspicious celebration between brothers and sisters."},
+        {"summary": "Guru Nanak Jayanti", "date": "2025-11-05", "emoji": "✨", "description": "Celebration of the birth of Guru Nanak Dev Ji."},
+        {"summary": "Christmas Eve", "date": "2025-12-24", "emoji": "🎄", "description": "Evening preceding Christmas Day."},
+        {"summary": "Christmas Day", "date": "2025-12-25", "emoji": "🎅", "description": "Celebration of the birth of Jesus Christ."},
+        {"summary": "New Year's Eve", "date": "2025-12-31", "emoji": "🥂", "description": "Celebrations welcoming the new year."},
+    ],
+    2026: [
+        {"summary": "New Year's Day", "date": "2026-01-01", "emoji": "🎉", "description": "Global celebration of the first day of the year."},
+        {"summary": "Lohri", "date": "2026-01-13", "emoji": "🔥", "description": "Punjabi winter harvest festival celebrated with bonfires and folk songs."},
+        {"summary": "Makar Sankranti / Pongal", "date": "2026-01-14", "emoji": "🪁", "description": "Solar cycle harvest festival celebrated with kite flying."},
+        {"summary": "Republic Day", "date": "2026-01-26", "emoji": "🇮🇳", "description": "National holiday honoring the Constitution of India."},
+        {"summary": "Maha Shivratri", "date": "2026-02-15", "emoji": "🔱", "description": "Auspicious festival honoring Lord Shiva."},
+        {"summary": "Holi (Festival of Colors)", "date": "2026-03-03", "emoji": "🎨", "description": "Joyous celebration of spring, love, and colors."},
+        {"summary": "Eid ul-Fitr", "date": "2026-03-20", "emoji": "🌙", "description": "Islamic festival marking the end of Ramadan fast."},
+        {"summary": "Good Friday", "date": "2026-04-03", "emoji": "✝️", "description": "Christian holiday commemorating the crucifixion of Jesus."},
+        {"summary": "Easter Sunday", "date": "2026-04-05", "emoji": "🐣", "description": "Christian celebration of the resurrection of Jesus Christ."},
+        {"summary": "Baisakhi", "date": "2026-04-14", "emoji": "🌾", "description": "Spring harvest festival and Sikh New Year."},
+        {"summary": "Labour Day", "date": "2026-05-01", "emoji": "🛠️", "description": "International Workers' Day."},
+        {"summary": "Eid al-Adha (Bakrid)", "date": "2026-05-27", "emoji": "🐑", "description": "Feast of the Sacrifice in Islamic tradition."},
+        {"summary": "Independence Day", "date": "2026-08-15", "emoji": "🇮🇳", "description": "Commemorates the nation's independence in 1947."},
+        {"summary": "Raksha Bandhan", "date": "2026-08-28", "emoji": "🧵", "description": "Celebration of sibling bond and protection."},
+        {"summary": "Janmashtami", "date": "2026-09-04", "emoji": "🦚", "description": "Birth celebration of Lord Krishna."},
+        {"summary": "Ganesh Chaturthi", "date": "2026-09-14", "emoji": "🐘", "description": "Festival welcoming Lord Ganesha."},
+        {"summary": "Gandhi Jayanti", "date": "2026-10-02", "emoji": "🕊️", "description": "National holiday commemorating Mahatma Gandhi's birthday."},
+        {"summary": "Dussehra (Vijayadashami)", "date": "2026-10-20", "emoji": "🏹", "description": "Celebration of victory over evil."},
+        {"summary": "Diwali (Festival of Lights)", "date": "2026-11-08", "emoji": "🪔", "description": "Grand festival of lights, prosperity, and joy."},
+        {"summary": "Govardhan Puja / Bhai Dooj", "date": "2026-11-10", "emoji": "🎁", "description": "Auspicious celebration between brothers and sisters."},
+        {"summary": "Guru Nanak Jayanti", "date": "2026-11-24", "emoji": "✨", "description": "Celebration of the birth of Guru Nanak Dev Ji."},
+        {"summary": "Christmas Eve", "date": "2026-12-24", "emoji": "🎄", "description": "Evening preceding Christmas Day."},
+        {"summary": "Christmas Day", "date": "2026-12-25", "emoji": "🎅", "description": "Celebration of the birth of Jesus Christ."},
+        {"summary": "New Year's Eve", "date": "2026-12-31", "emoji": "🥂", "description": "Celebrations welcoming the new year."},
+    ],
+    2027: [
+        {"summary": "New Year's Day", "date": "2027-01-01", "emoji": "🎉", "description": "Global celebration of the first day of the year."},
+        {"summary": "Lohri", "date": "2027-01-13", "emoji": "🔥", "description": "Punjabi winter harvest festival celebrated with bonfires and folk songs."},
+        {"summary": "Makar Sankranti / Pongal", "date": "2027-01-14", "emoji": "🪁", "description": "Solar cycle harvest festival celebrated with kite flying."},
+        {"summary": "Republic Day", "date": "2027-01-26", "emoji": "🇮🇳", "description": "National holiday honoring the Constitution of India."},
+        {"summary": "Maha Shivratri", "date": "2027-03-06", "emoji": "🔱", "description": "Auspicious festival honoring Lord Shiva."},
+        {"summary": "Eid ul-Fitr", "date": "2027-03-10", "emoji": "🌙", "description": "Islamic festival marking the end of Ramadan fast."},
+        {"summary": "Holi (Festival of Colors)", "date": "2027-03-22", "emoji": "🎨", "description": "Joyous celebration of spring, love, and colors."},
+        {"summary": "Good Friday", "date": "2027-03-26", "emoji": "✝️", "description": "Christian holiday commemorating the crucifixion of Jesus."},
+        {"summary": "Easter Sunday", "date": "2027-03-28", "emoji": "🐣", "description": "Christian celebration of the resurrection of Jesus Christ."},
+        {"summary": "Baisakhi", "date": "2027-04-14", "emoji": "🌾", "description": "Spring harvest festival and Sikh New Year."},
+        {"summary": "Labour Day", "date": "2027-05-01", "emoji": "🛠️", "description": "International Workers' Day."},
+        {"summary": "Eid al-Adha (Bakrid)", "date": "2027-05-16", "emoji": "🐑", "description": "Feast of the Sacrifice in Islamic tradition."},
+        {"summary": "Independence Day", "date": "2027-08-15", "emoji": "🇮🇳", "description": "Commemorates the nation's independence in 1947."},
+        {"summary": "Raksha Bandhan", "date": "2027-08-16", "emoji": "🧵", "description": "Celebration of sibling bond and protection."},
+        {"summary": "Janmashtami", "date": "2027-08-25", "emoji": "🦚", "description": "Birth celebration of Lord Krishna."},
+        {"summary": "Ganesh Chaturthi", "date": "2027-09-04", "emoji": "🐘", "description": "Festival welcoming Lord Ganesha."},
+        {"summary": "Gandhi Jayanti", "date": "2027-10-02", "emoji": "🕊️", "description": "National holiday commemorating Mahatma Gandhi's birthday."},
+        {"summary": "Dussehra (Vijayadashami)", "date": "2027-10-10", "emoji": "🏹", "description": "Celebration of victory over evil."},
+        {"summary": "Diwali (Festival of Lights)", "date": "2027-10-29", "emoji": "🪔", "description": "Grand festival of lights, prosperity, and joy."},
+        {"summary": "Bhai Dooj", "date": "2027-10-31", "emoji": "🎁", "description": "Auspicious celebration between brothers and sisters."},
+        {"summary": "Guru Nanak Jayanti", "date": "2027-11-14", "emoji": "✨", "description": "Celebration of the birth of Guru Nanak Dev Ji."},
+        {"summary": "Christmas Day", "date": "2027-12-25", "emoji": "🎅", "description": "Celebration of the birth of Jesus Christ."},
+    ]
+}
 
 
 def _to_rfc3339(dt_str: str) -> str:
@@ -32,17 +116,14 @@ def _to_rfc3339(dt_str: str) -> str:
         return datetime.now(timezone.utc).isoformat()
     dt_str = dt_str.strip()
     try:
-        # Handle 'Z' suffix
         if dt_str.endswith("Z"):
             dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
         else:
             dt = datetime.fromisoformat(dt_str)
-        # If naive datetime, attach local timezone
         if dt.tzinfo is None:
             dt = dt.astimezone()
         return dt.isoformat()
     except Exception:
-        # Fallback formatting for YYYY-MM-DDTHH:MM
         if len(dt_str) == 16:
             local_tz = datetime.now().astimezone().strftime("%z")
             tz_formatted = f"{local_tz[:3]}:{local_tz[3:]}" if len(local_tz) == 5 else "+00:00"
@@ -51,7 +132,7 @@ def _to_rfc3339(dt_str: str) -> str:
 
 
 class CalendarConnector:
-    """Manages reading, scheduling, deduplication, and conflict detection for calendar events."""
+    """Manages reading, past/future scheduling, deduplication, conflict detection, and festivals."""
 
     def __init__(self, service: Optional[Any] = None, storage_path: Optional[Path] = None):
         self._custom_service = service
@@ -90,20 +171,52 @@ class CalendarConnector:
         except Exception:
             pass
 
-    def list_upcoming_events(self, days_ahead: int = 30) -> List[CalendarEvent]:
-        """Lists events occurring in the next N days with strict deduplication."""
+    def list_festivals(self, year: Optional[int] = None) -> List[CalendarEvent]:
+        """Returns festival events for the specified year or current ± 1 year range."""
+        current_year = datetime.now().year
+        years = [year] if year else [current_year - 1, current_year, current_year + 1]
+        festivals = []
+
+        for y in years:
+            items = FESTIVALS_DATA.get(y, [])
+            for item in items:
+                d_str = item["date"]
+                festivals.append(
+                    CalendarEvent(
+                        id=f"festival-{d_str}-{item['summary'].replace(' ', '_').lower()}",
+                        summary=f"{item['emoji']} {item['summary']}",
+                        start_time=f"{d_str}T00:00:00",
+                        end_time=f"{d_str}T23:59:59",
+                        description=item["description"],
+                        location="Celebrated Globally / Nationally",
+                        event_type="festival",
+                        emoji=item["emoji"],
+                        is_all_day=True,
+                    )
+                )
+        return sorted(festivals, key=lambda e: e.start_time)
+
+    def list_upcoming_events(
+        self,
+        days_back: int = 120,
+        days_ahead: int = 365,
+        include_festivals: bool = True
+    ) -> List[CalendarEvent]:
+        """Lists past, present, and upcoming events with strict deduplication."""
         events_dict: Dict[str, CalendarEvent] = {}
         seen_keys = set()
 
-        # 1. Fetch from Google Calendar API if available
+        # 1. Fetch Google Calendar events in wide time window (including past days)
         service = self._get_service()
         if service is not None:
             try:
-                now_iso = datetime.now(timezone.utc).isoformat()
+                time_min = (datetime.now(timezone.utc) - timedelta(days=days_back)).isoformat()
+                time_max = (datetime.now(timezone.utc) + timedelta(days=days_ahead)).isoformat()
                 events_result = service.events().list(
                     calendarId="primary",
-                    timeMin=now_iso,
-                    maxResults=50,
+                    timeMin=time_min,
+                    timeMax=time_max,
+                    maxResults=250,
                     singleEvents=True,
                     orderBy="startTime",
                 ).execute()
@@ -114,7 +227,6 @@ class CalendarConnector:
                     eid = i.get("id") or str(uuid.uuid4())
                     summary = i.get("summary", "Untitled")
 
-                    # Deduplicate any duplicate events already existing in remote Google Calendar
                     key = (summary.strip().lower(), start[:16])
                     if key in seen_keys or eid in events_dict:
                         continue
@@ -127,13 +239,14 @@ class CalendarConnector:
                         description=i.get("description"),
                         location=i.get("location"),
                         attendees=[a.get("email", "") for a in i.get("attendees", []) if a.get("email")],
+                        event_type="schedule",
                     )
                     events_dict[eid] = ev
                     seen_keys.add(key)
             except Exception:
                 pass
 
-        # 2. Merge local stored events (deduplicating against Google Calendar items)
+        # 2. Merge local stored events (including all past and future records)
         self._mock_events = self._load_local_events()
         for ev in self._mock_events:
             if not ev.id:
@@ -143,18 +256,28 @@ class CalendarConnector:
                 events_dict[ev.id] = ev
                 seen_keys.add(key)
 
-        # 3. Sort chronologically
+        # 3. Include cultural festivals
+        if include_festivals:
+            for f_ev in self.list_festivals():
+                key = (f_ev.summary.strip().lower(), f_ev.start_time[:10])
+                if f_ev.id not in events_dict and key not in seen_keys:
+                    events_dict[f_ev.id] = f_ev
+                    seen_keys.add(key)
+
+        # 4. Sort chronologically
         sorted_events = sorted(events_dict.values(), key=lambda e: e.start_time or "")
         return sorted_events
 
     def check_conflicts(self, start_time_iso: str, end_time_iso: str) -> List[CalendarEvent]:
-        """Checks for overlapping events in the given time window."""
+        """Checks for overlapping events in the given time window (ignoring full-day festivals)."""
         conflicts = []
         try:
             req_start = datetime.fromisoformat(_to_rfc3339(start_time_iso).replace("Z", "+00:00"))
             req_end = datetime.fromisoformat(_to_rfc3339(end_time_iso).replace("Z", "+00:00"))
 
-            for ev in self.list_upcoming_events():
+            for ev in self.list_upcoming_events(days_back=7, days_ahead=30, include_festivals=False):
+                if ev.event_type == "festival" or ev.is_all_day:
+                    continue
                 ev_start = datetime.fromisoformat(_to_rfc3339(ev.start_time).replace("Z", "+00:00"))
                 ev_end = datetime.fromisoformat(_to_rfc3339(ev.end_time).replace("Z", "+00:00"))
 
@@ -166,9 +289,9 @@ class CalendarConnector:
 
     def create_event(self, event: CalendarEvent) -> Dict[str, Any]:
         """Schedules a new calendar event with reliable formatting, deduplication, and local persistence."""
-        # Normalize datetime fields to RFC3339
         event.start_time = _to_rfc3339(event.start_time)
         event.end_time = _to_rfc3339(event.end_time)
+        event.event_type = "schedule"
 
         service = self._get_service()
         if service is not None:
@@ -183,7 +306,6 @@ class CalendarConnector:
             try:
                 created = service.events().insert(calendarId="primary", body=body).execute()
                 event.id = created.get("id")
-                # Save to local storage for offline retrieval
                 self._upsert_local_event(event)
                 return {
                     "status": "success",
@@ -192,8 +314,13 @@ class CalendarConnector:
                     "provider": "google_calendar_api",
                 }
             except Exception as gerr:
-                # Fallback to local storage so user event is NEVER lost
-                event.id = f"local-{uuid.uuid4().hex[:10]}"
+                existing_id = None
+                key = (event.summary.strip().lower(), event.start_time[:16])
+                for e in self._load_local_events():
+                    if (e.summary.strip().lower(), e.start_time[:16]) == key or e.id == event.id:
+                        existing_id = e.id
+                        break
+                event.id = existing_id or f"local-{uuid.uuid4().hex[:10]}"
                 self._upsert_local_event(event)
                 return {
                     "status": "success",
@@ -211,7 +338,6 @@ class CalendarConnector:
                 existing_id = e.id
                 break
 
-        # Offline / Local persistent store
         event.id = existing_id or f"local-{uuid.uuid4().hex[:10]}"
         self._upsert_local_event(event)
         return {
@@ -236,7 +362,6 @@ class CalendarConnector:
 
     def delete_event(self, event_id: str) -> bool:
         """Deletes an event by ID from Google Calendar and local store."""
-        # 1. Try Google Calendar API
         service = self._get_service()
         if service is not None:
             try:
@@ -244,7 +369,6 @@ class CalendarConnector:
             except Exception:
                 pass
 
-        # 2. Delete from local storage
         self._mock_events = self._load_local_events()
         self._mock_events = [e for e in self._mock_events if e.id != event_id]
         self._save_local_events()

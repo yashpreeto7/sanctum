@@ -1,4 +1,4 @@
-"""Unit tests for Calendar Connector, Deduplication, and API endpoints."""
+"""Unit tests for Calendar Connector, Deduplication, Past Schedule Retention, Festivals, and API endpoints."""
 
 import pytest
 from pathlib import Path
@@ -17,7 +17,16 @@ def test_calendar_connector_crud_and_dedup(tmp_path: Path, monkeypatch):
     connector = CalendarConnector(storage_path=storage_file)
     monkeypatch.setattr(connector, "_get_service", lambda: None)
 
-    # 1. Create an event
+    # 1. Create an event in the past (e.g. 5 days ago)
+    ev_past = CalendarEvent(
+        summary="Retro Sprint Review",
+        start_time="2026-08-20T10:00",
+        end_time="2026-08-20T11:00",
+        location="Room 101",
+    )
+    connector.create_event(ev_past)
+
+    # 2. Create an event in the future
     ev1 = CalendarEvent(
         summary="Architecture Sync Meeting",
         start_time="2026-08-29T10:00",
@@ -30,12 +39,14 @@ def test_calendar_connector_crud_and_dedup(tmp_path: Path, monkeypatch):
     assert res_create["status"] == "success"
     assert res_create["summary"] == "Architecture Sync Meeting"
 
-    # 2. List events
-    events = connector.list_upcoming_events(days_ahead=30)
-    assert len(events) == 1
-    assert events[0].summary == "Architecture Sync Meeting"
+    # 3. List events without festivals (verifying past + future retention)
+    events_schedule = connector.list_upcoming_events(days_back=30, days_ahead=30, include_festivals=False)
+    assert len(events_schedule) == 2
+    summaries = [e.summary for e in events_schedule]
+    assert "Retro Sprint Review" in summaries
+    assert "Architecture Sync Meeting" in summaries
 
-    # 3. Attempt to create duplicate event (same summary and start_time)
+    # 4. Attempt to create duplicate event (same summary and start_time)
     ev2 = CalendarEvent(
         summary="Architecture Sync Meeting",
         start_time="2026-08-29T10:00",
@@ -46,18 +57,26 @@ def test_calendar_connector_crud_and_dedup(tmp_path: Path, monkeypatch):
     assert res_create2["status"] == "success"
 
     # List events again - must NOT have duplicates!
-    events_after = connector.list_upcoming_events(days_ahead=30)
-    assert len(events_after) == 1
+    events_after = connector.list_upcoming_events(days_back=30, days_ahead=30, include_festivals=False)
+    assert len(events_after) == 2
 
-    # 4. Check conflict detection
+    # 5. Check conflict detection
     conflicts = connector.check_conflicts("2026-08-29T10:30:00", "2026-08-29T11:30:00")
     assert len(conflicts) == 1
     assert conflicts[0].summary == "Architecture Sync Meeting"
 
-    # 5. Delete event
-    deleted = connector.delete_event(events[0].id)
+    # 6. Check festival listing
+    festivals = connector.list_festivals(year=2026)
+    assert len(festivals) > 0
+    assert any("Diwali" in f.summary for f in festivals)
+    assert any("Holi" in f.summary for f in festivals)
+
+    # 7. Delete event
+    deleted = connector.delete_event(ev1.id)
     assert deleted is True
-    assert len(connector.list_upcoming_events(days_ahead=30)) == 0
+    events_remaining = connector.list_upcoming_events(days_back=30, days_ahead=30, include_festivals=False)
+    assert len(events_remaining) == 1
+    assert events_remaining[0].summary == "Retro Sprint Review"
 
 
 def test_calendar_api_endpoints(test_client):
@@ -79,12 +98,20 @@ def test_calendar_api_endpoints(test_client):
     event_id = data["result"]["event_id"]
 
     # 2. List events via API
-    res_list = test_client.get("/api/calendar/events?days_ahead=30")
+    res_list = test_client.get("/api/calendar/events?days_back=60&days_ahead=60&include_festivals=true")
     assert res_list.status_code == 200
     events = res_list.json()["events"]
-    assert any(e["summary"] == "FastAPI Deployment Review" for e in events)
+    assert any("FastAPI Deployment Review" in e["summary"] for e in events)
+    assert any(e.get("event_type") == "festival" for e in events)
 
-    # 3. Delete event via API
+    # 3. Test Festivals endpoint
+    res_fest = test_client.get("/api/calendar/festivals?year=2026")
+    assert res_fest.status_code == 200
+    festivals = res_fest.json()["festivals"]
+    assert len(festivals) > 0
+    assert any("Independence Day" in f["summary"] for f in festivals)
+
+    # 4. Delete event via API
     res_del = test_client.delete(f"/api/calendar/event?event_id={event_id}")
     assert res_del.status_code == 200
     assert res_del.json()["status"] == "success"

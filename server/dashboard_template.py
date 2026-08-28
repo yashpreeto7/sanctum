@@ -1561,14 +1561,22 @@ DASHBOARD_HTML = """
               <div class="flex items-center justify-between pb-2 border-b border-white/5">
                 <div class="flex items-center space-x-2">
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span class="text-xs font-mono uppercase font-bold text-slate-300">Upcoming Agenda (14 Days)</span>
+                  <span class="text-xs font-mono uppercase font-bold text-slate-300">Agenda & Festivals</span>
                 </div>
-                <span id="calendar-agenda-count" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0 events</span>
+                <span id="calendar-agenda-count" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0 items</span>
+              </div>
+
+              <!-- Quick Filter Pills -->
+              <div class="flex items-center space-x-1 overflow-x-auto pb-1 text-[11px] font-mono select-none">
+                <button onclick="setCalendarFilter('all')" id="cal-filter-btn-all" class="px-2.5 py-1 rounded-lg bg-amber-500 text-black font-bold cursor-pointer transition">All</button>
+                <button onclick="setCalendarFilter('schedule')" id="cal-filter-btn-schedule" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border text-slate-300 hover:text-white cursor-pointer transition">My Schedule</button>
+                <button onclick="setCalendarFilter('festival')" id="cal-filter-btn-festival" class="px-2.5 py-1 rounded-lg bg-purple-600/30 border border-purple-500/30 text-purple-300 hover:text-white cursor-pointer transition">🎉 Festivals</button>
+                <button onclick="setCalendarFilter('past')" id="cal-filter-btn-past" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border text-slate-400 hover:text-white cursor-pointer transition">⏮️ Past</button>
               </div>
 
               <!-- Agenda Events Scroll Feed -->
               <div class="flex-1 overflow-y-auto space-y-2.5 max-h-[500px] pr-1" id="calendar-agenda-stream">
-                <div class="p-8 text-center text-xs text-slate-500 font-mono">No upcoming events scheduled.</div>
+                <div class="p-8 text-center text-xs text-slate-500 font-mono">Loading schedule & festivals...</div>
               </div>
             </div>
           </div>
@@ -5141,26 +5149,73 @@ DASHBOARD_HTML = """
       sendChatMessage();
     }
 
-    // ── Interactive Google Calendar & Schedule Engine ──
+    // ── Interactive Google Calendar, Festivals & Schedule Engine ──
     let allCalendarEvents = [];
     let calendarCurrentDate = new Date();
+    let currentCalendarFilter = 'all';
 
     async function fetchCalendarEvents() {
       try {
-        const res = await fetch('/api/calendar/events?days_ahead=30');
+        const res = await fetch('/api/calendar/events?days_back=120&days_ahead=365&include_festivals=true');
         const data = await res.json();
         allCalendarEvents = data.events || [];
 
         const navBadge = document.getElementById('nav-calendar-badge');
-        const agendaCount = document.getElementById('calendar-agenda-count');
-        if (navBadge) navBadge.textContent = allCalendarEvents.length;
-        if (agendaCount) agendaCount.textContent = `${allCalendarEvents.length} events`;
+        const totalUpcoming = allCalendarEvents.filter(e => {
+          try { return new Date(e.start_time) >= new Date(); } catch(err) { return true; }
+        }).length;
+        if (navBadge) navBadge.textContent = totalUpcoming;
 
         renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
-        renderCalendarAgenda(allCalendarEvents);
+        applyCalendarFilter();
       } catch (e) {
         console.error('Failed to fetch calendar events:', e);
       }
+    }
+
+    function setCalendarFilter(filterName) {
+      currentCalendarFilter = filterName;
+      playCyberClick(900);
+      
+      const filterBtns = {
+        'all': document.getElementById('cal-filter-btn-all'),
+        'schedule': document.getElementById('cal-filter-btn-schedule'),
+        'festival': document.getElementById('cal-filter-btn-festival'),
+        'past': document.getElementById('cal-filter-btn-past')
+      };
+
+      Object.entries(filterBtns).forEach(([name, btn]) => {
+        if (!btn) return;
+        if (name === filterName) {
+          btn.className = name === 'festival'
+            ? 'px-2.5 py-1 rounded-lg bg-purple-600 text-white font-bold cursor-pointer transition shadow-sm'
+            : 'px-2.5 py-1 rounded-lg bg-amber-500 text-black font-bold cursor-pointer transition shadow-sm';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg bg-black/40 border theme-border text-slate-300 hover:text-white cursor-pointer transition';
+        }
+      });
+
+      applyCalendarFilter();
+    }
+
+    function applyCalendarFilter() {
+      const now = new Date();
+      let filtered = [...allCalendarEvents];
+
+      if (currentCalendarFilter === 'schedule') {
+        filtered = filtered.filter(e => e.event_type !== 'festival');
+      } else if (currentCalendarFilter === 'festival') {
+        filtered = filtered.filter(e => e.event_type === 'festival');
+      } else if (currentCalendarFilter === 'past') {
+        filtered = filtered.filter(e => {
+          try { return new Date(e.start_time) < now; } catch(err) { return false; }
+        });
+      }
+
+      const agendaCount = document.getElementById('calendar-agenda-count');
+      if (agendaCount) agendaCount.textContent = `${filtered.length} items`;
+
+      renderCalendarAgenda(filtered);
     }
 
     function changeCalendarMonth(delta) {
@@ -5201,7 +5256,7 @@ DASHBOARD_HTML = """
       for (let i = startOffset - 1; i >= 0; i--) {
         const d = daysInPrevMonth - i;
         const cell = document.createElement('div');
-        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-40';
+        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-30';
         cell.textContent = d;
         grid.appendChild(cell);
       }
@@ -5209,11 +5264,15 @@ DASHBOARD_HTML = """
       // Current month days
       for (let d = 1; d <= daysInMonth; d++) {
         const isToday = isCurrentMonth && d === todayDate;
+        const isPastDay = isCurrentMonth ? d < todayDate : (year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth()));
+
         const cell = document.createElement('div');
         cell.className = `h-24 p-2 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
           isToday 
             ? 'bg-amber-500/10 border-amber-500/50 shadow-inner' 
-            : 'theme-card border-white/5 hover:border-amber-400/40 hover:bg-white/[0.04]'
+            : isPastDay 
+              ? 'theme-card border-white/5 opacity-75 hover:opacity-100 hover:border-amber-400/30'
+              : 'theme-card border-white/5 hover:border-amber-400/40 hover:bg-white/[0.04]'
         }`;
         
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -5232,26 +5291,49 @@ DASHBOARD_HTML = """
 
         let eventPillsHtml = '';
         dayEvents.slice(0, 2).forEach(ev => {
+          const isFestival = ev.event_type === 'festival';
           let time = '';
           try {
-            if (ev.start_time.includes('T')) {
+            if (ev.start_time.includes('T') && !ev.is_all_day && !isFestival) {
               time = new Date(ev.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
           } catch(e) {}
-          eventPillsHtml += `
-            <div class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate" title="${escapeHtml(ev.summary)}">
-              ${time ? `${time} ` : ''}${escapeHtml(ev.summary)}
-            </div>
-          `;
+
+          if (isFestival) {
+            eventPillsHtml += `
+              <div class="px-1.5 py-0.5 rounded bg-purple-500/25 text-purple-200 border border-purple-500/40 text-[9px] font-mono font-semibold truncate" title="${escapeHtml(ev.summary)}: ${escapeHtml(ev.description || '')}">
+                ${escapeHtml(ev.summary)}
+              </div>
+            `;
+          } else {
+            eventPillsHtml += `
+              <div class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate" title="${escapeHtml(ev.summary)}">
+                ${time ? `${time} ` : ''}${escapeHtml(ev.summary)}
+              </div>
+            `;
+          }
         });
+
         if (dayEvents.length > 2) {
           eventPillsHtml += `<span class="text-[9px] text-amber-400 font-mono">+${dayEvents.length - 2} more</span>`;
         }
 
+        const hasFestival = dayEvents.some(e => e.event_type === 'festival');
+        const hasSchedule = dayEvents.some(e => e.event_type !== 'festival');
+
+        let indicatorBadge = '';
+        if (hasFestival && hasSchedule) {
+          indicatorBadge = `<div class="flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>`;
+        } else if (hasFestival) {
+          indicatorBadge = `<span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>`;
+        } else if (hasSchedule) {
+          indicatorBadge = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;
+        }
+
         cell.innerHTML = `
           <div class="flex items-center justify-between text-xs font-mono">
-            <span class="${isToday ? 'w-5 h-5 rounded-full bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]' : 'text-slate-300 font-semibold'}">${d}</span>
-            ${dayEvents.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>` : ''}
+            <span class="${isToday ? 'w-5 h-5 rounded-full bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]' : isPastDay ? 'text-slate-400' : 'text-slate-200 font-semibold'}">${d}</span>
+            ${indicatorBadge}
           </div>
           <div class="space-y-1 overflow-hidden">${eventPillsHtml}</div>
         `;
@@ -5262,7 +5344,7 @@ DASHBOARD_HTML = """
       const remaining = (7 - (totalCells % 7)) % 7;
       for (let i = 1; i <= remaining; i++) {
         const cell = document.createElement('div');
-        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-40';
+        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-30';
         cell.textContent = i;
         grid.appendChild(cell);
       }
@@ -5274,45 +5356,78 @@ DASHBOARD_HTML = """
       stream.innerHTML = '';
 
       if (events.length === 0) {
-        stream.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">No upcoming events scheduled.</div>`;
+        stream.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">No items found matching the selected filter.</div>`;
         return;
       }
 
       const sorted = [...events].sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
+      const now = new Date();
 
       sorted.forEach(ev => {
-        const card = document.createElement('div');
-        card.className = 'p-3.5 rounded-xl bg-black/40 border border-white/10 hover:border-amber-500/40 transition space-y-2';
-
+        const isFestival = ev.event_type === 'festival';
         const startDate = ev.start_time ? new Date(ev.start_time) : null;
-        const timeStr = startDate ? startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'All Day';
-        const dateStr = startDate ? startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) : '';
+        const isPast = startDate && startDate < now && !isFestival;
 
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-amber-300 truncate pr-2">${escapeHtml(ev.summary)}</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex-shrink-0">${timeStr}</span>
-          </div>
-          <div class="text-[11px] text-slate-400 font-mono flex items-center space-x-2">
-            <span>📅 ${dateStr}</span>
-            ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
-          </div>
-          ${ev.description ? `<p class="text-[11px] text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.description)}</p>` : ''}
-          ${ev.attendees && ev.attendees.length > 0 ? `
-            <div class="text-[10px] font-mono text-slate-500">Attendees: <span class="text-cyan-300">${escapeHtml(ev.attendees.join(', '))}</span></div>
-          ` : ''}
-          <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]">
-            <span class="text-slate-500 font-mono">🛡️ Synced & Saved</span>
-            <div class="flex items-center space-x-1.5">
-              <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
-                📝 Prep in Obsidian
-              </button>
-              <button onclick="deleteCalendarEvent('${ev.id}', '${escapeHtml(ev.summary)}')" title="Delete Event" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition cursor-pointer">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        const timeStr = isFestival || ev.is_all_day ? 'All Day' : (startDate ? startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'All Day');
+        const dateStr = startDate ? startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+        const card = document.createElement('div');
+        if (isFestival) {
+          card.className = 'p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 hover:border-purple-400/60 transition space-y-2 relative overflow-hidden';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-200 truncate pr-2">${escapeHtml(ev.summary)}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-600/30 text-purple-200 border border-purple-500/40 flex-shrink-0">🎉 Festival</span>
+            </div>
+            <div class="text-[11px] text-purple-300/80 font-mono flex items-center space-x-2">
+              <span>📅 ${dateStr}</span>
+              ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
+            </div>
+            ${ev.description ? `<p class="text-[11px] text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.description)}</p>` : ''}
+            <div class="pt-1.5 border-t border-purple-500/20 flex items-center justify-between text-[10px]">
+              <span class="text-purple-400/60 font-mono">🌟 Cultural & Public Holiday</span>
+              <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr}')" class="px-2 py-0.5 rounded bg-purple-600/40 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-500/40 transition cursor-pointer">
+                📝 Add Note in Vault
               </button>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          card.className = `p-3.5 rounded-xl bg-black/40 border transition space-y-2 ${
+            isPast 
+              ? 'border-white/5 opacity-70 hover:opacity-100 hover:border-slate-500' 
+              : 'border-white/10 hover:border-amber-500/40'
+          }`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold ${isPast ? 'text-slate-300' : 'text-amber-300'} truncate pr-2">${escapeHtml(ev.summary)}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                isPast 
+                  ? 'bg-slate-800 text-slate-400 border border-slate-700' 
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+              } flex-shrink-0">${timeStr}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono flex items-center space-x-2">
+              <span>📅 ${dateStr}</span>
+              ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
+            </div>
+            ${ev.description ? `<p class="text-[11px] text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.description)}</p>` : ''}
+            ${ev.attendees && ev.attendees.length > 0 ? `
+              <div class="text-[10px] font-mono text-slate-500">Attendees: <span class="text-cyan-300">${escapeHtml(ev.attendees.join(', '))}</span></div>
+            ` : ''}
+            <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]">
+              <span class="text-slate-500 font-mono">${isPast ? '⏮️ Past Event' : '🛡️ Synced & Saved'}</span>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
+                  📝 Prep in Obsidian
+                </button>
+                <button onclick="deleteCalendarEvent('${ev.id}', '${escapeHtml(ev.summary)}')" title="Delete Event" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition cursor-pointer">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
         stream.appendChild(card);
       });
       refreshIcons();
