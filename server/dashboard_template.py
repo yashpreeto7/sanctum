@@ -2142,7 +2142,7 @@ DASHBOARD_HTML = """
 
       <div class="flex items-center justify-between pt-2 border-t theme-border">
         <button onclick="closeCalendarEventModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
-        <button onclick="saveCalendarEventFromModal()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+        <button id="btn-save-calendar-event" onclick="saveCalendarEventFromModal()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
           <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
           <span>Confirm & Schedule</span>
         </button>
@@ -5221,12 +5221,23 @@ DASHBOARD_HTML = """
 
         const dayEvents = allCalendarEvents.filter(ev => {
           if (!ev.start_time) return false;
-          return ev.start_time.startsWith(dateStr);
+          if (ev.start_time.startsWith(dateStr)) return true;
+          try {
+            const evD = new Date(ev.start_time);
+            return evD.getFullYear() === year && evD.getMonth() === month && evD.getDate() === d;
+          } catch(e) {
+            return false;
+          }
         });
 
         let eventPillsHtml = '';
         dayEvents.slice(0, 2).forEach(ev => {
-          const time = ev.start_time.includes('T') ? ev.start_time.split('T')[1].slice(0, 5) : '';
+          let time = '';
+          try {
+            if (ev.start_time.includes('T')) {
+              time = new Date(ev.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+          } catch(e) {}
           eventPillsHtml += `
             <div class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate" title="${escapeHtml(ev.summary)}">
               ${time ? `${time} ` : ''}${escapeHtml(ev.summary)}
@@ -5291,10 +5302,15 @@ DASHBOARD_HTML = """
             <div class="text-[10px] font-mono text-slate-500">Attendees: <span class="text-cyan-300">${escapeHtml(ev.attendees.join(', '))}</span></div>
           ` : ''}
           <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]">
-            <span class="text-slate-500 font-mono">🛡️ Google Cal Synced</span>
-            <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
-              📝 Prep in Obsidian
-            </button>
+            <span class="text-slate-500 font-mono">🛡️ Synced & Saved</span>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
+                📝 Prep in Obsidian
+              </button>
+              <button onclick="deleteCalendarEvent('${ev.id}', '${escapeHtml(ev.summary)}')" title="Delete Event" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
           </div>
         `;
         stream.appendChild(card);
@@ -5316,8 +5332,11 @@ DASHBOARD_HTML = """
       } else {
         const nextHour = new Date(now.getTime() + 3600000);
         const nextTwoHours = new Date(now.getTime() + 7200000);
-        document.getElementById('calendar-input-start').value = nextHour.toISOString().slice(0, 16);
-        document.getElementById('calendar-input-end').value = nextTwoHours.toISOString().slice(0, 16);
+        const pad = (n) => String(n).padStart(2, '0');
+        const startStr = `${nextHour.getFullYear()}-${pad(nextHour.getMonth() + 1)}-${pad(nextHour.getDate())}T${pad(nextHour.getHours())}:00`;
+        const endStr = `${nextTwoHours.getFullYear()}-${pad(nextTwoHours.getMonth() + 1)}-${pad(nextTwoHours.getDate())}T${pad(nextTwoHours.getHours())}:00`;
+        document.getElementById('calendar-input-start').value = startStr;
+        document.getElementById('calendar-input-end').value = endStr;
       }
 
       const m = document.getElementById('calendar-event-modal');
@@ -5339,10 +5358,17 @@ DASHBOARD_HTML = """
       const location = document.getElementById('calendar-input-location').value.trim() || null;
       const attendeesStr = document.getElementById('calendar-input-attendees').value.trim();
       const description = document.getElementById('calendar-input-description').value.trim() || null;
+      const btn = document.getElementById('btn-save-calendar-event');
 
       if (!summary || !start || !end) {
         alert('Please fill in event summary, start time, and end time.');
         return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Scheduling...</span>`;
+        refreshIcons();
       }
 
       const attendees = attendeesStr ? attendeesStr.split(',').map(a => a.trim()).filter(Boolean) : [];
@@ -5361,17 +5387,43 @@ DASHBOARD_HTML = """
           })
         });
         const data = await res.json();
-        if (res.ok) {
+        if (res.ok && (data.status === 'success' || (data.result && data.result.status === 'success'))) {
           playHudBeep(1600);
-          showProactiveToast('Event Scheduled', `"${summary}" created in Google Calendar.`);
+          showProactiveToast('Event Scheduled', `"${summary}" created in Calendar.`);
           appendSystemLog(`[Calendar Engine] Scheduled "${summary}" for ${start}`);
           closeCalendarEventModal();
           await fetchCalendarEvents();
         } else {
-          alert(`Failed to create event: ${data.detail || 'Error'}`);
+          alert(`Failed to create event: ${data.detail || (data.result && data.result.message) || 'Error'}`);
         }
       } catch (e) {
         alert(`Error scheduling event: ${e.message}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="calendar-check" class="w-3.5 h-3.5"></i><span>Confirm & Schedule</span>`;
+          refreshIcons();
+        }
+      }
+    }
+
+    async function deleteCalendarEvent(id, summary) {
+      if (!confirm(`Delete event "${summary}" from your schedule?`)) return;
+      try {
+        const res = await fetch(`/api/calendar/event?event_id=${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          playHudBeep(900);
+          showProactiveToast('Event Deleted', `Removed "${summary}"`);
+          appendSystemLog(`[Calendar Engine] Deleted event "${summary}"`);
+          await fetchCalendarEvents();
+        } else {
+          alert(`Failed to delete: ${data.detail || 'Error'}`);
+        }
+      } catch (e) {
+        alert(`Error deleting event: ${e.message}`);
       }
     }
 

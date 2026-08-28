@@ -573,25 +573,41 @@ async def send_inbox_reply(payload: SendReplyPayload):
 
 
 @app.get("/api/calendar/events")
-async def list_calendar_events(days_ahead: int = 14):
+async def list_calendar_events(days_ahead: int = 30):
     """Lists upcoming Google Calendar events."""
-    events = calendar_connector.list_upcoming_events(days_ahead=days_ahead)
-    return {"events": [e.model_dump() for e in events]}
+    try:
+        events = calendar_connector.list_upcoming_events(days_ahead=days_ahead)
+        return {"status": "success", "events": [e.model_dump() for e in events]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch calendar events: {str(e)}")
 
 
 @app.post("/api/calendar/create")
 async def create_calendar_event(payload: CreateCalendarEventPayload):
-    """Creates a new event in Google Calendar."""
-    ev = CalendarEvent(
-        summary=payload.summary,
-        start_time=payload.start_time,
-        end_time=payload.end_time,
-        description=payload.description,
-        location=payload.location,
-        attendees=payload.attendees,
-    )
-    res = calendar_connector.create_event(ev)
-    return {"status": "success", "result": res}
+    """Creates a new event in Google Calendar with offline persistent fallback."""
+    try:
+        ev = CalendarEvent(
+            summary=payload.summary,
+            start_time=payload.start_time,
+            end_time=payload.end_time,
+            description=payload.description,
+            location=payload.location,
+            attendees=payload.attendees,
+        )
+        res = calendar_connector.create_event(ev)
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create event: {str(e)}")
+
+
+@app.delete("/api/calendar/event")
+async def delete_calendar_event(event_id: str):
+    """Deletes a calendar event by ID."""
+    try:
+        deleted = calendar_connector.delete_event(event_id=event_id)
+        return {"status": "success", "deleted": deleted, "event_id": event_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete event: {str(e)}")
 
 
 # ── Obsidian Vault Endpoints ──
