@@ -145,6 +145,15 @@ class ObsidianConnector:
             "modified_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
         }
 
+    def search_notes(self, query: str) -> List[Dict[str, Any]]:
+        """Searches all notes for matching text in title, content, or tags."""
+        q = query.lower().strip()
+        matched = []
+        for n in self.list_all_notes():
+            if q in n["title"].lower() or q in n["preview"].lower() or any(q in t.lower() for t in n.get("tags", [])):
+                matched.append(n)
+        return matched
+
     def delete_note(self, rel_path: str) -> bool:
         """Deletes a note file."""
         target = self.vault_path / rel_path
