@@ -203,8 +203,16 @@ class CalendarConnector:
                     "google_api_warning": str(gerr),
                 }
 
+        # Check if existing event has same key to preserve its ID
+        existing_id = None
+        key = (event.summary.strip().lower(), event.start_time[:16])
+        for e in self._load_local_events():
+            if (e.summary.strip().lower(), e.start_time[:16]) == key or e.id == event.id:
+                existing_id = e.id
+                break
+
         # Offline / Local persistent store
-        event.id = f"local-{uuid.uuid4().hex[:10]}"
+        event.id = existing_id or f"local-{uuid.uuid4().hex[:10]}"
         self._upsert_local_event(event)
         return {
             "status": "success",
@@ -217,7 +225,6 @@ class CalendarConnector:
     def _upsert_local_event(self, event: CalendarEvent):
         """Adds or updates an event in the local persistent list without duplicates."""
         self._mock_events = self._load_local_events()
-        # Remove any existing event with same ID or same (summary, start_time)
         key = (event.summary.strip().lower(), event.start_time[:16])
         filtered = [
             e for e in self._mock_events
@@ -239,10 +246,9 @@ class CalendarConnector:
 
         # 2. Delete from local storage
         self._mock_events = self._load_local_events()
-        prev_len = len(self._mock_events)
         self._mock_events = [e for e in self._mock_events if e.id != event_id]
         self._save_local_events()
-        return len(self._mock_events) < prev_len or True
+        return True
 
 
 # Singleton instance
