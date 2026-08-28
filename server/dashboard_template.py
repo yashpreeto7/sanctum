@@ -472,6 +472,8 @@ DASHBOARD_HTML = """
         <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">5:HITL</button>
         <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">6:DAG</button>
         <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">7:RAG</button>
+        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">8:NOTES</button>
+        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">9:CAL</button>
       </div>
     </div>
 
@@ -638,6 +640,22 @@ DASHBOARD_HTML = """
           <a onclick="switchTab('rag'); playCyberClick();" id="nav-rag" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
             <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
             <span>7. Knowledge (RAG)</span>
+          </a>
+
+          <a onclick="switchTab('obsidian'); playCyberClick();" id="nav-obsidian" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="book-open" class="w-4 h-4 text-purple-400"></i>
+              <span>8. Obsidian Notes</span>
+            </div>
+            <span id="nav-obsidian-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">0</span>
+          </a>
+
+          <a onclick="switchTab('calendar'); playCyberClick();" id="nav-calendar" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+              <span>9. Calendar & Schedule</span>
+            </div>
+            <span id="nav-calendar-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0</span>
           </a>
 
           <a onclick="switchTab('activity'); playCyberClick();" id="nav-activity" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
@@ -1373,7 +1391,190 @@ DASHBOARD_HTML = """
           </div>
         </section>
 
-        <!-- ══════════════════ TAB 8: ACTIVITY & TELEMETRY ════════════ -->
+        <!-- ══════════════════ TAB 8: OBSIDIAN VAULT ══════════════════ -->
+        <section id="view-obsidian" class="hidden space-y-5 max-w-7xl mx-auto">
+          <!-- Top Vault Status Banner -->
+          <div class="p-5 rounded-2xl theme-card border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+                  <i data-lucide="book-open" class="w-4 h-4 text-purple-300"></i>
+                </div>
+                <div>
+                  <h2 class="text-base font-display font-bold text-white">Obsidian Knowledge Vault</h2>
+                  <p class="text-xs text-slate-400 font-mono" id="obsidian-vault-path-label">Connected: .tmp/obsidian_vault</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
+              <button onclick="openCreateObsidianNoteModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+                <i data-lucide="file-plus" class="w-3.5 h-3.5"></i>
+                <span>New Note</span>
+              </button>
+              <button onclick="openObsidianDailyModal()" class="px-3.5 py-2 rounded-xl bg-indigo-600/40 hover:bg-indigo-600 border border-indigo-500 text-cyan-300 hover:text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition">
+                <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
+                <span>Quick Daily Log</span>
+              </button>
+              <button onclick="fetchObsidianNotes(); fetchObsidianStatus(); playCyberClick();" class="p-2 rounded-xl theme-card border hover:border-purple-400 text-slate-300 hover:text-white transition cursor-pointer" title="Refresh Vault">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vault Filter Bar (Search + Folder Pills + Tags) -->
+          <div class="p-3.5 rounded-2xl theme-card border space-y-3">
+            <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-2">
+              <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
+              <input type="text" id="obsidian-search-input" oninput="filterObsidianNotes()" placeholder="Filter notes by title, tag (#action), or content..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-mono">
+              <span id="obsidian-filtered-count" class="text-[10px] font-mono text-slate-400">0 notes</span>
+            </div>
+
+            <!-- Folder & Tag Badges -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs" id="obsidian-folder-pills">
+              <button onclick="filterObsidianFolder('all')" class="px-2.5 py-1 rounded-lg bg-purple-600/30 border border-purple-500 text-purple-300 font-bold text-[11px] cursor-pointer">📁 All Folders</button>
+            </div>
+          </div>
+
+          <!-- 2-Column Split: Left Note List, Right Markdown Reader/Editor -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[640px]">
+            
+            <!-- Left: Notes List -->
+            <div class="lg:col-span-5 theme-card border rounded-2xl p-4 flex flex-col h-full overflow-hidden">
+              <div class="flex items-center justify-between pb-3 border-b border-white/5 text-xs font-mono">
+                <span class="text-slate-400 uppercase font-bold">Markdown Documents</span>
+                <span id="obsidian-notes-list-count" class="text-[11px] text-purple-400 font-bold">0</span>
+              </div>
+              <div class="flex-1 overflow-y-auto space-y-2 pt-3 pr-1" id="obsidian-notes-list-container">
+                <div class="p-8 text-center text-xs text-slate-500 font-mono">Loading notes...</div>
+              </div>
+            </div>
+
+            <!-- Right: Note Viewer / Editor -->
+            <div class="lg:col-span-7 theme-card border rounded-2xl p-5 flex flex-col h-full overflow-hidden relative">
+              <div id="obsidian-empty-view" class="flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-400 space-y-2">
+                <i data-lucide="file-text" class="w-10 h-10 text-purple-400/40"></i>
+                <div class="text-sm font-semibold text-white">Select a note to preview</div>
+                <p class="text-xs text-slate-500 max-w-sm">Click any markdown document on the left to read, edit, or copy its contents.</p>
+              </div>
+
+              <!-- Active Note Content View -->
+              <div id="obsidian-active-view" class="hidden flex-1 flex flex-col h-full overflow-hidden space-y-3">
+                <!-- Note Title & Toolbar -->
+                <div class="flex items-center justify-between pb-3 border-b border-white/5 flex-shrink-0">
+                  <div class="space-y-0.5 min-w-0 flex-1 pr-3">
+                    <h3 id="obsidian-view-title" class="text-sm font-bold text-white truncate font-display"></h3>
+                    <div class="flex items-center space-x-2 text-[10px] font-mono text-slate-400">
+                      <span id="obsidian-view-folder" class="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300"></span>
+                      <span id="obsidian-view-path" class="text-slate-500 truncate max-w-xs"></span>
+                      <span id="obsidian-view-modified" class="text-slate-400"></span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-1.5 flex-shrink-0">
+                    <button onclick="askCopilotAboutCurrentNote()" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 text-xs flex items-center space-x-1 cursor-pointer transition" title="Ask Personal AI about this note">
+                      <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                      <span>Ask AI</span>
+                    </button>
+                    <button onclick="copyCurrentObsidianNote(this)" class="px-2.5 py-1.5 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                      <span>Copy</span>
+                    </button>
+                    <button onclick="editCurrentObsidianNote()" class="px-2.5 py-1.5 rounded-lg theme-card border hover:border-purple-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
+                      <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                      <span>Edit</span>
+                    </button>
+                    <button onclick="deleteCurrentObsidianNote()" class="p-1.5 rounded-lg theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 text-xs transition cursor-pointer" title="Delete Note">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Markdown Content Display Area -->
+                <div id="obsidian-markdown-body" class="flex-1 overflow-y-auto p-4 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════ TAB 9: CALENDAR ═══════════════════════ -->
+        <section id="view-calendar" class="hidden space-y-5 max-w-7xl mx-auto">
+          <!-- Calendar Header & Navigation Bar -->
+          <div class="p-5 rounded-2xl theme-card border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+                <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+              </div>
+              <div>
+                <h2 class="text-base font-display font-bold text-white" id="calendar-month-year-label">Schedule & Google Calendar</h2>
+                <p class="text-xs text-slate-400 font-mono">Live synchronization with Google Calendar & conflict detection</p>
+              </div>
+            </div>
+
+            <!-- Calendar Navigation & Action Buttons -->
+            <div class="flex items-center space-x-2">
+              <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border theme-border">
+                <button onclick="changeCalendarMonth(-1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <button onclick="jumpToCalendarToday()" class="px-3 py-1 rounded-lg text-xs font-mono font-bold text-cyan-300 hover:bg-white/10 transition cursor-pointer">Today</button>
+                <button onclick="changeCalendarMonth(1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <button onclick="openNewCalendarEventModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>+ Schedule Event</span>
+              </button>
+
+              <button onclick="fetchCalendarEvents(); playCyberClick();" class="p-2 rounded-xl theme-card border hover:border-amber-400 text-slate-300 hover:text-white transition cursor-pointer" title="Sync Calendar">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2-Column Calendar Layout: Left Month Grid, Right Upcoming Agenda -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- Left 7x5 Interactive Grid -->
+            <div class="lg:col-span-8 theme-card border rounded-2xl p-5 space-y-3">
+              <!-- Weekday Header (Mon - Sun) -->
+              <div class="grid grid-cols-7 gap-1 text-center font-mono text-[11px] font-bold text-slate-400 pb-2 border-b border-white/5">
+                <div>MON</div>
+                <div>TUE</div>
+                <div>WED</div>
+                <div>THU</div>
+                <div>FRI</div>
+                <div class="text-amber-400">SAT</div>
+                <div class="text-amber-400">SUN</div>
+              </div>
+
+              <!-- Month Days Dynamic Grid -->
+              <div class="grid grid-cols-7 gap-1.5" id="calendar-days-grid">
+                <!-- Populated via JavaScript -->
+              </div>
+            </div>
+
+            <!-- Right: Upcoming Events Agenda Feed -->
+            <div class="lg:col-span-4 theme-card border rounded-2xl p-5 flex flex-col h-full space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-white/5">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span class="text-xs font-mono uppercase font-bold text-slate-300">Upcoming Agenda (14 Days)</span>
+                </div>
+                <span id="calendar-agenda-count" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0 events</span>
+              </div>
+
+              <!-- Agenda Events Scroll Feed -->
+              <div class="flex-1 overflow-y-auto space-y-2.5 max-h-[500px] pr-1" id="calendar-agenda-stream">
+                <div class="p-8 text-center text-xs text-slate-500 font-mono">No upcoming events scheduled.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════ TAB 10: ACTIVITY & TELEMETRY ════════════ -->
         <section id="view-activity" class="hidden space-y-6 max-w-7xl mx-auto">
           <div class="p-5 rounded-2xl theme-card border space-y-3">
             <h2 class="text-base font-display font-bold text-white">Full System Activity Stream</h2>
@@ -1798,6 +1999,153 @@ DASHBOARD_HTML = """
             <span>Send Email via Gmail API</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.6 OBSIDIAN NOTE CREATOR / EDITOR MODAL ─────────────────── -->
+  <div id="obsidian-note-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+    <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+            <i data-lucide="edit" class="w-4 h-4 text-purple-300"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display" id="obsidian-modal-title">Create Obsidian Markdown Note</h3>
+            <p class="text-[10px] font-mono text-slate-400">Save directly to your local Obsidian vault on disk</p>
+          </div>
+        </div>
+        <button onclick="closeObsidianNoteModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+        <div class="md:col-span-2 space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">Note Title (Filename):</label>
+          <input type="text" id="obsidian-input-title" placeholder="Project Architecture Spec" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-purple-500" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">Folder (Optional):</label>
+          <input type="text" id="obsidian-input-folder" placeholder="Daily, Projects, etc." class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-purple-500" />
+        </div>
+      </div>
+
+      <div class="space-y-1 text-xs font-mono">
+        <label class="text-[10px] text-slate-400 uppercase">Tags (comma-separated):</label>
+        <input type="text" id="obsidian-input-tags" placeholder="action, incident, architecture, meeting" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-cyan-300 focus:outline-none focus:border-purple-500" />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-mono text-slate-400 uppercase">Markdown Body Content:</label>
+        <textarea id="obsidian-input-content" rows="10" placeholder="# Heading&#10;&#10;Write note content in GitHub Flavored Markdown..." class="w-full p-3.5 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-purple-500 font-mono leading-relaxed resize-none"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeObsidianNoteModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+        <button onclick="saveObsidianNoteFromModal()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+          <i data-lucide="save" class="w-3.5 h-3.5"></i>
+          <span>Save to Vault</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.7 OBSIDIAN QUICK DAILY LOG MODAL ───────────────────────── -->
+  <div id="obsidian-daily-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+    <div class="w-full max-w-lg theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-cyan-300 flex items-center justify-center">
+            <i data-lucide="calendar-plus" class="w-4 h-4 text-cyan-300"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display">Append Quick Daily Log</h3>
+            <p class="text-[10px] font-mono text-slate-400">Appends a timestamped entry to today's Daily Note</p>
+          </div>
+        </div>
+        <button onclick="closeObsidianDailyModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1 text-xs font-mono">
+        <label class="text-[10px] text-slate-400 uppercase">Section Heading:</label>
+        <input type="text" id="obsidian-daily-section" value="AI Actions" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-cyan-300 focus:outline-none focus:border-indigo-500" />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-mono text-slate-400 uppercase">Log Entry (What happened?):</label>
+        <textarea id="obsidian-daily-entry" rows="4" placeholder="Reviewed and triaged 12 inbound messages, accepted DocDispatch review for Tuesday 3 PM." class="w-full p-3 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 font-sans leading-relaxed resize-none"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeObsidianDailyModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+        <button onclick="saveObsidianDailyLog()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          <span>Append Entry</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.8 GOOGLE CALENDAR EVENT CREATOR MODAL ──────────────────── -->
+  <div id="calendar-event-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+    <div class="w-full max-w-xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+            <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display">Schedule Google Calendar Event</h3>
+            <p class="text-[10px] font-mono text-slate-400">Creates event with conflict detection & notifications</p>
+          </div>
+        </div>
+        <button onclick="closeCalendarEventModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1 text-xs font-mono">
+        <label class="text-[10px] text-slate-400 uppercase">Event Title / Summary:</label>
+        <input type="text" id="calendar-input-summary" placeholder="DocDispatch Quarterly Review Meeting" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white font-semibold focus:outline-none focus:border-amber-500" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">Start Date & Time:</label>
+          <input type="datetime-local" id="calendar-input-start" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-cyan-300 focus:outline-none focus:border-amber-500" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">End Date & Time:</label>
+          <input type="datetime-local" id="calendar-input-end" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-cyan-300 focus:outline-none focus:border-amber-500" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">Location / Meeting Link:</label>
+          <input type="text" id="calendar-input-location" placeholder="Google Meet / Room 302" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-amber-500" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 uppercase">Attendees (comma-separated):</label>
+          <input type="text" id="calendar-input-attendees" placeholder="rahul@techcorp.io" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-amber-500" />
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-mono text-slate-400 uppercase">Description / Agenda Notes:</label>
+        <textarea id="calendar-input-description" rows="3" placeholder="Quarterly architecture and deployment sync." class="w-full p-3 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans leading-relaxed resize-none"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeCalendarEventModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+        <button onclick="saveCalendarEventFromModal()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+          <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+          <span>Confirm & Schedule</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2480,7 +2828,7 @@ DASHBOARD_HTML = """
 
     // ── Navigation & Workspace Switching ──
     function switchTab(tabId) {
-      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'activity', 'system'];
+      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'obsidian', 'calendar', 'activity', 'system'];
       
       tabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
@@ -2511,6 +2859,8 @@ DASHBOARD_HTML = """
           approvals: 'HITL Approvals',
           topology: 'LangGraph Topology DAG',
           rag: 'Knowledge Vault (RAG)',
+          obsidian: 'Obsidian Knowledge Vault',
+          calendar: 'Schedule & Google Calendar',
           activity: 'Activity Event Logs',
           system: 'System Telemetry'
         };
@@ -2529,14 +2879,31 @@ DASHBOARD_HTML = """
       if (tabId === 'approvals') {
         fetchPendingApprovals();
       }
+      if (tabId === 'obsidian') {
+        fetchObsidianNotes();
+        fetchObsidianStatus();
+      }
+      if (tabId === 'calendar') {
+        fetchCalendarEvents();
+      }
       refreshIcons();
     }
 
-    // ── Keyboard Shortcuts (Alt+1 to Alt+7) ──
+    // ── Keyboard Shortcuts (Alt+1 to Alt+9) ──
     window.addEventListener('keydown', (e) => {
-      if (e.altKey && e.key >= '1' && e.key <= '7') {
+      if (e.altKey && e.key >= '1' && e.key <= '9') {
         e.preventDefault();
-        const map = { '1': 'home', '2': 'chat', '3': 'traces', '4': 'inbox', '5': 'approvals', '6': 'topology', '7': 'rag' };
+        const map = {
+          '1': 'home',
+          '2': 'chat',
+          '3': 'traces',
+          '4': 'inbox',
+          '5': 'approvals',
+          '6': 'topology',
+          '7': 'rag',
+          '8': 'obsidian',
+          '9': 'calendar'
+        };
         if (map[e.key]) {
           switchTab(map[e.key]);
           playCyberClick();
@@ -4479,23 +4846,561 @@ DASHBOARD_HTML = """
         .split('"').join('&quot;');
     }
 
-    // ── App Boot Lifecycle ──
+    // ── Obsidian Knowledge Vault & Note Browser Logic ──
+    let allObsidianNotes = [];
+    let currentObsidianFolder = 'all';
+    let activeObsidianNote = null;
+
+    async function fetchObsidianStatus() {
+      try {
+        const res = await fetch('/api/obsidian/status');
+        const data = await res.json();
+        const pathLabel = document.getElementById('obsidian-vault-path-label');
+        if (pathLabel) pathLabel.textContent = `Connected: ${data.vault_path || '.tmp/obsidian_vault'}`;
+        
+        const folderContainer = document.getElementById('obsidian-folder-pills');
+        if (folderContainer && data.folders) {
+          let html = `<button onclick="filterObsidianFolder('all')" class="px-2.5 py-1 rounded-lg ${currentObsidianFolder === 'all' ? 'bg-purple-600/40 border-purple-500 text-white font-bold' : 'theme-card border-transparent text-slate-400 hover:text-white'} border text-[11px] cursor-pointer transition">📁 All Folders (${data.total_notes})</button>`;
+          data.folders.forEach(f => {
+            if (f && f !== 'all') {
+              const active = currentObsidianFolder === f;
+              html += `<button onclick="filterObsidianFolder('${f}')" class="px-2.5 py-1 rounded-lg ${active ? 'bg-purple-600/40 border-purple-500 text-white font-bold' : 'theme-card border-transparent text-slate-400 hover:text-white'} border text-[11px] cursor-pointer transition">📂 ${f}</button>`;
+            }
+          });
+          folderContainer.innerHTML = html;
+        }
+      } catch (e) {
+        console.error('Failed to fetch obsidian status:', e);
+      }
+    }
+
+    async function fetchObsidianNotes() {
+      try {
+        const res = await fetch('/api/obsidian/notes');
+        const data = await res.json();
+        allObsidianNotes = data.notes || [];
+
+        const navBadge = document.getElementById('nav-obsidian-badge');
+        const listCount = document.getElementById('obsidian-notes-list-count');
+        if (navBadge) navBadge.textContent = allObsidianNotes.length;
+        if (listCount) listCount.textContent = `${allObsidianNotes.length} notes`;
+
+        renderObsidianNotesList();
+
+        if (activeObsidianNote) {
+          openObsidianNote(activeObsidianNote.rel_path);
+        } else if (allObsidianNotes.length > 0) {
+          openObsidianNote(allObsidianNotes[0].rel_path);
+        }
+      } catch (e) {
+        console.error('Failed to fetch obsidian notes:', e);
+      }
+    }
+
+    function filterObsidianFolder(folder) {
+      currentObsidianFolder = folder;
+      fetchObsidianStatus();
+      renderObsidianNotesList();
+    }
+
+    function filterObsidianNotes() {
+      renderObsidianNotesList();
+    }
+
+    function renderObsidianNotesList() {
+      const container = document.getElementById('obsidian-notes-list-container');
+      const filteredCount = document.getElementById('obsidian-filtered-count');
+      if (!container) return;
+
+      const q = (document.getElementById('obsidian-search-input')?.value || '').toLowerCase().trim();
+
+      let notes = allObsidianNotes;
+      if (currentObsidianFolder !== 'all') {
+        notes = notes.filter(n => n.folder.toLowerCase() === currentObsidianFolder.toLowerCase());
+      }
+      if (q) {
+        notes = notes.filter(n => 
+          n.title.toLowerCase().includes(q) || 
+          n.preview.toLowerCase().includes(q) ||
+          (n.tags && n.tags.some(t => t.toLowerCase().includes(q)))
+        );
+      }
+
+      if (filteredCount) filteredCount.textContent = `${notes.length} of ${allObsidianNotes.length}`;
+      container.innerHTML = '';
+
+      if (notes.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">No matching notes found in this folder.</div>`;
+        return;
+      }
+
+      notes.forEach(n => {
+        const isSelected = activeObsidianNote && activeObsidianNote.rel_path === n.rel_path;
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border transition cursor-pointer space-y-1.5 ${isSelected ? 'bg-purple-900/30 border-purple-500/60 shadow-md' : 'theme-card border-transparent hover:border-purple-500/30'}`;
+        card.onclick = () => openObsidianNote(n.rel_path);
+
+        const tagsHtml = (n.tags || []).slice(0, 3).map(t => `<span class="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 text-[9px] font-mono">#${t}</span>`).join(' ');
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold ${isSelected ? 'text-purple-200 font-bold' : 'text-white'} truncate flex-1 pr-2">${escapeHtml(n.title)}</span>
+            <span class="text-[9px] font-mono text-slate-500 flex-shrink-0">${n.is_daily ? '📅 Daily' : n.folder}</span>
+          </div>
+          <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed font-sans select-text">${escapeHtml(n.preview)}</p>
+          <div class="flex items-center justify-between text-[9px] font-mono text-slate-500 pt-1 border-t border-white/5">
+            <div class="space-x-1">${tagsHtml}</div>
+            <span>${n.modified_at ? new Date(n.modified_at).toLocaleDateString() : ''}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      refreshIcons();
+    }
+
+    async function openObsidianNote(relPath) {
+      playCyberClick(900);
+      try {
+        const res = await fetch(`/api/obsidian/note?path=${encodeURIComponent(relPath)}`);
+        const data = await res.json();
+        if (!res.ok || !data.note) return;
+
+        activeObsidianNote = data.note;
+        renderObsidianNotesList();
+
+        document.getElementById('obsidian-empty-view')?.classList.add('hidden');
+        const activeView = document.getElementById('obsidian-active-view');
+        if (activeView) activeView.classList.remove('hidden');
+
+        document.getElementById('obsidian-view-title').textContent = activeObsidianNote.title;
+        document.getElementById('obsidian-view-folder').textContent = activeObsidianNote.folder || 'Root';
+        document.getElementById('obsidian-view-path').textContent = activeObsidianNote.rel_path;
+        document.getElementById('obsidian-view-modified').textContent = `Modified: ${new Date(activeObsidianNote.modified_at).toLocaleString()}`;
+
+        const bodyEl = document.getElementById('obsidian-markdown-body');
+        if (bodyEl) {
+          bodyEl.innerHTML = formatMarkdownText(activeObsidianNote.content);
+        }
+        refreshIcons();
+      } catch (e) {
+        console.error('Failed to open obsidian note:', e);
+      }
+    }
+
+    function openCreateObsidianNoteModal() {
+      playCyberClick();
+      document.getElementById('obsidian-modal-title').textContent = 'Create Obsidian Markdown Note';
+      document.getElementById('obsidian-input-title').value = '';
+      document.getElementById('obsidian-input-folder').value = currentObsidianFolder !== 'all' ? currentObsidianFolder : '';
+      document.getElementById('obsidian-input-tags').value = '';
+      document.getElementById('obsidian-input-content').value = '';
+      const m = document.getElementById('obsidian-note-modal');
+      if (m) {
+        m.style.display = 'flex';
+        refreshIcons();
+      }
+    }
+
+    function closeObsidianNoteModal() {
+      const m = document.getElementById('obsidian-note-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    async function saveObsidianNoteFromModal() {
+      const title = document.getElementById('obsidian-input-title').value.trim();
+      const folder = document.getElementById('obsidian-input-folder').value.trim() || null;
+      const tagsStr = document.getElementById('obsidian-input-tags').value.trim();
+      const content = document.getElementById('obsidian-input-content').value;
+
+      if (!title) {
+        alert('Please provide a note title / filename.');
+        return;
+      }
+
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim().replace(/^#/, '')).filter(Boolean) : [];
+
+      try {
+        const res = await fetch('/api/obsidian/note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title,
+            folder: folder,
+            tags: tags,
+            content: content
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          playHudBeep(1400);
+          showProactiveToast('Note Saved to Obsidian', `Saved "${title}.md" to vault.`);
+          appendSystemLog(`[Obsidian Vault] Created note "${title}.md"`);
+          closeObsidianNoteModal();
+          await fetchObsidianStatus();
+          await fetchObsidianNotes();
+        } else {
+          alert(`Failed to save note: ${data.detail || 'Error'}`);
+        }
+      } catch (e) {
+        alert(`Error saving note: ${e.message}`);
+      }
+    }
+
+    function editCurrentObsidianNote() {
+      if (!activeObsidianNote) return;
+      openCreateObsidianNoteModal();
+      document.getElementById('obsidian-modal-title').textContent = 'Edit Obsidian Markdown Note';
+      document.getElementById('obsidian-input-title').value = activeObsidianNote.title;
+      document.getElementById('obsidian-input-folder').value = activeObsidianNote.folder === 'Root' ? '' : activeObsidianNote.folder;
+      document.getElementById('obsidian-input-content').value = activeObsidianNote.content;
+    }
+
+    async function copyCurrentObsidianNote(btn) {
+      if (!activeObsidianNote) return;
+      try {
+        await navigator.clipboard.writeText(activeObsidianNote.content);
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span class="text-emerald-400">Copied!</span>`;
+        refreshIcons();
+        playHudBeep(1400);
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          refreshIcons();
+        }, 2000);
+      } catch (e) {}
+    }
+
+    async function deleteCurrentObsidianNote() {
+      if (!activeObsidianNote) return;
+      if (!confirm(`Are you sure you want to permanently delete "${activeObsidianNote.title}.md" from your Obsidian vault?`)) return;
+
+      try {
+        const res = await fetch(`/api/obsidian/note?path=${encodeURIComponent(activeObsidianNote.rel_path)}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          playHudBeep(700);
+          showProactiveToast('Note Deleted', `Deleted "${activeObsidianNote.title}.md"`);
+          activeObsidianNote = null;
+          document.getElementById('obsidian-active-view')?.classList.add('hidden');
+          document.getElementById('obsidian-empty-view')?.classList.remove('hidden');
+          await fetchObsidianStatus();
+          await fetchObsidianNotes();
+        }
+      } catch (e) {
+        alert(`Error deleting note: ${e.message}`);
+      }
+    }
+
+    function openObsidianDailyModal() {
+      playCyberClick();
+      document.getElementById('obsidian-daily-entry').value = '';
+      const m = document.getElementById('obsidian-daily-modal');
+      if (m) {
+        m.style.display = 'flex';
+        refreshIcons();
+      }
+    }
+
+    function closeObsidianDailyModal() {
+      const m = document.getElementById('obsidian-daily-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    async function saveObsidianDailyLog() {
+      const section = document.getElementById('obsidian-daily-section').value.trim() || 'AI Actions';
+      const entry = document.getElementById('obsidian-daily-entry').value.trim();
+
+      if (!entry) {
+        alert('Please enter a log entry description.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/obsidian/daily-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ section: section, entry: entry })
+        });
+        if (res.ok) {
+          playHudBeep(1500);
+          showProactiveToast('Daily Note Appended', `Added entry under ## ${section}`);
+          appendSystemLog(`[Obsidian Daily] Appended entry to today's daily log`);
+          closeObsidianDailyModal();
+          await fetchObsidianNotes();
+        }
+      } catch (e) {
+        alert(`Error appending log: ${e.message}`);
+      }
+    }
+
+    function askCopilotAboutCurrentNote() {
+      if (!activeObsidianNote) return;
+      switchTab('chat');
+      setChatPrompt(`Review and summarize my Obsidian note titled "${activeObsidianNote.title}" and identify key next action items.`);
+      sendChatMessage();
+    }
+
+    // ── Interactive Google Calendar & Schedule Engine ──
+    let allCalendarEvents = [];
+    let calendarCurrentDate = new Date();
+
+    async function fetchCalendarEvents() {
+      try {
+        const res = await fetch('/api/calendar/events?days_ahead=30');
+        const data = await res.json();
+        allCalendarEvents = data.events || [];
+
+        const navBadge = document.getElementById('nav-calendar-badge');
+        const agendaCount = document.getElementById('calendar-agenda-count');
+        if (navBadge) navBadge.textContent = allCalendarEvents.length;
+        if (agendaCount) agendaCount.textContent = `${allCalendarEvents.length} events`;
+
+        renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
+        renderCalendarAgenda(allCalendarEvents);
+      } catch (e) {
+        console.error('Failed to fetch calendar events:', e);
+      }
+    }
+
+    function changeCalendarMonth(delta) {
+      calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
+      playCyberClick(800);
+      renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
+    }
+
+    function jumpToCalendarToday() {
+      calendarCurrentDate = new Date();
+      playCyberClick(1100);
+      renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
+    }
+
+    function renderCalendarGrid(year, month) {
+      const monthLabel = document.getElementById('calendar-month-year-label');
+      const grid = document.getElementById('calendar-days-grid');
+      if (!grid) return;
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      if (monthLabel) monthLabel.textContent = `${monthNames[month]} ${year}`;
+
+      grid.innerHTML = '';
+
+      const firstDayOfMonth = new Date(year, month, 1).getDay();
+      const startOffset = (firstDayOfMonth + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+      const todayDate = today.getDate();
+
+      // Prev month filler days
+      for (let i = startOffset - 1; i >= 0; i--) {
+        const d = daysInPrevMonth - i;
+        const cell = document.createElement('div');
+        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-40';
+        cell.textContent = d;
+        grid.appendChild(cell);
+      }
+
+      // Current month days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = isCurrentMonth && d === todayDate;
+        const cell = document.createElement('div');
+        cell.className = `h-24 p-2 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+          isToday 
+            ? 'bg-amber-500/10 border-amber-500/50 shadow-inner' 
+            : 'theme-card border-white/5 hover:border-amber-400/40 hover:bg-white/[0.04]'
+        }`;
+        
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        cell.onclick = () => openNewCalendarEventModal(dateStr);
+
+        const dayEvents = allCalendarEvents.filter(ev => {
+          if (!ev.start_time) return false;
+          return ev.start_time.startsWith(dateStr);
+        });
+
+        let eventPillsHtml = '';
+        dayEvents.slice(0, 2).forEach(ev => {
+          const time = ev.start_time.includes('T') ? ev.start_time.split('T')[1].slice(0, 5) : '';
+          eventPillsHtml += `
+            <div class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate" title="${escapeHtml(ev.summary)}">
+              ${time ? `${time} ` : ''}${escapeHtml(ev.summary)}
+            </div>
+          `;
+        });
+        if (dayEvents.length > 2) {
+          eventPillsHtml += `<span class="text-[9px] text-amber-400 font-mono">+${dayEvents.length - 2} more</span>`;
+        }
+
+        cell.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="${isToday ? 'w-5 h-5 rounded-full bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]' : 'text-slate-300 font-semibold'}">${d}</span>
+            ${dayEvents.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>` : ''}
+          </div>
+          <div class="space-y-1 overflow-hidden">${eventPillsHtml}</div>
+        `;
+        grid.appendChild(cell);
+      }
+
+      const totalCells = startOffset + daysInMonth;
+      const remaining = (7 - (totalCells % 7)) % 7;
+      for (let i = 1; i <= remaining; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'h-24 p-1.5 rounded-xl bg-black/20 border border-white/[0.02] text-slate-600 text-xs font-mono select-none opacity-40';
+        cell.textContent = i;
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderCalendarAgenda(events) {
+      const stream = document.getElementById('calendar-agenda-stream');
+      if (!stream) return;
+      stream.innerHTML = '';
+
+      if (events.length === 0) {
+        stream.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">No upcoming events scheduled.</div>`;
+        return;
+      }
+
+      const sorted = [...events].sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
+
+      sorted.forEach(ev => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-xl bg-black/40 border border-white/10 hover:border-amber-500/40 transition space-y-2';
+
+        const startDate = ev.start_time ? new Date(ev.start_time) : null;
+        const timeStr = startDate ? startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'All Day';
+        const dateStr = startDate ? startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) : '';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-300 truncate pr-2">${escapeHtml(ev.summary)}</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex-shrink-0">${timeStr}</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-mono flex items-center space-x-2">
+            <span>📅 ${dateStr}</span>
+            ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
+          </div>
+          ${ev.description ? `<p class="text-[11px] text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.description)}</p>` : ''}
+          ${ev.attendees && ev.attendees.length > 0 ? `
+            <div class="text-[10px] font-mono text-slate-500">Attendees: <span class="text-cyan-300">${escapeHtml(ev.attendees.join(', '))}</span></div>
+          ` : ''}
+          <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]">
+            <span class="text-slate-500 font-mono">🛡️ Google Cal Synced</span>
+            <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
+              📝 Prep in Obsidian
+            </button>
+          </div>
+        `;
+        stream.appendChild(card);
+      });
+      refreshIcons();
+    }
+
+    function openNewCalendarEventModal(defaultDate = null) {
+      playCyberClick();
+      document.getElementById('calendar-input-summary').value = '';
+      document.getElementById('calendar-input-location').value = '';
+      document.getElementById('calendar-input-attendees').value = '';
+      document.getElementById('calendar-input-description').value = '';
+
+      const now = new Date();
+      if (defaultDate) {
+        document.getElementById('calendar-input-start').value = `${defaultDate}T10:00`;
+        document.getElementById('calendar-input-end').value = `${defaultDate}T11:00`;
+      } else {
+        const nextHour = new Date(now.getTime() + 3600000);
+        const nextTwoHours = new Date(now.getTime() + 7200000);
+        document.getElementById('calendar-input-start').value = nextHour.toISOString().slice(0, 16);
+        document.getElementById('calendar-input-end').value = nextTwoHours.toISOString().slice(0, 16);
+      }
+
+      const m = document.getElementById('calendar-event-modal');
+      if (m) {
+        m.style.display = 'flex';
+        refreshIcons();
+      }
+    }
+
+    function closeCalendarEventModal() {
+      const m = document.getElementById('calendar-event-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    async function saveCalendarEventFromModal() {
+      const summary = document.getElementById('calendar-input-summary').value.trim();
+      const start = document.getElementById('calendar-input-start').value;
+      const end = document.getElementById('calendar-input-end').value;
+      const location = document.getElementById('calendar-input-location').value.trim() || null;
+      const attendeesStr = document.getElementById('calendar-input-attendees').value.trim();
+      const description = document.getElementById('calendar-input-description').value.trim() || null;
+
+      if (!summary || !start || !end) {
+        alert('Please fill in event summary, start time, and end time.');
+        return;
+      }
+
+      const attendees = attendeesStr ? attendeesStr.split(',').map(a => a.trim()).filter(Boolean) : [];
+
+      try {
+        const res = await fetch('/api/calendar/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            summary: summary,
+            start_time: start,
+            end_time: end,
+            location: location,
+            attendees: attendees,
+            description: description
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          playHudBeep(1600);
+          showProactiveToast('Event Scheduled', `"${summary}" created in Google Calendar.`);
+          appendSystemLog(`[Calendar Engine] Scheduled "${summary}" for ${start}`);
+          closeCalendarEventModal();
+          await fetchCalendarEvents();
+        } else {
+          alert(`Failed to create event: ${data.detail || 'Error'}`);
+        }
+      } catch (e) {
+        alert(`Error scheduling event: ${e.message}`);
+      }
+    }
+
+    function draftMeetingPrepInObsidian(summary, dateStr) {
+      openCreateObsidianNoteModal();
+      document.getElementById('obsidian-input-title').value = `Meeting Prep - ${summary}`;
+      document.getElementById('obsidian-input-folder').value = 'Meetings';
+      document.getElementById('obsidian-input-tags').value = 'meeting, agenda, prep';
+      document.getElementById('obsidian-input-content').value = `# Meeting Prep: ${summary}\n\n**Scheduled Time:** ${dateStr}\n\n## Objectives\n- \n\n## Key Talking Points\n1. \n2. \n\n## Action Items\n- [ ] `;
+    }
+
+    // ── Setup Window Drag & Drop Document Ingestion ──
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. Restore Theme
-      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'omarchy-cyberpunk';
-      setThemePreset(savedTheme);
+      // 1. Initialize Theme Engine
+      initThemeState();
 
-      // 2. Restore Glass Transparency
-      const savedCardOpacity = localStorage.getItem(STORAGE_CARD_OPACITY) || '65';
-      updateCardOpacity(savedCardOpacity);
-      const sliderCard = document.getElementById('slider-card-opacity');
-      if (sliderCard) sliderCard.value = savedCardOpacity;
+      // 2. Restore Wallpaper & Custom URL
+      const savedEngine = localStorage.getItem(STORAGE_WALLPAPER) || 'particles';
+      currentWallpaperEngine = savedEngine;
 
-      // 3. Restore Wallpaper & Canvas
+      // 3. Restore Opacity & Blur
       const savedOpacity = localStorage.getItem(STORAGE_OPACITY) || '60';
       const savedBlur = localStorage.getItem(STORAGE_BLUR) || '0';
+      const savedCardOpacity = localStorage.getItem(STORAGE_CARD_OPACITY) || '65';
+
       updateWallpaperOpacity(savedOpacity);
       updateWallpaperBlur(savedBlur);
+      updateCardOpacity(savedCardOpacity);
+
       const sliderOp = document.getElementById('slider-wallpaper-opacity');
       const sliderBl = document.getElementById('slider-wallpaper-blur');
       if (sliderOp) sliderOp.value = savedOpacity;
@@ -4546,6 +5451,9 @@ DASHBOARD_HTML = """
       fetchInbox();
       fetchTraces();
       fetchPendingApprovals();
+      fetchObsidianStatus();
+      fetchObsidianNotes();
+      fetchCalendarEvents();
       refreshIcons();
 
       // 9. Periodic Fast Background Refresh (15s)

@@ -31,6 +31,7 @@ from execution.rag.reranker import reranker
 from execution.rag.vector_store import DocumentChunk, vector_store
 from execution.tools.calendar_connector import CalendarEvent, calendar_connector
 from execution.tools.gmail_connector import OutboundEmail, gmail_connector
+from execution.tools.obsidian_connector import ObsidianNote, obsidian_connector
 
 app = FastAPI(
     title="Personal AI OS",
@@ -154,6 +155,18 @@ class CreateCalendarEventPayload(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
     attendees: List[str] = Field(default_factory=list)
+
+
+class CreateObsidianNotePayload(BaseModel):
+    title: str
+    content: str
+    tags: List[str] = Field(default_factory=list)
+    folder: Optional[str] = None
+
+
+class DailyLogPayload(BaseModel):
+    entry: str
+    section: str = "AI Actions"
 
 
 class ResolveApprovalPayload(BaseModel):
@@ -579,6 +592,83 @@ async def create_calendar_event(payload: CreateCalendarEventPayload):
     )
     res = calendar_connector.create_event(ev)
     return {"status": "success", "result": res}
+
+
+# ── Obsidian Vault Endpoints ──
+
+@app.get("/api/obsidian/status")
+async def get_obsidian_status():
+    """Returns Obsidian vault connection status, location path, and note stats."""
+    vault_path = obsidian_connector.vault_path
+    notes = obsidian_connector.list_all_notes()
+    folders = list(set(n["folder"] for n in notes))
+    all_tags = sorted(list(set(t for n in notes for t in n.get("tags", []))))
+    return {
+        "status": "connected" if vault_path.exists() else "not_found",
+        "vault_path": str(vault_path),
+        "total_notes": len(notes),
+        "folders": sorted(folders),
+        "tags": all_tags,
+    }
+
+
+@app.get("/api/obsidian/notes")
+async def list_obsidian_notes(folder: Optional[str] = None, tag: Optional[str] = None):
+    """Lists notes with optional folder or tag filtering."""
+    notes = obsidian_connector.list_all_notes()
+    if folder and folder.lower() != "all":
+        notes = [n for n in notes if n["folder"].lower() == folder.lower()]
+    if tag:
+        notes = [n for n in notes if tag in n.get("tags", [])]
+    return {
+        "notes": notes,
+        "vault_path": str(obsidian_connector.vault_path),
+        "total": len(notes),
+    }
+
+
+@app.get("/api/obsidian/note")
+async def get_obsidian_note(path: str):
+    """Reads a specific note content and metadata."""
+    note = obsidian_connector.read_note(path)
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found in Obsidian vault")
+    return {"note": note}
+
+
+@app.post("/api/obsidian/note")
+async def create_or_update_obsidian_note(payload: CreateObsidianNotePayload):
+    """Creates or updates a note file in the Obsidian vault."""
+    try:
+        note_obj = ObsidianNote(
+            title=payload.title,
+            content=payload.content,
+            tags=payload.tags,
+            folder=payload.folder,
+        )
+        res = obsidian_connector.create_or_update_note(note_obj)
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create note: {str(e)}")
+
+
+@app.post("/api/obsidian/daily-log")
+async def append_obsidian_daily_log(payload: DailyLogPayload):
+    """Appends an entry to today's Obsidian daily note."""
+    try:
+        res = obsidian_connector.append_daily_log(payload.entry, section=payload.section)
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to append daily log: {str(e)}")
+
+
+@app.delete("/api/obsidian/note")
+async def delete_obsidian_note(path: str):
+    """Deletes a note from the Obsidian vault."""
+    deleted = obsidian_connector.delete_note(path)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Note file could not be deleted or was not found")
+    return {"status": "success", "deleted_path": path}
 
 
 @app.get("/api/approvals")

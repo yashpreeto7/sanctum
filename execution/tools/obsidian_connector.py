@@ -78,23 +78,82 @@ class ObsidianConnector:
         daily_file.write_text(content, encoding="utf-8")
         return {"status": "success", "daily_file": str(daily_file), "timestamp": timestamp}
 
-    def search_notes(self, query: str) -> List[Dict[str, Any]]:
-        """Searches markdown note titles and contents within the vault."""
-        matches = []
-        q = query.lower()
-        for md_file in self.vault_path.rglob("*.md"):
+    def list_all_notes(self) -> List[Dict[str, Any]]:
+        """Lists all markdown files in the vault with metadata and frontmatter tags."""
+        notes = []
+        for md_file in sorted(self.vault_path.rglob("*.md"), key=lambda f: f.stat().st_mtime if f.exists() else 0, reverse=True):
             try:
-                text = md_file.read_text(encoding="utf-8")
-                if q in md_file.name.lower() or q in text.lower():
-                    matches.append({
-                        "file_path": str(md_file),
-                        "title": md_file.stem,
-                        "preview": text[:200],
-                    })
+                content = md_file.read_text(encoding="utf-8", errors="ignore")
+                rel_path = md_file.relative_to(self.vault_path).as_posix()
+                folder = md_file.parent.relative_to(self.vault_path).as_posix()
+                if folder == ".":
+                    folder = "Root"
+
+                # Extract frontmatter tags & title if present
+                tags = []
+                title = md_file.stem
+                body_preview = content
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    if len(parts) >= 3:
+                        fm = parts[1]
+                        body_preview = parts[2].strip()
+                        for line in fm.splitlines():
+                            if line.startswith("title:"):
+                                title = line.split("title:", 1)[1].strip()
+                            elif line.startswith("tags:"):
+                                tags_str = line.split("tags:", 1)[1].strip().strip("[]")
+                                tags = [t.strip().strip("'\"") for t in tags_str.split(",") if t.strip()]
+
+                stat = md_file.stat()
+                notes.append({
+                    "title": title,
+                    "filename": md_file.name,
+                    "rel_path": rel_path,
+                    "folder": folder,
+                    "tags": tags,
+                    "preview": body_preview[:160].replace("\n", " ").strip(),
+                    "size_bytes": stat.st_size,
+                    "modified_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                    "is_daily": folder.lower() == "daily" or md_file.parent.name.lower() == "daily",
+                })
             except Exception:
                 continue
-        return matches
+        return notes
+
+    def read_note(self, rel_path: str) -> Optional[Dict[str, Any]]:
+        """Reads a specific note by relative path."""
+        target = self.vault_path / rel_path
+        if not target.exists() or not target.is_file():
+            # Try searching by stem/filename
+            for f in self.vault_path.rglob("*.md"):
+                if f.name == rel_path or f.stem == rel_path:
+                    target = f
+                    break
+        if not target.exists():
+            return None
+
+        content = target.read_text(encoding="utf-8", errors="ignore")
+        stat = target.stat()
+        return {
+            "title": target.stem,
+            "filename": target.name,
+            "rel_path": target.relative_to(self.vault_path).as_posix(),
+            "folder": target.parent.relative_to(self.vault_path).as_posix(),
+            "content": content,
+            "size_bytes": stat.st_size,
+            "modified_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+        }
+
+    def delete_note(self, rel_path: str) -> bool:
+        """Deletes a note file."""
+        target = self.vault_path / rel_path
+        if target.exists() and target.is_file():
+            target.unlink()
+            return True
+        return False
 
 
 # Singleton instance
 obsidian_connector = ObsidianConnector()
+
