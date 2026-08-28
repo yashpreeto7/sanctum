@@ -734,7 +734,11 @@ Available tools:
             "email rahul", "email sarah", "email alex", "email jashan", "write email to", "draft email to"
         ]
         has_send_action = any(w in cmd_lower for w in send_triggers)
-        has_inbound_check = any(w in cmd_lower for w in ["check if", "did i", "did you", "have i", "received", "search", "find", "read", "show"])
+        inbound_check_patterns = [
+            r"\bcheck if\b", r"\bdid i\b", r"\bdid you\b", r"\bhave i\b",
+            r"\breceived\b", r"\bsearch\b", r"\bfind\b", r"\bread\b", r"\bshow\b"
+        ]
+        has_inbound_check = any(re.search(p, cmd_lower) for p in inbound_check_patterns)
 
         if has_send_action and not has_inbound_check:
             if email_regex_match:

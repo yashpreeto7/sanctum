@@ -61,7 +61,7 @@ def test_engine():
         
         # Outbound Send (Explicit Sending Action)
         ("send a mail to jashanjashan372@gmail.com saying its a test mail and add other content", "email.send", "to", "jashanjashan372@gmail.com"),
-        ("email rahul saying project update is ready", "email.send", "to", "rahul"),
+        ("email rahul saying project update is ready", "email.send", "to", "rahul@techcorp.io"),
         ("send an email to contact@company.org", "email.send", "to", "contact@company.org"),
         
         # Calendar
