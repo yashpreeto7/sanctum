@@ -40,9 +40,16 @@
   - Revamped Multi-Agent Pipeline Topology DAG map into a modern node graph with live simulation runner.
   - Fixed Light Studio high-contrast text and surface readability.
   - Built full interactive **Custom Theme Studio & Palette Creator** with live preview, preset starters, and JSON import/export.
-  - All changes committed and pushed to `feature/research-ux-and-sidebar-toggle`.
+- **Phase 6: Old Regime Editorial Base, Fluid Workspace & Dynamic Theming**:
+  - Adopted Old Regime design system (`Playfair Display`, `Space Grotesk`, `JetBrains Mono`, 1px precision hairline borders, corner crosshair anchors `+`, monospace section stamps).
+  - Added `Sovereign Manifesto` theme preset.
+  - Universal dynamic input binding (`input, textarea, select { color: var(--text-main) !important; }`).
+  - Universal dynamic button branding (`.btn-brand-primary` on New Session and Action buttons).
+  - Fluid edge-to-edge `.view-container` layout across all 12 views (zero gaps on sidebar collapse).
+  - Verified test suite and pushed commit `b52687e` to `origin/feature/research-ux-and-sidebar-toggle`.
 
 ## Current State
 - Branch: `feature/research-ux-and-sidebar-toggle` (Clean working tree, up to date with remote).
-- Test Pass Rate: 100% (66/66 scenarios passed).
-- Status: Ready for user testing. Merge to `main` deferred until user completes hands-on evaluation.
+- Test Pass Rate: 100% (All scenarios passed).
+- Active Server: Running on `http://127.0.0.1:8000`.
+- Memory: Synced to on-disk persistent memory files and `claude-mem` MCP server corpus (`sovereign_os_context`).

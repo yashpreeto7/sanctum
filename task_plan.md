@@ -1,9 +1,9 @@
-# Task Plan: Personal AI OS
+# Task Plan: SovereignOS (Personal AI OS)
 
-**Goal:** Build, test, and maintain the autonomous Personal AI OS architecture (Directives, Orchestration, Deterministic Execution, UI/Dashboard, Connectors, Traces & RAG).
+**Goal:** Build, test, and maintain the autonomous SovereignOS architecture (Directives, Orchestration, Deterministic Execution, UI/Dashboard, Connectors, Traces & RAG).
 
-## Current Phase: Active Development & System Stability
-**Status:** in_progress
+## Current Phase: Active Development & Testing
+**Status:** in_progress (on branch `feature/research-ux-and-sidebar-toggle`)
 
 ## Phases
 
@@ -32,7 +32,6 @@
 - [x] Upgraded Deep Autonomous Research reader with executive summary callout, collapsible DeepSeek R1 `<think>` reasoning trace, interactive Mermaid workflow cards, aspect breakdown cards, and verified citations.
 - [x] Built export engine for **Save as Microsoft Word (.doc)**, **Save as PDF**, **Save as Markdown (.md)**, and **Copy to Clipboard** across Research Dossiers and Obsidian Notes.
 - [x] Added `/api/research/dossier` endpoint to load past research notes directly into the rich dossier reader.
-- [x] Verified test suite and pushed branch to `origin/feature/research-ux-and-sidebar-toggle`.
 
 ### Phase 5: SovereignOS UI/UX Overhaul, Professional Themes, Backdrops & Rebranding
 - **Status:** complete
@@ -42,7 +41,19 @@
 - [x] Add 5 Sovereign Professional Themes: `Sovereign Slate`, `Titanium Onyx`, `Minimal Studio`, `Obsidian Gold`, and `Light Studio` while retaining the 8 Omarchy cyber presets.
 - [x] Add 4 Professional Workstation Backgrounds: `Solid Minimal (0% CPU)`, `Technical Grid`, `Slate Ambient`, and `Titanium Studio`.
 - [x] Modernize the Multi-Agent Pipeline Topology DAG map (`#view-topology`) with interactive SVG flow connectors, latency badges, and live simulation execution runner.
-- [x] Verify non-mail / non-calendar test suites.
+- [x] Fixed Light Studio high-contrast text and surface readability.
+- [x] Built full interactive **Custom Theme Studio & Palette Creator** with live preview, preset starters, and JSON import/export.
 
-## Next Step
-User test and review the interactive app on `feature/research-ux-and-sidebar-toggle`. If approved, merge into `main`.
+### Phase 6: Old Regime Design Base, Fluid Edge-to-Edge Workspace & Dynamic Theming
+- **Status:** complete
+- [x] Applied **Old Regime design system** as foundational base: `Playfair Display` serif headers + `Space Grotesk` sans + `JetBrains Mono` code, 1px continuous precision grid borders, corner crosshair anchors (`+`), and monospace section stamps (`01 //`, `02 //`).
+- [x] Added **Sovereign Manifesto** theme preset (cream parchment `#f5f0e8`, deep charcoal ink `#0a0a0a`, Swiss vermilion accent `#d42b2b`, brutalist 2px offset shadows).
+- [x] Fixed Copilot and search text color glitch with universal dynamic input binding (`input, textarea, select { color: var(--text-main) !important; }`).
+- [x] Converted sidebar "New Session" button from static purple gradients to `.btn-brand-primary` dynamic theme styling.
+- [x] Removed all fixed-width `max-w-7xl mx-auto` containers across all 12 workspace views, replacing with `.view-container` (100% fluid edge-to-edge layout with zero left/right gutters on sidebar collapse).
+- [x] Verified full integration test suite (`tests/integration/test_spotlight_and_research_api.py`) with 100% pass rate.
+- [x] Committed and pushed changes to remote branch `origin/feature/research-ux-and-sidebar-toggle` (commit `b52687e`).
+
+## Next Steps
+- User hands-on testing on branch `feature/research-ux-and-sidebar-toggle`.
+- On user approval, merge branch into `main`.
