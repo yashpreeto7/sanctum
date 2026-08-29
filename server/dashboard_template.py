@@ -27,7 +27,7 @@ DASHBOARD_HTML = r"""
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Mermaid.js for Architecture & Flowchart Diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -55,7 +55,9 @@ DASHBOARD_HTML = r"""
           fontFamily: {
             sans: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'sans-serif'],
             display: ['Outfit', 'Space Grotesk', 'Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+            serif: ['Playfair Display', 'serif'],
+            editorial: ['Playfair Display', 'serif'],
+            mono: ['JetBrains Mono', 'Space Grotesk', 'monospace']
           }
         }
       }
@@ -221,7 +223,7 @@ DASHBOARD_HTML = r"""
       --bg-base: #f8fafc;
       --bg-sidebar: rgba(255, 255, 255, 0.95);
       --bg-surface: rgba(241, 245, 249, 0.95);
-      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card: rgba(255, 255, 255, 0.95);
       --bg-card-hover: #f1f5f9;
       --border-main: #e2e8f0;
       --border-accent: #4f46e5;
@@ -238,6 +240,35 @@ DASHBOARD_HTML = r"""
       --text-muted: #64748b;
       --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15);
       --waybar-bg: rgba(255, 255, 255, 0.92);
+    }
+
+    /* ── Sovereign Manifesto (Old Regime Editorial Swiss/Parchment) ── */
+    [data-theme="sovereign-manifesto"] {
+      --rgb-base: 245, 240, 232;
+      --rgb-sidebar: 234, 228, 216;
+      --rgb-surface: 252, 251, 250;
+      --rgb-card: 252, 251, 250;
+      --rgb-card-hover: 240, 234, 223;
+      --bg-base: #f5f0e8;
+      --bg-sidebar: #eae4d8;
+      --bg-surface: #fcfbfa;
+      --bg-card: #fcfbfa;
+      --bg-card-hover: #f0eadf;
+      --border-main: #0a0a0a;
+      --border-accent: #d42b2b;
+      --color-brand: #d42b2b;
+      --color-brand-hover: #b91c1c;
+      --color-accent: #1a3dc4;
+      --color-highlight: #f5c518;
+      --color-cyan: #1a3dc4;
+      --color-emerald: #15803d;
+      --color-amber: #b45309;
+      --color-rose: #d42b2b;
+      --color-purple: #4338ca;
+      --text-main: #0a0a0a;
+      --text-muted: #5c584e;
+      --glow-shadow: 0 4px 16px -2px rgba(212, 43, 43, 0.25);
+      --waybar-bg: #eae4d8;
     }
 
     /* ── Omarchy Cyberpunk & Aesthetic Themes ── */
@@ -761,6 +792,195 @@ DASHBOARD_HTML = r"""
       border-color: #cbd5e1 !important;
     }
 
+    /* ── Sovereign Manifesto (Old Regime Inspired) Overrides ── */
+    [data-theme="sovereign-manifesto"] {
+      color-scheme: light;
+    }
+    [data-theme="sovereign-manifesto"] body {
+      background-color: #f5f0e8 !important;
+      color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] h1,
+    [data-theme="sovereign-manifesto"] h2,
+    [data-theme="sovereign-manifesto"] h3,
+    [data-theme="sovereign-manifesto"] .font-display {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      letter-spacing: -0.02em;
+    }
+    [data-theme="sovereign-manifesto"] .text-white {
+      color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .text-slate-100,
+    [data-theme="sovereign-manifesto"] .text-slate-200,
+    [data-theme="sovereign-manifesto"] .text-slate-300 {
+      color: #1e1e1e !important;
+    }
+    [data-theme="sovereign-manifesto"] .text-slate-400 {
+      color: #4a463c !important;
+    }
+    [data-theme="sovereign-manifesto"] .text-slate-500 {
+      color: #6b6659 !important;
+    }
+    [data-theme="sovereign-manifesto"] .bg-black\/20,
+    [data-theme="sovereign-manifesto"] .bg-black\/30,
+    [data-theme="sovereign-manifesto"] .bg-black\/40,
+    [data-theme="sovereign-manifesto"] .bg-black\/50,
+    [data-theme="sovereign-manifesto"] .bg-black\/60,
+    [data-theme="sovereign-manifesto"] .bg-black\/80 {
+      background-color: #eae4d8 !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .bg-slate-900,
+    [data-theme="sovereign-manifesto"] .bg-slate-900\/50,
+    [data-theme="sovereign-manifesto"] .bg-slate-900\/60,
+    [data-theme="sovereign-manifesto"] .bg-slate-900\/80,
+    [data-theme="sovereign-manifesto"] .bg-slate-900\/90,
+    [data-theme="sovereign-manifesto"] .bg-slate-800,
+    [data-theme="sovereign-manifesto"] .bg-slate-800\/90 {
+      background-color: #fcfbfa !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] input,
+    [data-theme="sovereign-manifesto"] textarea,
+    [data-theme="sovereign-manifesto"] select {
+      background-color: #ffffff !important;
+      color: #0a0a0a !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] input::placeholder,
+    [data-theme="sovereign-manifesto"] textarea::placeholder {
+      color: #8a8577 !important;
+    }
+    [data-theme="sovereign-manifesto"] .border-white\/5,
+    [data-theme="sovereign-manifesto"] .border-white\/10,
+    [data-theme="sovereign-manifesto"] .border-white\/20 {
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .divide-white\/5 {
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-card {
+      background-color: #fcfbfa !important;
+      border-color: #0a0a0a !important;
+      box-shadow: 2px 2px 0px #0a0a0a !important;
+      border-radius: 8px !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-card:hover {
+      background-color: #ffffff !important;
+      border-color: #0a0a0a !important;
+      box-shadow: 3px 3px 0px #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-bg-sidebar {
+      background-color: #eae4d8 !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-bg-surface {
+      background-color: #f5f0e8 !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-border {
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .nav-item {
+      color: #0a0a0a !important;
+      border-radius: 6px !important;
+    }
+    [data-theme="sovereign-manifesto"] .nav-item:hover {
+      background: #e2dac9 !important;
+      color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .nav-item.active {
+      background: #0a0a0a !important;
+      color: #f5f0e8 !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="sovereign-manifesto"] .nav-item.active i {
+      color: #f5c518 !important;
+    }
+    [data-theme="sovereign-manifesto"] .btn-brand-primary {
+      background-color: #0a0a0a !important;
+      color: #f5f0e8 !important;
+      border: 1px solid #0a0a0a !important;
+      box-shadow: 2px 2px 0px #d42b2b !important;
+    }
+    [data-theme="sovereign-manifesto"] .btn-brand-primary:hover {
+      background-color: #d42b2b !important;
+      color: #ffffff !important;
+      border-color: #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .user-bubble {
+      background-color: #0a0a0a !important;
+      color: #f5f0e8 !important;
+      border: 1px solid #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .theme-avatar-bot {
+      background: #d42b2b !important;
+      color: #ffffff !important;
+      border: 1px solid #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .bubble-card {
+      background-color: #fcfbfa !important;
+      color: #0a0a0a !important;
+      border: 1px solid #0a0a0a !important;
+      box-shadow: 2px 2px 0px #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .workspace-pill.active {
+      background: #0a0a0a !important;
+      color: #f5f0e8 !important;
+      border: 1px solid #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] .workspace-pill:not(.active) {
+      background: #eae4d8 !important;
+      color: #4a463c !important;
+      border: 1px solid #0a0a0a !important;
+    }
+    [data-theme="sovereign-manifesto"] #omarchy-crt-overlay {
+      display: none !important;
+    }
+    [data-theme="sovereign-manifesto"] pre, 
+    [data-theme="sovereign-manifesto"] code:not(pre code) {
+      background-color: #eae4d8 !important;
+      color: #0a0a0a !important;
+      border-color: #0a0a0a !important;
+    }
+
+    /* ── Impeccable Seamless Architectural Grid & Card Utilities ── */
+    .seamless-card {
+      position: relative;
+      border: 1px solid var(--border-main);
+      background-color: var(--bg-card);
+      backdrop-filter: blur(var(--card-blur));
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .seamless-card:hover {
+      border-color: var(--border-accent);
+      background-color: var(--bg-card-hover);
+    }
+    .eyebrow-stamp {
+      font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .corner-crosshair {
+      position: relative;
+    }
+    .corner-crosshair::before,
+    .corner-crosshair::after {
+      content: '+';
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      line-height: 1;
+      color: var(--border-main);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .corner-crosshair::before { top: 3px; left: 4px; }
+    .corner-crosshair::after { bottom: 3px; right: 4px; }
+
     /* Text Selection Enablement */
     body {
       user-select: auto;
@@ -1182,101 +1402,107 @@ DASHBOARD_HTML = r"""
 
           <!-- Section: System Health (5-Card Grid) -->
           <div class="space-y-3">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">System Architecture & Health</h3>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3.5">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center space-x-2">
+                <span class="text-brand-400 font-mono">[ 01 ]</span>
+                <span>System Architecture & Health Telemetry</span>
+              </h3>
+              <span class="text-[10px] font-mono text-slate-500 uppercase">Seamless Continuous Grid</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
               
               <!-- Health Card 1: Gateway -->
-              <div onclick="switchTab('system')" class="p-4 rounded-2xl theme-card border hover:border-emerald-500/50 transition cursor-pointer flex flex-col justify-between h-36">
+              <div onclick="switchTab('system')" class="p-4 rounded-xl seamless-card corner-crosshair border hover:border-emerald-500/60 transition cursor-pointer flex flex-col justify-between h-36 group">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-slate-300 font-medium">Gateway Node</span>
-                  <i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-emerald-400 transition">01 // GATEWAY</span>
+                  <i data-lucide="radio" class="w-3.5 h-3.5 text-emerald-400"></i>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-xl font-bold text-white">Online</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LIVE</span>
+                    <span class="text-lg font-bold text-white tracking-tight">Online</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LIVE</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">FastAPI & WS Engine</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">FastAPI & WS Engine</div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-2">
-                  <span>Port 8000</span>
-                  <span class="text-cyan-400">Details &gt;</span>
+                <div class="text-[10px] text-slate-400 flex items-center justify-between border-t theme-border pt-2">
+                  <span class="font-mono">Port 8000</span>
+                  <span class="text-cyan-400 font-medium group-hover:translate-x-0.5 transition-transform">Details &rarr;</span>
                 </div>
               </div>
 
               <!-- Health Card 2: Agents 3 -->
-              <div onclick="switchTab('topology')" class="p-4 rounded-2xl theme-card border hover:border-cyan-500/50 transition cursor-pointer flex flex-col justify-between h-36">
+              <div onclick="switchTab('topology')" class="p-4 rounded-xl seamless-card corner-crosshair border hover:border-cyan-500/60 transition cursor-pointer flex flex-col justify-between h-36 group">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-slate-300 font-medium">Agents</span>
-                  <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-cyan-400 transition">02 // AGENTS</span>
+                  <i data-lucide="bot" class="w-3.5 h-3.5 text-cyan-400"></i>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-xl font-bold text-white">3</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">ACTIVE</span>
+                    <span class="text-lg font-bold text-white tracking-tight">3</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">ACTIVE</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">Quarantine • Triage • ReAct</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">Quarantine • Triage • ReAct</div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-2">
-                  <span>LangGraph DAG</span>
-                  <span class="text-cyan-400 font-bold">Inspect &gt;</span>
+                <div class="text-[10px] text-slate-400 flex items-center justify-between border-t theme-border pt-2">
+                  <span class="font-mono">LangGraph DAG</span>
+                  <span class="text-cyan-400 font-medium group-hover:translate-x-0.5 transition-transform">Inspect &rarr;</span>
                 </div>
               </div>
 
               <!-- Health Card 3: Execution Traces -->
-              <div onclick="switchTab('traces')" class="p-4 rounded-2xl theme-card border hover:border-purple-500/50 transition cursor-pointer flex flex-col justify-between h-36">
+              <div onclick="switchTab('traces')" class="p-4 rounded-xl seamless-card corner-crosshair border hover:border-purple-500/60 transition cursor-pointer flex flex-col justify-between h-36 group">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-slate-300 font-medium">Execution Traces</span>
-                  <i data-lucide="git-branch" class="w-4 h-4 text-purple-400"></i>
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-purple-400 transition">03 // TRACES</span>
+                  <i data-lucide="git-branch" class="w-3.5 h-3.5 text-purple-400"></i>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span id="home-trace-count" class="text-xl font-bold text-white">0</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">LANGSMITH</span>
+                    <span id="home-trace-count" class="text-lg font-bold text-white tracking-tight">0</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">LANGSMITH</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">Step-by-Step Tool Traces</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">Step-by-Step Tool Traces</div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-2">
-                  <span>View Node Traces</span>
-                  <span class="text-purple-400">Open &gt;</span>
+                <div class="text-[10px] text-slate-400 flex items-center justify-between border-t theme-border pt-2">
+                  <span class="font-mono">Node Traces</span>
+                  <span class="text-purple-400 font-medium group-hover:translate-x-0.5 transition-transform">Open &rarr;</span>
                 </div>
               </div>
 
               <!-- Health Card 4: HITL Health -->
-              <div onclick="switchTab('approvals')" class="p-4 rounded-2xl theme-card border hover:border-amber-500/50 transition cursor-pointer flex flex-col justify-between h-36">
+              <div onclick="switchTab('approvals')" class="p-4 rounded-xl seamless-card corner-crosshair border hover:border-amber-500/60 transition cursor-pointer flex flex-col justify-between h-36 group">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-slate-300 font-medium">HITL Safety Gate</span>
-                  <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-amber-400 transition">04 // HITL GATE</span>
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-400"></i>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span id="card-pending-approvals" class="text-xl font-bold text-white">0</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">3-TIER RISK</span>
+                    <span id="card-pending-approvals" class="text-lg font-bold text-white tracking-tight">0</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">3-TIER</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">High-Risk Gatekeeper</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">High-Risk Gatekeeper</div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-2">
-                  <span>Review Approvals</span>
-                  <span class="text-amber-400">Manage &gt;</span>
+                <div class="text-[10px] text-slate-400 flex items-center justify-between border-t theme-border pt-2">
+                  <span class="font-mono">Approvals</span>
+                  <span class="text-amber-400 font-medium group-hover:translate-x-0.5 transition-transform">Manage &rarr;</span>
                 </div>
               </div>
 
               <!-- Health Card 5: Knowledge (RAG) -->
-              <div onclick="switchTab('rag')" class="p-4 rounded-2xl theme-card border hover:border-emerald-500/50 transition cursor-pointer flex flex-col justify-between h-36">
+              <div onclick="switchTab('rag')" class="p-4 rounded-xl seamless-card corner-crosshair border hover:border-emerald-500/60 transition cursor-pointer flex flex-col justify-between h-36 group">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-slate-300 font-medium">Knowledge (RAG)</span>
-                  <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-emerald-400 transition">05 // HYBRID RAG</span>
+                  <i data-lucide="database" class="w-3.5 h-3.5 text-emerald-400"></i>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-xl font-bold text-white">Ready</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">HYBRID</span>
+                    <span class="text-lg font-bold text-white tracking-tight">Ready</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">BM25+VEC</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-0.5">Dense + BM25 + Recency</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">Dense + BM25 + Recency</div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-2">
-                  <span>Sample Vault Indexed</span>
-                  <span class="text-emerald-400">Search &gt;</span>
+                <div class="text-[10px] text-slate-400 flex items-center justify-between border-t theme-border pt-2">
+                  <span class="font-mono">Vault Memory</span>
+                  <span class="text-emerald-400 font-medium group-hover:translate-x-0.5 transition-transform">Search &rarr;</span>
                 </div>
               </div>
 
@@ -2641,7 +2867,7 @@ DASHBOARD_HTML = r"""
           <i data-lucide="briefcase" class="w-3.5 h-3.5 text-indigo-400"></i>
           <span>👑 Sovereign Professional Workstation Themes</span>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <!-- 1. Sovereign Slate -->
           <button onclick="setThemePreset('sovereign-slate'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#0d1017] border-[#242d3e] hover:border-indigo-500/80 text-white shadow-md">
             <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#6366f1] via-[#38bdf8] to-[#1e293b] mb-2 border border-white/5"></div>
@@ -2675,6 +2901,13 @@ DASHBOARD_HTML = r"""
             <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#4f46e5] via-[#0284c7] to-[#e2e8f0] mb-2 border border-black/5"></div>
             <div class="font-bold text-xs text-slate-900">Light Studio</div>
             <div class="text-[10px] text-indigo-600 font-mono">High Contrast Clean</div>
+          </button>
+
+          <!-- 6. Sovereign Manifesto (Old Regime) -->
+          <button onclick="setThemePreset('sovereign-manifesto'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#f5f0e8] border-[#0a0a0a] hover:border-red-600 text-[#0a0a0a] shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#d42b2b] via-[#1a3dc4] to-[#f5f0e8] mb-2 border border-black/10"></div>
+            <div class="font-bold text-xs font-serif">Manifesto</div>
+            <div class="text-[10px] text-[#d42b2b] font-mono">Old Regime / Swiss</div>
           </button>
         </div>
       </div>
@@ -3812,6 +4045,7 @@ DASHBOARD_HTML = r"""
         'sovereign-studio': 'Minimal Studio',
         'sovereign-obsidian': 'Obsidian Gold',
         'sovereign-light': 'Light Studio',
+        'sovereign-manifesto': 'Sovereign Manifesto',
         'custom': 'Custom Theme',
         'omarchy-cyberpunk': 'Cyberpunk',
         'omarchy-tokyonight': 'Tokyo Night',
