@@ -122,3 +122,57 @@ def test_calendar_endpoints(test_client):
     assert list_res.status_code == 200
     events = list_res.json().get("events", [])
     assert any(e["summary"] == "Sprint Retro" for e in events)
+
+
+def test_sent_emails_and_compose_endpoints(test_client):
+    """Test /api/inbox/sent, /api/inbox/compose/ai-assist, and /api/inbox/compose/send endpoints."""
+    # 1. AI Assist Drafting
+    assist_res = test_client.post(
+        "/api/inbox/compose/ai-assist",
+        json={
+            "to": "rahul@techcorp.io",
+            "prompt": "Follow up on the DocDispatch proposal review and confirm tomorrow 3 PM sync",
+            "tone": "professional",
+        },
+    )
+    assert assist_res.status_code == 200
+    assist_data = assist_res.json()
+    assert assist_data["status"] == "success"
+    assert len(assist_data["subject"]) > 2
+    assert len(assist_data["body"]) > 10
+
+    # 2. Compose Save Draft
+    draft_res = test_client.post(
+        "/api/inbox/compose/send",
+        json={
+            "to": "rahul@techcorp.io",
+            "subject": assist_data["subject"],
+            "body": assist_data["body"],
+            "is_draft": True,
+        },
+    )
+    assert draft_res.status_code == 200
+    assert draft_res.json()["mode"] == "draft"
+
+    # 3. Compose Send Outbound Email
+    send_res = test_client.post(
+        "/api/inbox/compose/send",
+        json={
+            "to": "rahul@techcorp.io",
+            "subject": "DocDispatch Production Deployment Status",
+            "body": "Hi Rahul,\n\nAll tests and RAG pipelines are operating normally.\n\nBest,\nYashpreet",
+            "is_draft": False,
+        },
+    )
+    assert send_res.status_code == 200
+    assert send_res.json()["mode"] == "sent"
+
+    # 4. Verify Sent Emails List Endpoint
+    sent_res = test_client.get("/api/inbox/sent")
+    assert sent_res.status_code == 200
+    sent_data = sent_res.json()
+    assert sent_data["status"] == "success"
+    assert "sent" in sent_data
+    assert len(sent_data["sent"]) > 0
+    assert any(s["to"] == "rahul@techcorp.io" for s in sent_data["sent"])
+

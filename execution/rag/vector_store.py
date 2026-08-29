@@ -67,17 +67,31 @@ class LocalVectorStore:
                 ),
             )
 
-    def insert_chunks(self, chunks: List[DocumentChunk], collection_name: Optional[str] = None) -> List[str]:
+    def insert_chunks(self, chunks: List[Any], collection_name: Optional[str] = None) -> List[str]:
         """Embed and upsert chunks into Qdrant."""
         if not chunks:
             return []
 
+        formatted_chunks: List[DocumentChunk] = []
+        for c in chunks:
+            if isinstance(c, DocumentChunk):
+                formatted_chunks.append(c)
+            elif isinstance(c, dict):
+                formatted_chunks.append(
+                    DocumentChunk(
+                        id=str(c.get("id") or uuid.uuid4()),
+                        text=c.get("text", ""),
+                        source_type=c.get("source_type", c.get("metadata", {}).get("source", "document")),
+                        metadata=c.get("metadata", {}),
+                    )
+                )
+
         coll = collection_name or self.DEFAULT_COLLECTION
-        texts = [chunk.text for chunk in chunks]
+        texts = [chunk.text for chunk in formatted_chunks]
         embeddings = self.embedding_model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
 
         points = []
-        for chunk, emb in zip(chunks, embeddings):
+        for chunk, emb in zip(formatted_chunks, embeddings):
             payload = {
                 "text": chunk.text,
                 "source_type": chunk.source_type,

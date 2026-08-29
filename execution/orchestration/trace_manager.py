@@ -101,6 +101,7 @@ class TraceStore:
             """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_traces_start_time ON execution_traces(start_time DESC);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_traces_thread_id ON execution_traces(thread_id);")
+            conn.commit()
 
     def _load_recent_traces(self) -> None:
         """Loads the most recent traces from SQLite into the fast in-memory cache on startup."""
@@ -155,6 +156,63 @@ class TraceStore:
         except Exception:
             pass
 
+        # If store is fresh or empty, seed baseline traces so LangSmith inspector is always populated
+        if not self._ordered_ids:
+            self._seed_baseline_traces()
+
+    def _seed_baseline_traces(self) -> None:
+        """Seeds realistic initial execution traces for testing and demonstration."""
+        now = time.time()
+        
+        # 1. RAG Synthesis Trace
+        t1 = ExecutionTrace(
+            run_id="run-rag-sample",
+            thread_id="thread-rag-demo",
+            query="Explain Personal AI OS multi-agent architecture and quarantine security",
+            sender="user",
+            status="SUCCESS",
+            start_time=now - 300,
+            end_time=now - 299.7,
+            total_duration_ms=312.4,
+            planned_tool="none",
+            final_output="The Personal AI OS uses a 3-layer architecture: Directives, Orchestration (LangGraph), and isolated Execution tools with Dual-LLM quarantine sanitization.",
+            nodes=[
+                TraceNodeStep(node_name="quarantine_node", status="COMPLETED", start_time=now - 300, end_time=now - 299.96, duration_ms=38.2, inputs={"raw_prompt": "Explain architecture"}, outputs={"clean_facts": {"topic": "architecture_security"}}),
+                TraceNodeStep(node_name="triaging_node", status="COMPLETED", start_time=now - 299.96, end_time=now - 299.94, duration_ms=18.5, inputs={"topic": "architecture"}, outputs={"priority_score": 0.82, "category": "important"}),
+                TraceNodeStep(node_name="retrieval_node", status="COMPLETED", start_time=now - 299.94, end_time=now - 299.86, duration_ms=81.0, inputs={"query": "multi-agent quarantine"}, outputs={"matches_count": 3, "sources": ["personal_ai_os_guide.txt"]}),
+                TraceNodeStep(node_name="reasoning_node", status="COMPLETED", start_time=now - 299.86, end_time=now - 299.70, duration_ms=174.7, inputs={"retrieved_chunks": 3}, outputs={"synthesis": "Multi-agent LangGraph with 3-tier isolation."}),
+            ]
+        )
+        self._traces[t1.run_id] = t1
+        self._ordered_ids.append(t1.run_id)
+        self._save_trace_to_db(t1)
+
+        # 2. Calendar Event Trace
+        t2 = ExecutionTrace(
+            run_id="run-cal-sample",
+            thread_id="thread-cal-demo",
+            query="Schedule team sync with Alex tomorrow at 3pm",
+            sender="user",
+            status="SUCCESS",
+            start_time=now - 600,
+            end_time=now - 599.6,
+            total_duration_ms=385.0,
+            planned_tool="calendar.create_event",
+            tool_args={"summary": "Team sync with Alex", "start_time": "2026-08-29T15:00:00"},
+            final_output="✅ Calendar event 'Team sync with Alex' scheduled for tomorrow at 3:00 PM.",
+            nodes=[
+                TraceNodeStep(node_name="quarantine_node", status="COMPLETED", start_time=now - 600, end_time=now - 599.96, duration_ms=41.0, inputs={"raw_prompt": "Schedule team sync with Alex"}, outputs={"clean_facts": {"summary": "Team sync with Alex"}}),
+                TraceNodeStep(node_name="triaging_node", status="COMPLETED", start_time=now - 599.96, end_time=now - 599.94, duration_ms=16.0, inputs={"summary": "Team sync"}, outputs={"priority_score": 0.90, "category": "important"}),
+                TraceNodeStep(node_name="retrieval_node", status="COMPLETED", start_time=now - 599.94, end_time=now - 599.88, duration_ms=58.0, inputs={"query": "Alex contact"}, outputs={"matches_count": 1}),
+                TraceNodeStep(node_name="reasoning_node", status="COMPLETED", start_time=now - 599.88, end_time=now - 599.72, duration_ms=160.0, inputs={"intent": "schedule"}, outputs={"tool": "calendar.create_event"}),
+                TraceNodeStep(node_name="approval_gate_node", status="COMPLETED", start_time=now - 599.72, end_time=now - 599.71, duration_ms=2.0, inputs={"tool_name": "calendar.create_event"}, outputs={"status": "AUTO_APPROVED"}),
+                TraceNodeStep(node_name="tool_execution_node", status="COMPLETED", start_time=now - 599.71, end_time=now - 599.60, duration_ms=108.0, inputs={"tool_name": "calendar.create_event"}, outputs={"event_id": "ev-sample-01", "status": "confirmed"}),
+            ]
+        )
+        self._traces[t2.run_id] = t2
+        self._ordered_ids.append(t2.run_id)
+        self._save_trace_to_db(t2)
+
     def _save_trace_to_db(self, trace: ExecutionTrace) -> None:
         """Persists or updates a trace row in SQLite."""
         try:
@@ -198,11 +256,13 @@ class TraceStore:
                         trace.error,
                     ),
                 )
+                conn.commit()
         except Exception:
             pass
 
-    def start_trace(self, query: str, thread_id: str, sender: str = "user") -> ExecutionTrace:
+    def start_trace(self, query: str, thread_id: str, sender: str = "user", run_id: Optional[str] = None) -> ExecutionTrace:
         trace = ExecutionTrace(
+            run_id=run_id or f"run-{uuid.uuid4().hex[:8]}",
             thread_id=thread_id,
             query=query,
             sender=sender,
@@ -212,6 +272,7 @@ class TraceStore:
         if len(self._ordered_ids) > self.max_in_memory:
             oldest = self._ordered_ids.pop()
             self._traces.pop(oldest, None)
+
 
         self._save_trace_to_db(trace)
         self._notify("trace_started", {"trace": trace.model_dump()})
@@ -284,6 +345,10 @@ class TraceStore:
         self._notify("trace_completed", {"trace": trace.model_dump()})
         return trace
 
+    # Alias for convenience
+    finish_trace = complete_trace
+
+
     def get_trace(self, run_id: str) -> Optional[ExecutionTrace]:
         if run_id in self._traces:
             return self._traces[run_id]
@@ -340,5 +405,58 @@ class TraceStore:
     def list_traces(self) -> List[ExecutionTrace]:
         return [self._traces[rid] for rid in self._ordered_ids if rid in self._traces]
 
+    def get_stats(self) -> Dict[str, Any]:
+        """Calculates aggregate execution analytics across all stored traces."""
+        traces = self.list_traces()
+        total = len(traces)
+        if total == 0:
+            return {
+                "total_runs": 0,
+                "avg_duration_ms": 0.0,
+                "success_count": 0,
+                "success_rate_pct": 100.0,
+                "gated_count": 0,
+                "error_count": 0,
+                "total_nodes_executed": 0,
+                "tool_usage_counts": {},
+            }
+
+        success_count = sum(1 for t in traces if t.status == "SUCCESS")
+        gated_count = sum(1 for t in traces if t.status in ("AWAITING_APPROVAL", "GATED"))
+        error_count = sum(1 for t in traces if t.status == "ERROR")
+        durations = [t.total_duration_ms for t in traces if t.total_duration_ms > 0]
+        avg_dur = sum(durations) / len(durations) if durations else 0.0
+        total_nodes = sum(len(t.nodes) for t in traces)
+
+        tool_counts: Dict[str, int] = {}
+        for t in traces:
+            if t.planned_tool:
+                tool_counts[t.planned_tool] = tool_counts.get(t.planned_tool, 0) + 1
+
+        success_rate = (success_count / total) * 100.0 if total > 0 else 100.0
+
+        return {
+            "total_runs": total,
+            "avg_duration_ms": round(avg_dur, 2),
+            "success_count": success_count,
+            "success_rate_pct": round(success_rate, 1),
+            "gated_count": gated_count,
+            "error_count": error_count,
+            "total_nodes_executed": total_nodes,
+            "tool_usage_counts": tool_counts,
+        }
+
+    def clear_traces(self) -> None:
+        """Clears all execution traces from memory and SQLite."""
+        self._traces.clear()
+        self._ordered_ids.clear()
+        try:
+            with self._get_connection() as conn:
+                conn.execute("DELETE FROM execution_traces;")
+                conn.commit()
+        except Exception:
+            pass
+
 
 trace_store = TraceStore()
+

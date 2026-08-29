@@ -27,9 +27,13 @@ class ObsidianConnector:
     def __init__(self, vault_path: Optional[Path] = None):
         self.vault_path = vault_path or settings.OBSIDIAN_VAULT_PATH or (settings.TEMP_DIR / "obsidian_vault")
         self.vault_path.mkdir(parents=True, exist_ok=True)
+        self._cached_notes: List[Dict[str, Any]] = []
+        self._cache_timestamp: float = 0.0
 
     def create_or_update_note(self, note: ObsidianNote) -> Dict[str, Any]:
         """Creates or updates a markdown note file."""
+        self._cache_timestamp = 0.0
+        self._cached_notes = []
         target_dir = self.vault_path / (note.folder or "")
         target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -55,8 +59,51 @@ class ObsidianConnector:
             "bytes_written": len(formatted_content),
         }
 
+    def create_note(self, title: str, content: str, folder: Optional[str] = None, tags: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Creates or writes a markdown note file from direct arguments."""
+        self._cache_timestamp = 0.0
+        self._cached_notes = []
+        
+        clean_title = title
+        note_folder = folder
+        if "/" in clean_title or "\\" in clean_title:
+            parts = clean_title.replace("\\", "/").split("/")
+            note_folder = "/".join(parts[:-1])
+            clean_title = parts[-1]
+            if clean_title.endswith(".md"):
+                clean_title = clean_title[:-3]
+
+        target_dir = self.vault_path / (note_folder or "")
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        filename = f"{clean_title}.md" if not clean_title.endswith(".md") else clean_title
+        file_path = target_dir / filename
+        
+        if content.strip().startswith("---"):
+            formatted_content = content
+        else:
+            frontmatter_tags = f"tags: [{', '.join(tags)}]\n" if tags else ""
+            formatted_content = (
+                f"---\n"
+                f"title: {clean_title}\n"
+                f"created: {datetime.now().isoformat()}\n"
+                f"{frontmatter_tags}"
+                f"---\n\n"
+                f"{content}\n"
+            )
+
+        file_path.write_text(formatted_content, encoding="utf-8")
+        return {
+            "status": "success",
+            "file_path": str(file_path),
+            "title": clean_title,
+            "bytes_written": len(formatted_content),
+        }
+
     def append_daily_log(self, entry: str, section: str = "AI Actions") -> Dict[str, Any]:
         """Appends an entry to today's daily note."""
+        self._cache_timestamp = 0.0
+        self._cached_notes = []
         today_str = datetime.now().strftime("%Y-%m-%d")
         daily_folder = self.vault_path / "Daily"
         daily_folder.mkdir(parents=True, exist_ok=True)
@@ -78,8 +125,13 @@ class ObsidianConnector:
         daily_file.write_text(content, encoding="utf-8")
         return {"status": "success", "daily_file": str(daily_file), "timestamp": timestamp}
 
-    def list_all_notes(self) -> List[Dict[str, Any]]:
+    def list_all_notes(self, force_refresh: bool = False) -> List[Dict[str, Any]]:
         """Lists all markdown files in the vault with metadata and frontmatter tags."""
+        import time
+        now_ts = time.time()
+        if not force_refresh and self._cached_notes and (now_ts - self._cache_timestamp < 30.0):
+            return self._cached_notes
+
         notes = []
         for md_file in sorted(self.vault_path.rglob("*.md"), key=lambda f: f.stat().st_mtime if f.exists() else 0, reverse=True):
             try:
@@ -119,6 +171,8 @@ class ObsidianConnector:
                 })
             except Exception:
                 continue
+        self._cached_notes = notes
+        self._cache_timestamp = now_ts
         return notes
 
     def read_note(self, rel_path: str) -> Optional[Dict[str, Any]]:
@@ -156,6 +210,8 @@ class ObsidianConnector:
 
     def delete_note(self, rel_path: str) -> bool:
         """Deletes a note file."""
+        self._cache_timestamp = 0.0
+        self._cached_notes = []
         target = self.vault_path / rel_path
         if target.exists() and target.is_file():
             target.unlink()

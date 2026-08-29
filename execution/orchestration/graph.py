@@ -278,7 +278,14 @@ Available tools:
             "You are Personal AI OS, Yashpreet's intelligent, conversational AI assistant and local automation system.\n\n"
             "INSTRUCTIONS FOR YOUR OUTPUT:\n"
             "• `response_to_user`: This is the direct message that Yashpreet reads. Always provide a natural, articulate, comprehensive, and friendly reply with clear markdown headings, bullet points, and clean syntax. If asked a question (e.g. 'what is YouTube', 'what is Next.js', 'explain quantum computing', 'how does python work'), write a high-quality, comprehensive explanation directly in `response_to_user`.\n"
-            "• `tool_name`: Choose `no_action` for general conversation, greetings, definitions, explanations, conceptual questions, coding, and architecture queries. Only select `web.search` when the user explicitly asks to search the web (e.g. 'search web for...', 'look up online...') or when recent live web facts are strictly requested.\n"
+            "• `tool_name`: Choose the most direct and specific tool for the user's intent:\n"
+            "  - For morning briefings or schedule inquiries ('what meetings do I have today', 'daily agenda', 'morning briefing'), choose `calendar.list_events`.\n"
+            "  - For checking messages or inbox summaries ('check my unread emails', 'any urgent emails'), choose `email.list_unread`.\n"
+            "  - For taking or saving notes ('take a note', 'save to obsidian', 'sync notes'), choose `obsidian.create_note`.\n"
+            "  - For searching notes or knowledge base ('search notes for X', 'what do my notes say about Y'), choose `obsidian.search_notes`.\n"
+            "  - For inspecting codebase workspace ('list workspace files', 'check project structure'), choose `workspace.list_files`.\n"
+            "  - For web searches ('search web for X', 'look up online'), choose `web.search`.\n"
+            "  - Choose `no_action` for general conversation, greetings, definitions, explanations, conceptual questions, coding, and architecture queries.\n"
             "• `plan_rationale`: Brief internal reasoning for your chosen action.\n\n"
             f"{tool_schema}"
         )
@@ -687,10 +694,48 @@ Available tools:
                 )
 
         # ── 4. Calendar Tool Intents (Explicit Commands) ───────────────────
-        is_calendar_query = any(w in cmd_lower for w in ["my calendar", "my schedule", "upcoming events", "upcoming meetings", "list events", "show events", "show meetings", "what meetings", "what events", "check calendar", "check schedule"])
+        is_calendar_query = any(
+            w in cmd_lower
+            for w in [
+                "my calendar",
+                "my schedule",
+                "upcoming events",
+                "upcoming meetings",
+                "list events",
+                "show events",
+                "show meetings",
+                "what meetings",
+                "what events",
+                "check calendar",
+                "check schedule",
+                "morning briefing",
+                "daily briefing",
+                "daily agenda",
+                "today's agenda",
+                "today's schedule",
+                "today schedule",
+            ]
+        )
         is_schedule_command = (
-            any(w in cmd_lower for w in ["schedule a", "schedule meeting", "book a slot", "book meeting", "block two hours", "block 2 hours", "create event"]) or
-            ("schedule" in cmd_lower and any(w in cmd_lower for w in ["tomorrow", " pm", " am", " at ", "with rahul", "with sarah", "with jashan"]))
+            any(
+                w in cmd_lower
+                for w in [
+                    "schedule a",
+                    "schedule meeting",
+                    "book a slot",
+                    "book meeting",
+                    "block two hours",
+                    "block 2 hours",
+                    "create event",
+                ]
+            )
+            or (
+                "schedule" in cmd_lower
+                and any(
+                    w in cmd_lower
+                    for w in ["tomorrow", " pm", " am", " at ", "with rahul", "with sarah", "with jashan"]
+                )
+            )
         ) and not ("what is" in cmd_lower or "explain" in cmd_lower)
 
         if is_schedule_command:
@@ -710,8 +755,8 @@ Available tools:
             return ReasoningPlan(
                 tool_name="calendar.list_events",
                 tool_args={"query": "upcoming"},
-                plan_rationale="List calendar events intent detected.",
-                response_to_user="📅 Fetching your upcoming Google Calendar events...",
+                plan_rationale="List calendar events / daily briefing intent detected.",
+                response_to_user="📅 Fetching your Google Calendar events and daily agenda...",
             )
 
         # ── 5. Ordinal / Numbered Email Retrieval ──────────────────────────

@@ -19,6 +19,9 @@ data/*.db
 data/*.sqlite3
 data/*.db-wal
 data/*.db-shm
+data/inbox_drop/*
+data/knowledge_vault/*
+!data/**/.gitkeep
 *.exe
 OllamaSetup.exe
 

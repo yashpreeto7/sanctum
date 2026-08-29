@@ -23,8 +23,9 @@ class Settings(BaseSettings):
 
     # Local LLM (Ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    DEFAULT_REASONING_MODEL: str = "qwen2.5:1.5b"
+    DEFAULT_REASONING_MODEL: str = "qwen2.5:7b"
     DEFAULT_FAST_MODEL: str = "qwen2.5:1.5b"
+    RESEARCH_REASONING_MODEL: str = "deepseek-r1:7b"
     DEFAULT_EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     LLM_TEMPERATURE: float = 0.2
     LLM_TIMEOUT_SECONDS: float = 60.0

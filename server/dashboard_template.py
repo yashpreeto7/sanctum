@@ -29,6 +29,14 @@ DASHBOARD_HTML = """
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Mermaid.js for Architecture & Flowchart Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+    }
+  </script>
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -348,21 +356,26 @@ DASHBOARD_HTML = """
     ::-webkit-scrollbar-thumb { background: var(--border-main); border-radius: 999px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--color-brand); }
 
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
     /* Waybar Rice Styling */
     .waybar-hud {
       background: var(--waybar-bg);
       border-bottom: 1px solid var(--border-main);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
     }
     .workspace-pill {
       font-family: 'JetBrains Mono', monospace;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
     }
     .workspace-pill.active {
       background: var(--color-brand);
       color: #ffffff;
-      box-shadow: 0 0 12px var(--color-brand);
+      box-shadow: 0 0 10px var(--color-brand);
       font-weight: 700;
     }
     .workspace-pill:not(.active) {
@@ -450,115 +463,113 @@ DASHBOARD_HTML = """
   <div id="omarchy-crt-overlay" class="fixed inset-0 hidden"></div>
 
   <!-- ─── 1. OMARCHY TOP WAYBAR / STATUS BAR ───────────────────────── -->
-  <header class="waybar-hud h-10 px-4 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none">
+  <header class="waybar-hud h-10 px-3 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none w-full border-b theme-border bg-black/50 backdrop-blur-xl">
     
-    <!-- Left: Distro Logo & Workspaces -->
-    <div class="flex items-center space-x-3">
+    <!-- Left: Distro Logo & Workspaces (scrollable if needed without scrollbars) -->
+    <div class="flex items-center space-x-2 min-w-0 flex-shrink">
       <!-- Distro Pill -->
-      <div class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-white shadow-sm">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 300 300" fill="currentColor">
+      <div class="flex items-center space-x-1 px-2 py-0.5 rounded-lg bg-black/40 border border-white/10 text-white shadow-sm flex-shrink-0">
+        <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 300 300" fill="currentColor">
           <path d="M141.3 8.7c-2.4 5.9-9.5 24.3-15.8 40.8-6.3 16.5-18.7 48.7-27.5 71.5s-20.9 54.4-26.9 70.3c-6 15.8-13.8 36.3-17.4 45.5-5.9 15-6.4 17.2-4.1 17.2 1.4 0 5.4-3.5 8.9-7.7 7.7-9.4 15.6-21.7 20.3-31.5 2.1-4.4 2.8-5.3 4-5.3 1 0 2.8 1.9 4 4.3 3.8 7.3 12.1 17.6 19.3 23.9 8.2 7.1 13.9 9.8 23 10.8 12.7 1.4 27-2.6 37.9-10.6 4.9-3.6 13.4-12.7 16.5-17.7 1.4-2.3 2.8-3.9 3.1-3.6.3.3 2.1 4.5 4 9.3 4.8 12.2 13 25.1 21.2 33.3 3.2 3.2 4.1 3.4 8.7 1.9 4.3-1.4 5.3-3 2.8-4.7-2.4-1.6-11.8-24.3-25.1-60.6-20.6-56.3-46.6-127.3-51.1-139.7-1.7-4.8-3.4-9.3-3.8-9.9-.7-.9-1.4-.2-2.1 2z"/>
         </svg>
-        <span class="font-bold tracking-wider text-[11px] text-white">OMARCHY</span>
-        <span class="text-[9px] px-1 py-0.2 rounded bg-indigo-500/30 text-indigo-300 font-mono">v2.4</span>
+        <span class="font-bold tracking-wider text-[10px] text-white">OMARCHY</span>
+        <span class="text-[8px] px-1 py-0.1 rounded bg-indigo-500/30 text-indigo-300 font-mono hidden sm:inline">v2.4</span>
       </div>
 
       <!-- Hyprland Workspace Switcher -->
-      <div class="flex items-center space-x-1 bg-black/30 p-0.5 rounded-lg border border-white/5">
-        <button onclick="switchTab('home'); playCyberClick();" id="ws-home" class="workspace-pill active px-2.5 py-0.5 rounded text-[11px] cursor-pointer">1:SYS</button>
-        <button onclick="switchTab('chat'); playCyberClick();" id="ws-chat" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">2:CHAT</button>
-        <button onclick="switchTab('traces'); playCyberClick();" id="ws-traces" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">3:TRACES</button>
-        <button onclick="switchTab('inbox'); playCyberClick();" id="ws-inbox" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">4:INBOX</button>
-        <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">5:HITL</button>
-        <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">6:DAG</button>
-        <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">7:RAG</button>
-        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">8:NOTES</button>
-        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-2.5 py-0.5 rounded text-[11px] cursor-pointer">9:CAL</button>
+      <div class="flex items-center space-x-1 bg-black/30 p-0.5 rounded-lg border border-white/5 overflow-x-auto no-scrollbar max-w-[44vw] flex-shrink">
+        <button onclick="switchTab('home'); playCyberClick();" id="ws-home" class="workspace-pill active px-1.5 py-0.5 rounded text-[10px] cursor-pointer">1:SYS</button>
+        <button onclick="switchTab('chat'); playCyberClick();" id="ws-chat" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">2:CHAT</button>
+        <button onclick="switchTab('traces'); playCyberClick();" id="ws-traces" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">3:TRC</button>
+        <button onclick="switchTab('inbox'); playCyberClick();" id="ws-inbox" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">4:INBOX</button>
+        <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">5:HITL</button>
+        <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">6:DAG</button>
+        <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">7:RAG</button>
+        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">8:VAULT</button>
+        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">9:CAL</button>
+        <button onclick="switchTab('research'); playCyberClick();" id="ws-research" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer text-cyan-400">10:RES</button>
+        <button onclick="switchTab('documents'); playCyberClick();" id="ws-documents" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer text-emerald-400">11:DOCS</button>
       </div>
     </div>
 
     <!-- Center: Audio Spectrum Visualizer (CAVA-style Equalizer Bar for Spotify/Music) -->
-    <div onclick="toggleAudioVisualizerSync()" title="Music Visualizer: Click to Sync Live Spotify/Browser Audio" class="flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-3 py-1 rounded-full border border-white/10 cursor-pointer transition">
-      <div class="flex items-center space-x-1.5">
-        <i data-lucide="music" class="w-3.5 h-3.5 text-cyan-400" id="icon-music-sync"></i>
-        <span id="label-music-status" class="text-[10px] text-slate-300 font-mono">CAVA: Rhythm</span>
+    <div onclick="toggleAudioVisualizerSync()" title="Music Visualizer: Click to Sync Live Spotify/Browser Audio" class="hidden md:flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-2 py-0.5 rounded-full border border-white/10 cursor-pointer transition flex-shrink-0">
+      <div class="flex items-center space-x-1">
+        <i data-lucide="music" class="w-3 h-3 text-cyan-400" id="icon-music-sync"></i>
+        <span id="label-music-status" class="text-[9px] text-slate-300 font-mono hidden xl:inline">CAVA</span>
       </div>
 
-      <!-- 16 Animated Frequency Equalizer Bars -->
-      <div class="flex items-end space-x-0.5 h-4.5 w-20 px-1 py-0.5 rounded bg-black/30" id="equalizer-bars-container">
+      <!-- 12 Animated Frequency Equalizer Bars -->
+      <div class="flex items-end space-x-0.5 h-3.5 w-14 px-0.5 py-0.5 rounded bg-black/30" id="equalizer-bars-container">
         <div class="eq-bar" style="height: 4px;"></div>
         <div class="eq-bar" style="height: 8px;"></div>
-        <div class="eq-bar" style="height: 14px;"></div>
-        <div class="eq-bar" style="height: 10px;"></div>
-        <div class="eq-bar" style="height: 16px;"></div>
         <div class="eq-bar" style="height: 12px;"></div>
-        <div class="eq-bar" style="height: 6px;"></div>
-        <div class="eq-bar" style="height: 15px;"></div>
-        <div class="eq-bar" style="height: 9px;"></div>
-        <div class="eq-bar" style="height: 13px;"></div>
-        <div class="eq-bar" style="height: 17px;"></div>
-        <div class="eq-bar" style="height: 11px;"></div>
-        <div class="eq-bar" style="height: 7px;"></div>
+        <div class="eq-bar" style="height: 10px;"></div>
         <div class="eq-bar" style="height: 14px;"></div>
-        <div class="eq-bar" style="height: 8px;"></div>
-        <div class="eq-bar" style="height: 5px;"></div>
+        <div class="eq-bar" style="height: 11px;"></div>
+        <div class="eq-bar" style="height: 6px;"></div>
+        <div class="eq-bar" style="height: 13px;"></div>
+        <div class="eq-bar" style="height: 9px;"></div>
+        <div class="eq-bar" style="height: 12px;"></div>
+        <div class="eq-bar" style="height: 7px;"></div>
+        <div class="eq-bar" style="height: 4px;"></div>
       </div>
 
       <span class="text-slate-600">|</span>
-      <span id="waybar-clock" class="text-cyan-300 font-bold text-[11px]">12:00:00</span>
+      <span id="waybar-clock" class="text-cyan-300 font-bold text-[10px]">12:00:00</span>
     </div>
 
     <!-- Right: Telemetry, Theme/Wallpaper Pickers & Desktop Mode Controls -->
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-1.5 flex-shrink-0">
       <!-- Simulated CPU/RAM Telemetry -->
-      <div class="hidden xl:flex items-center space-x-2 bg-black/30 px-2.5 py-1 rounded-lg border border-white/5 text-[10px]">
+      <div class="hidden 2xl:flex items-center space-x-1.5 bg-black/30 px-2 py-0.5 rounded-lg border border-white/5 text-[9px]">
         <div class="flex items-center space-x-1 text-cyan-300">
-          <i data-lucide="cpu" class="w-3 h-3"></i>
+          <i data-lucide="cpu" class="w-2.5 h-2.5"></i>
           <span id="waybar-cpu">14%</span>
         </div>
         <span class="text-slate-600">/</span>
         <div class="flex items-center space-x-1 text-purple-300">
-          <i data-lucide="hard-drive" class="w-3 h-3"></i>
+          <i data-lucide="hard-drive" class="w-2.5 h-2.5"></i>
           <span id="waybar-ram">1.4GB</span>
         </div>
       </div>
 
       <!-- Audio SFX Toggle -->
-      <button onclick="toggleAudioSFX()" id="btn-audio-sfx" title="Toggle Synthesized Audio SFX" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer">
+      <button onclick="toggleAudioSFX()" id="btn-audio-sfx" title="Toggle Synthesized Audio SFX" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
         <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="icon-audio-sfx"></i>
       </button>
 
       <!-- TTS Speech Output Toggle (JARVIS Mode) -->
-      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle JARVIS Speech Synthesis (TTS Voice Output)" class="px-2 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
-        <i data-lucide="volume-x" class="w-3.5 h-3.5 text-slate-400" id="icon-tts-state"></i>
-        <span id="label-tts-state" class="text-[10px] font-mono text-slate-400">Voice: OFF</span>
+      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle JARVIS Speech Synthesis (TTS Voice Output)" class="px-1.5 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
+        <i data-lucide="volume-x" class="w-3 h-3 text-slate-400" id="icon-tts-state"></i>
+        <span id="label-tts-state" class="text-[9px] font-mono text-slate-400 hidden sm:inline">Voice</span>
       </button>
 
-      <!-- Document Ingestion Trigger -->
-      <button onclick="triggerDocUploadDialog()" title="Upload & Index Document (PDF, TXT, MD, JSON)" class="px-2.5 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
-        <i data-lucide="file-up" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span class="hidden md:inline">Ingest Doc</span>
+      <!-- Global Spotlight Trigger -->
+      <button onclick="openSpotlightModal()" title="Quick Spotlight HUD (Ctrl+K / Cmd+K)" class="px-2 py-0.5 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-500/40 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
+        <i data-lucide="command" class="w-3 h-3 text-cyan-400"></i>
+        <span class="font-mono font-bold">⌘K</span>
       </button>
 
       <!-- Wallpaper & Glass Customizer Trigger -->
-      <button onclick="openWallpaperModal()" class="px-2.5 py-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[11px] flex items-center space-x-1.5 transition cursor-pointer">
-        <i data-lucide="image" class="w-3.5 h-3.5 text-purple-400"></i>
-        <span>Backgrounds & Glass</span>
+      <button onclick="openWallpaperModal()" title="Backgrounds & Glass Transparency" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
+        <i data-lucide="sliders" class="w-3 h-3 text-purple-400"></i>
+        <span class="hidden lg:inline">Glass</span>
       </button>
 
       <!-- Themes Picker Trigger -->
-      <button onclick="openThemeModal()" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-indigo-500/40 to-purple-500/40 hover:from-indigo-500/60 hover:to-purple-500/60 text-white border border-indigo-400/30 text-[11px] flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
-        <i data-lucide="palette" class="w-3.5 h-3.5 text-cyan-300"></i>
-        <span id="current-theme-label">Cyberpunk</span>
+      <button onclick="openThemeModal()" title="Theme Selector" class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-indigo-500/40 to-purple-500/40 hover:from-indigo-500/60 hover:to-purple-500/60 text-white border border-indigo-400/30 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
+        <i data-lucide="palette" class="w-3 h-3 text-cyan-300"></i>
+        <span id="current-theme-label" class="hidden sm:inline">Cyberpunk</span>
       </button>
 
       <!-- Desktop Mode / Standalone Window Helper -->
-      <button onclick="openDesktopLauncherModal()" title="Desktop App Mode & Launcher" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 transition cursor-pointer">
+      <button onclick="openDesktopLauncherModal()" title="Desktop App Mode & Launcher" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 transition cursor-pointer flex-shrink-0">
         <i data-lucide="app-window" class="w-3.5 h-3.5 text-amber-400"></i>
       </button>
 
       <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullScreen()" title="Fullscreen F11" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer">
+      <button onclick="toggleFullScreen()" title="Fullscreen F11" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
         <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
       </button>
     </div>
@@ -656,6 +667,22 @@ DASHBOARD_HTML = """
               <span>9. Calendar & Schedule</span>
             </div>
             <span id="nav-calendar-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0</span>
+          </a>
+
+          <a onclick="switchTab('research'); playCyberClick();" id="nav-research" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="microscope" class="w-4 h-4 text-cyan-400"></i>
+              <span>10. Deep Research</span>
+            </div>
+            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">AI</span>
+          </a>
+
+          <a onclick="switchTab('documents'); playCyberClick();" id="nav-documents" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="folder-down" class="w-4 h-4 text-emerald-400"></i>
+              <span>11. Drop Ingestion</span>
+            </div>
+            <span id="nav-documents-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">0</span>
           </a>
 
           <a onclick="switchTab('activity'); playCyberClick();" id="nav-activity" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
@@ -1165,16 +1192,105 @@ DASHBOARD_HTML = """
         </section>
 
         <!-- ══════════════════ TAB 3: TRACES (LANGSMITH INSPECTOR) ═════ -->
+        <!-- ══════════════════ TAB 3: TRACES (LANGSMITH INSPECTOR) ═════ -->
         <section id="view-traces" class="hidden space-y-6 max-w-7xl mx-auto">
-          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between">
+          <!-- Top Control Header -->
+          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3 relative z-30">
             <div class="space-y-1">
-              <h2 class="text-base font-display font-bold text-white">Execution Traces & Step Inspector</h2>
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-cyan-600/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center">
+                  <i data-lucide="git-commit" class="w-4 h-4 text-cyan-400"></i>
+                </div>
+                <h2 class="text-base font-display font-bold text-white">Execution Traces & Step Inspector</h2>
+              </div>
               <p class="text-xs text-slate-400 font-mono">Real-time LangSmith-style visibility into every LangGraph node, inputs, outputs, tool calls, and latencies.</p>
             </div>
-            <button onclick="fetchTraces(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>Refresh Traces</span>
-            </button>
+            <div class="flex items-center space-x-2 flex-wrap gap-2">
+              <div class="relative inline-block text-left">
+                <button onclick="toggleTraceSimulateMenu(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                  <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                  <span>Simulate Run</span>
+                  <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+                </button>
+                <div id="trace-simulate-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl border border-white/10 bg-slate-900 shadow-2xl z-50 divide-y divide-white/5 py-1.5 font-mono text-xs ring-1 ring-cyan-500/40">
+                  <button onclick="triggerSimulatedTrace('rag'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                    <span>🧠 Knowledge RAG Synthesis</span>
+                  </button>
+                  <button onclick="triggerSimulatedTrace('calendar_event'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                    <span>📅 Calendar Event Scheduling</span>
+                  </button>
+                  <button onclick="triggerSimulatedTrace('high_risk_gate'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                    <span>⚠️ High-Risk Approval Gate</span>
+                  </button>
+                </div>
+              </div>
+              <button onclick="exportTracesJSON(); playCyberClick();" title="Export all traces as LangSmith-compatible JSON" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Export JSON</span>
+              </button>
+              <button onclick="clearAllTraces(); playCyberClick();" title="Clear all traces" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-rose-400 hover:border-rose-400 text-xs flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span>Clear</span>
+              </button>
+              <button onclick="fetchTraces(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trace Analytics Metrics Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+            <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[11px] font-mono text-slate-400">TOTAL RUNS</span>
+                <div id="stat-traces-total" class="text-xl font-bold font-mono text-white">0</div>
+              </div>
+              <div class="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                <i data-lucide="activity" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[11px] font-mono text-slate-400">AVG LATENCY</span>
+                <div id="stat-traces-avg-dur" class="text-xl font-bold font-mono text-cyan-300">0ms</div>
+              </div>
+              <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[11px] font-mono text-slate-400">SUCCESS RATE</span>
+                <div id="stat-traces-success-rate" class="text-xl font-bold font-mono text-emerald-400">100%</div>
+              </div>
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[11px] font-mono text-slate-400">GATED / PAUSED</span>
+                <div id="stat-traces-gated" class="text-xl font-bold font-mono text-amber-400">0</div>
+              </div>
+              <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trace Search & Filter Ribbon -->
+          <div class="p-3 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-1.5 flex-1 min-w-[240px]">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500"></i>
+              <input type="text" id="traces-search-input" oninput="handleTracesSearch(this.value)" placeholder="Search query, run ID, tool name..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-mono">
+            </div>
+            <div class="flex items-center space-x-1.5 font-mono text-xs select-none">
+              <button onclick="filterTracesByStatus('ALL')" id="trace-filter-ALL" class="trace-filter-pill px-3 py-1 rounded-lg bg-cyan-600/30 border border-cyan-500 text-cyan-300 font-bold cursor-pointer">ALL</button>
+              <button onclick="filterTracesByStatus('SUCCESS')" id="trace-filter-SUCCESS" class="trace-filter-pill px-3 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-emerald-300 cursor-pointer">SUCCESS</button>
+              <button onclick="filterTracesByStatus('AWAITING_APPROVAL')" id="trace-filter-AWAITING_APPROVAL" class="trace-filter-pill px-3 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-amber-300 cursor-pointer">GATED</button>
+              <button onclick="filterTracesByStatus('ERROR')" id="trace-filter-ERROR" class="trace-filter-pill px-3 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-rose-300 cursor-pointer">ERROR</button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1217,6 +1333,17 @@ DASHBOARD_HTML = """
                 </div>
               </div>
 
+              <!-- Latency Stacked Breakdown Bar -->
+              <div id="trace-latency-breakdown-box" class="hidden p-3 rounded-xl bg-black/30 border theme-border space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                  <span>STEP DURATION DISTRIBUTION</span>
+                  <span id="trace-total-latency-label" class="text-cyan-300 font-bold">Total: 0ms</span>
+                </div>
+                <div class="h-2 rounded-full bg-white/10 overflow-hidden flex" id="trace-latency-bar">
+                  <!-- Dynamically populated progress segments -->
+                </div>
+              </div>
+
               <!-- Node Cards Stream & Expanded Inspector -->
               <div class="space-y-3 flex-1" id="trace-nodes-container">
                 <div class="p-8 rounded-xl bg-black/30 border theme-border text-center text-xs text-slate-500">
@@ -1241,6 +1368,10 @@ DASHBOARD_HTML = """
               <p class="text-[11px] text-slate-400 font-mono">Live Gmail stream sanitized via Dual-LLM quarantine and classified by ML.</p>
             </div>
             <div class="flex items-center space-x-2 flex-wrap gap-1.5">
+              <button onclick="openAiComposeModal(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-lg shadow-cyan-500/20 active:scale-95">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                <span>✉️ Compose with AI</span>
+              </button>
               <button onclick="markAllInboxAsRead(); playCyberClick();" title="Mark all displayed emails as read" class="px-3 py-1.5 rounded-xl theme-card border hover:border-amber-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
                 <i data-lucide="mail-open" class="w-3.5 h-3.5 text-amber-400"></i>
                 <span>Mark All Read</span>
@@ -1286,6 +1417,10 @@ DASHBOARD_HTML = """
               <span>🚨 Suspicious / Scam</span>
               <span id="tab-count-likely_scam" class="px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-400 text-[10px]">0</span>
             </button>
+            <button onclick="filterInboxCategory('sent')" id="inbox-tab-sent" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-emerald-300 flex items-center space-x-1.5 transition cursor-pointer">
+              <span>📤 Sent Mails</span>
+              <span id="tab-count-sent" class="px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px]">0</span>
+            </button>
           </div>
 
           <!-- Crisp Gmail-Style Row Stream -->
@@ -1298,62 +1433,328 @@ DASHBOARD_HTML = """
 
         <!-- ══════════════════ TAB 5: HITL APPROVALS ══════════════════ -->
         <section id="view-approvals" class="hidden space-y-6 max-w-7xl mx-auto">
-          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between">
+          <!-- Top Control Header -->
+          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-1">
-              <h2 class="text-base font-display font-bold text-white">Human-In-The-Loop (HITL) Authorizations</h2>
-              <p class="text-xs text-slate-400 font-mono">High-risk actions (sending emails, executing critical tools) are intercepted and held here until approved.</p>
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center">
+                  <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+                </div>
+                <h2 class="text-base font-display font-bold text-white">Human-In-The-Loop (HITL) Safety & Authorization Center</h2>
+              </div>
+              <p class="text-xs text-slate-400 font-mono">High-risk actions (sending emails, modifying workspace files) are intercepted for verification.</p>
             </div>
-            <button onclick="fetchPendingApprovals(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-amber-400 transition cursor-pointer">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span>Refresh Approvals</span>
+            <div class="flex items-center space-x-2">
+              <button onclick="simulateHighRiskApproval(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                <span>Simulate High-Risk Action</span>
+              </button>
+              <button onclick="fetchPendingApprovals(); fetchApprovalHistory(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-amber-400 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- HITL Sub-Navigation Tabs -->
+          <div class="flex items-center space-x-2 font-mono text-xs select-none">
+            <button onclick="switchApprovalSubTab('pending')" id="subtab-hitl-pending" class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 font-bold flex items-center space-x-2 cursor-pointer transition">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+              <span>Pending Authorizations</span>
+              <span id="badge-hitl-pending-count" class="px-1.5 py-0.2 rounded-full bg-amber-500/30 text-[10px] text-amber-200">0</span>
+            </button>
+            <button onclick="switchApprovalSubTab('history')" id="subtab-hitl-history" class="px-4 py-2 rounded-xl theme-card border border-transparent text-slate-400 hover:text-white flex items-center space-x-2 cursor-pointer transition">
+              <i data-lucide="history" class="w-3.5 h-3.5"></i>
+              <span>Audit Trail & Resolved Log</span>
+            </button>
+            <button onclick="switchApprovalSubTab('policies')" id="subtab-hitl-policies" class="px-4 py-2 rounded-xl theme-card border border-transparent text-slate-400 hover:text-white flex items-center space-x-2 cursor-pointer transition">
+              <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+              <span>Safety Policies & Risk Tiers</span>
             </button>
           </div>
 
-          <div class="space-y-3" id="approvals-cards-container">
-            <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400">
-              No pending approvals. All safety gates clear.
+          <!-- Sub-Section 1: Pending Authorizations Container -->
+          <div id="hitl-subview-pending" class="space-y-4">
+            <div class="space-y-3" id="approvals-cards-container">
+              <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400">
+                No pending approvals. All safety gates clear.
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-Section 2: Resolved History / Audit Trail -->
+          <div id="hitl-subview-history" class="hidden space-y-4">
+            <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
+              <span class="text-xs font-mono text-slate-300">PAST RESOLUTIONS AUDIT TRAIL</span>
+              <button onclick="clearApprovalHistory(); playCyberClick();" class="text-xs text-slate-400 hover:text-rose-400 flex items-center space-x-1 font-mono cursor-pointer">
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <span>Clear Audit Trail</span>
+              </button>
+            </div>
+            <div class="space-y-3" id="approvals-history-container">
+              <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-500 font-mono">
+                No resolved authorization history recorded yet.
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-Section 3: Security Policies Configuration -->
+          <div id="hitl-subview-policies" class="hidden space-y-5">
+            <div class="p-5 rounded-2xl theme-card border space-y-4">
+              <h3 class="text-sm font-display font-bold text-white">Active HITL Gatekeeper Policies</h3>
+              <p class="text-xs text-slate-400 font-mono">Control which tool tiers are halted for authorization versus executed autonomously.</p>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div class="p-4 rounded-xl bg-black/40 border theme-border space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-rose-400 font-mono">Tier 3: High Risk</span>
+                    <input type="checkbox" id="policy-high-risk" onchange="saveApprovalPolicies()" checked class="w-4 h-4 accent-rose-500 rounded cursor-pointer">
+                  </div>
+                  <p class="text-[11px] text-slate-300">Require explicit human confirmation before sending outbound emails, modifying disk files, or shell commands.</p>
+                  <div class="text-[10px] font-mono text-slate-500">Tools: email.send, workspace.write_file, shell.execute</div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-black/40 border theme-border space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-400 font-mono">Tier 2: Medium Risk</span>
+                    <input type="checkbox" id="policy-medium-risk" onchange="saveApprovalPolicies()" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                  </div>
+                  <p class="text-[11px] text-slate-300">Auto-approve medium-risk modifications (e.g. creating calendar events or drafting replies without sending).</p>
+                  <div class="text-[10px] font-mono text-slate-500">Tools: calendar.create_event, email.create_draft</div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-black/40 border theme-border space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-emerald-400 font-mono">Tier 1: Low Risk</span>
+                    <input type="checkbox" id="policy-low-risk" onchange="saveApprovalPolicies()" checked class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                  </div>
+                  <p class="text-[11px] text-slate-300">Autonomous execution for read-only operations, search, and personal Obsidian note taking.</p>
+                  <div class="text-[10px] font-mono text-slate-500">Tools: rag.search, web.search, obsidian.create_note, calendar.list_events</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         <!-- ══════════════════ TAB 6: TOPOLOGY DAG ═══════════════════ -->
         <section id="view-topology" class="hidden space-y-6 max-w-7xl mx-auto">
-          <div class="p-5 rounded-2xl theme-card border space-y-4">
+          <!-- Header Bar -->
+          <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-1">
-              <h2 class="text-base font-display font-bold text-white">LangGraph Multi-Agent Architecture & DAG</h2>
-              <p class="text-xs text-slate-400 font-mono">Visual representation of nodes, state transitions, quarantine boundaries, and tool executors.</p>
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+                  <i data-lucide="git-fork" class="w-4 h-4 text-purple-400"></i>
+                </div>
+                <h2 class="text-base font-display font-bold text-white">LangGraph Multi-Agent Architecture & Topology DAG</h2>
+              </div>
+              <p class="text-xs text-slate-400 font-mono">Interactive State Machine Graph with security boundaries, conditional routing, and real-time step execution runner.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="openDAGSimulateModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                <span>Run Live DAG Simulation</span>
+              </button>
+              <button onclick="fetchTopologyGraph(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-purple-400 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-purple-400"></i>
+                <span>Refresh Architecture</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Interactive Graph Canvas & Node Deep Dive Drawer -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 Columns: Graphical Pipeline Topology DAG Canvas -->
+            <div class="lg:col-span-2 p-6 rounded-2xl theme-card border space-y-6 relative overflow-hidden">
+              <div class="flex items-center justify-between text-xs font-mono text-slate-400 border-b theme-border pb-3">
+                <span class="flex items-center space-x-2"><i data-lucide="share-2" class="w-3.5 h-3.5 text-cyan-400"></i><span>STATE MACHINE PIPELINE GRAPH</span></span>
+                <span class="text-cyan-300">Click any node to inspect architecture</span>
+              </div>
+
+              <!-- Visual Interactive DAG Flow Chart -->
+              <div class="space-y-4 font-mono text-xs select-none">
+                <!-- Row 1: Entry -> Quarantine -->
+                <div class="flex items-center justify-center space-x-3">
+                  <div class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px]">
+                    ● ENTRY POINT (Raw Inbound / User Command)
+                  </div>
+                </div>
+
+                <div class="flex justify-center text-cyan-500">
+                  <i data-lucide="arrow-down" class="w-4 h-4 animate-bounce"></i>
+                </div>
+
+                <!-- Node 1: Quarantine Sandbox -->
+                <div onclick="inspectTopologyNode('quarantine_node'); playCyberClick();" id="dag-node-quarantine_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-cyan-500/60 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] transition cursor-pointer space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-cyan-400 font-bold">
+                      <i data-lucide="shield-check" class="w-4 h-4"></i>
+                      <span>1. Quarantine & Sanitization Node</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">TOOL-ISOLATED</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 font-sans">Neutralizes prompt injection attacks and outputs structured clean facts without tool access.</p>
+                </div>
+
+                <div class="flex justify-center text-indigo-400">
+                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </div>
+
+                <!-- Node 2: Triaging Node & Conditional Branch -->
+                <div onclick="inspectTopologyNode('triaging_node'); playCyberClick();" id="dag-node-triaging_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-indigo-500/60 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] transition cursor-pointer space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-indigo-400 font-bold">
+                      <i data-lucide="layers" class="w-4 h-4"></i>
+                      <span>2. ML Triaging & Gatekeeper Node</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">CALIBRATED SGD</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 font-sans">Calculates importance probability (0.0 to 1.0) and assigns category. Routes low-priority noise directly to bypass archive.</p>
+                </div>
+
+                <!-- Branching Visual -->
+                <div class="grid grid-cols-2 gap-4 text-center">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-emerald-400 pb-1">Score ≥ 0.50 (Trigger Agent)</span>
+                    <i data-lucide="arrow-down" class="w-4 h-4 text-emerald-400"></i>
+                  </div>
+                  <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-slate-500 pb-1">Score < 0.50 (Low Priority)</span>
+                    <i data-lucide="arrow-down" class="w-4 h-4 text-slate-500"></i>
+                  </div>
+                </div>
+
+                <!-- Row: RAG Node (Left) vs Low Priority Store (Right) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Node 3: Hybrid RAG -->
+                  <div onclick="inspectTopologyNode('retrieval_node'); playCyberClick();" id="dag-node-retrieval_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-emerald-500/60 hover:border-emerald-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition cursor-pointer space-y-1.5">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-2 text-emerald-400 font-bold">
+                        <i data-lucide="database" class="w-4 h-4"></i>
+                        <span>3. Hybrid RAG Retrieval</span>
+                      </div>
+                    </div>
+                    <p class="text-[11px] text-slate-300 font-sans">Dense MiniLM embeddings + BM25 keyword matching + CrossEncoder reranker.</p>
+                  </div>
+
+                  <!-- Node 2b: Low Priority Store -->
+                  <div onclick="inspectTopologyNode('low_priority_store_node'); playCyberClick();" id="dag-node-low_priority_store_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/60 border border-slate-700 hover:border-slate-500 transition cursor-pointer space-y-1.5">
+                    <div class="flex items-center justify-between text-slate-400 font-bold">
+                      <div class="flex items-center space-x-2">
+                        <i data-lucide="archive" class="w-4 h-4"></i>
+                        <span>2b. Low-Priority Store</span>
+                      </div>
+                      <span class="text-[10px] text-slate-500">BYPASS LLM</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-sans">Direct database storage without consuming LLM reasoning tokens.</p>
+                  </div>
+                </div>
+
+                <div class="flex justify-center text-purple-400">
+                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </div>
+
+                <!-- Node 4: ReAct Reasoning Node -->
+                <div onclick="inspectTopologyNode('reasoning_node'); playCyberClick();" id="dag-node-reasoning_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-purple-500/60 hover:border-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition cursor-pointer space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-purple-400 font-bold">
+                      <i data-lucide="brain" class="w-4 h-4"></i>
+                      <span>4. ReAct Reasoning & Planner Node</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">STRUCTURED OUTPUT</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 font-sans">Synthesizes context, formulates execution plan, and selects tool with schema-validated args.</p>
+                </div>
+
+                <div class="flex justify-center text-amber-400">
+                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </div>
+
+                <!-- Node 5: HITL Safety Gate Node -->
+                <div onclick="inspectTopologyNode('approval_gate_node'); playCyberClick();" id="dag-node-approval_gate_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-amber-500/60 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition cursor-pointer space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-amber-400 font-bold">
+                      <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                      <span>5. 3-Tier HITL Safety Gatekeeper</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">RISK INTERCEPTOR</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 font-sans">Halts Tier 3 destructive tools (email.send, workspace.write_file) until operator authorizes.</p>
+                </div>
+
+                <div class="flex justify-center text-blue-400">
+                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </div>
+
+                <!-- Node 6: Tool Execution Node -->
+                <div onclick="inspectTopologyNode('tool_execution_node'); playCyberClick();" id="dag-node-tool_execution_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-blue-500/60 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition cursor-pointer space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-blue-400 font-bold">
+                      <i data-lucide="cpu" class="w-4 h-4"></i>
+                      <span>6. Sandboxed Tool Execution Node</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">CONNECTORS</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 font-sans">Executes Gmail, Calendar, Obsidian, Workspace, and Web Search connectors safely.</p>
+                </div>
+              </div>
             </div>
 
-            <!-- Deep Graph Visual Map -->
-            <div class="p-6 bg-black/40 rounded-xl border theme-border space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                <div class="p-4 rounded-xl theme-card border space-y-2">
-                  <div class="flex items-center space-x-2 text-cyan-400 font-bold font-mono">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                    <span>1. Quarantine Node</span>
-                  </div>
-                  <p class="text-slate-300 text-[11px] leading-relaxed">Runs in complete tool-isolation using Fast LLM to extract clean facts from raw untrusted user input.</p>
+            <!-- Right 1 Column: Node Deep Dive Architecture Inspector -->
+            <div class="p-5 rounded-2xl theme-card border space-y-4 h-[680px] flex flex-col overflow-y-auto">
+              <div class="border-b theme-border pb-3">
+                <h3 id="topology-node-title" class="font-display font-bold text-sm text-white">Quarantine Node</h3>
+                <span id="topology-node-role" class="text-[11px] font-mono text-cyan-400">Tier 1: Security Isolation Sandbox</span>
+              </div>
+
+              <div class="space-y-3 text-xs flex-1">
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">MODEL & RUNTIME</span>
+                  <div id="topology-node-model" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px]">Gemini 2.5 Flash / Fast LLM</div>
                 </div>
 
-                <div class="p-4 rounded-xl theme-card border space-y-2">
-                  <div class="flex items-center space-x-2 text-indigo-400 font-bold font-mono">
-                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                    <span>2. Triaging & RAG Nodes</span>
-                  </div>
-                  <p class="text-slate-300 text-[11px] leading-relaxed">Calculates priority probability and performs Dense + BM25 hybrid semantic search over local vector stores.</p>
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">ISOLATION BOUNDARY</span>
+                  <div id="topology-node-isolation" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px]">Tool-Isolated (No file/network/state access)</div>
                 </div>
 
-                <div class="p-4 rounded-xl theme-card border space-y-2">
-                  <div class="flex items-center space-x-2 text-purple-400 font-bold font-mono">
-                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                    <span>3. Reasoning & HITL Gates</span>
-                  </div>
-                  <p class="text-slate-300 text-[11px] leading-relaxed">Executes ReAct planning. Intercepts Tier 3 destructive tools with authorization gates before direct execution.</p>
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">PURPOSE & LOGIC</span>
+                  <p id="topology-node-desc" class="text-slate-300 text-xs leading-relaxed">Sanitizes raw untrusted user/email inputs, neutralizing prompt injection attacks and extracting structured clean facts.</p>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">INPUT STATE SCHEMA</span>
+                  <div id="topology-node-inputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-cyan-300">["raw_subject", "raw_body", "sender", "is_known_contact"]</div>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">OUTPUT STATE MUTATIONS</span>
+                  <div id="topology-node-outputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-emerald-300">["clean_facts", "is_interactive_command"]</div>
+                </div>
+
+                <div class="space-y-1">
+                  <span class="font-mono text-[10px] text-slate-400">TYPICAL LATENCY</span>
+                  <div id="topology-node-latency" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-purple-300">~35ms</div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Live Step-by-Step State Transition Log Console -->
+          <div id="dag-live-console" class="hidden p-5 rounded-2xl theme-card border space-y-3">
+            <div class="flex items-center justify-between border-b theme-border pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-xs font-mono font-bold text-white">LIVE SIMULATION EXECUTION CONSOLE</span>
+              </div>
+              <span id="dag-sim-duration-badge" class="text-[10px] font-mono text-cyan-300">0ms</span>
+            </div>
+            <div class="space-y-2 font-mono text-xs" id="dag-sim-log-stream">
+              <!-- Log steps injected here -->
+            </div>
+          </div>
         </section>
+
 
         <!-- ══════════════════ TAB 7: KNOWLEDGE (RAG) ════════════════ -->
         <section id="view-rag" class="hidden space-y-6 max-w-7xl mx-auto">
@@ -1613,6 +2014,155 @@ DASHBOARD_HTML = """
                 <span class="text-slate-500">Checkpointer Store:</span>
                 <div class="text-purple-400 font-bold mt-1">Local SQLite Checkpoint</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════ TAB 11: DEEP RESEARCH ══════════════════ -->
+        <section id="view-research" class="hidden space-y-6 max-w-7xl mx-auto">
+          <!-- Research Header & Launch Banner -->
+          <div class="p-6 rounded-2xl theme-card border space-y-4 shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
+                    <i data-lucide="microscope" class="w-4 h-4"></i>
+                  </div>
+                  <h2 class="text-lg font-display font-bold text-white tracking-tight">Deep Autonomous Research & Intelligence</h2>
+                </div>
+                <p class="text-xs text-slate-300 font-mono">Multi-step query decomposition, live web crawling, Mermaid architecture synthesis & Obsidian auto-indexing.</p>
+              </div>
+              
+              <!-- Quick Depth Selector -->
+              <div class="flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border theme-border text-xs font-mono">
+                <button onclick="setResearchDepth(1)" id="depth-btn-1" class="px-2.5 py-1 rounded-lg transition cursor-pointer text-slate-400 hover:text-white">Quick (2 Queries)</button>
+                <button onclick="setResearchDepth(2)" id="depth-btn-2" class="px-2.5 py-1 rounded-lg transition cursor-pointer bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 font-bold">Standard (4 Queries)</button>
+                <button onclick="setResearchDepth(3)" id="depth-btn-3" class="px-2.5 py-1 rounded-lg transition cursor-pointer text-slate-400 hover:text-white">Exhaustive (Deep)</button>
+              </div>
+            </div>
+
+            <!-- Query Input Box -->
+            <div class="flex items-center space-x-2">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="research-topic-input" placeholder="e.g., 'Compare vLLM vs SGLang memory allocation', 'RAG cross-encoder reranking algorithms'..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-black/50 border theme-border text-sm text-white placeholder-slate-500 font-sans focus:outline-none focus:border-cyan-400 transition" onkeydown="if(event.key==='Enter') executeDeepResearch();" />
+              </div>
+              <button id="btn-start-research" onclick="executeDeepResearch()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20 cursor-pointer transition flex-shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Launch Research</span>
+              </button>
+            </div>
+
+            <!-- Preset Topic Suggestions -->
+            <div class="flex items-center space-x-2 text-xs text-slate-400 overflow-x-auto pt-1">
+              <span class="font-mono text-[10px] text-slate-500 uppercase flex-shrink-0">Suggestions:</span>
+              <button onclick="setResearchPrompt('Compare vLLM PagedAttention vs SGLang RadixAttention memory engines')" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border hover:border-cyan-400 text-slate-300 text-[11px] truncate cursor-pointer transition">⚡ vLLM vs SGLang</button>
+              <button onclick="setResearchPrompt('Cross-Encoder vs Bi-Encoder reranking performance in local RAG pipelines')" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border hover:border-cyan-400 text-slate-300 text-[11px] truncate cursor-pointer transition">🧠 RAG Rerankers</button>
+              <button onclick="setResearchPrompt('LangGraph multi-agent human-in-the-loop state checkpointing architecture')" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border hover:border-cyan-400 text-slate-300 text-[11px] truncate cursor-pointer transition">🛡️ LangGraph HITL</button>
+            </div>
+          </div>
+
+          <!-- Research Workspace Split View -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left: Past Research Dossiers in Vault (1 Col) -->
+            <div class="p-5 rounded-2xl theme-card border space-y-3 lg:col-span-1">
+              <div class="flex items-center justify-between border-b theme-border pb-2.5">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="archive" class="w-4 h-4 text-cyan-400"></i>
+                  <span class="font-bold text-xs text-white">Vault Dossiers</span>
+                </div>
+                <button onclick="fetchResearchHistory()" class="text-slate-400 hover:text-white text-xs p-1">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div class="space-y-2 max-h-[600px] overflow-y-auto pr-1" id="research-history-list">
+                <div class="p-6 text-center text-xs text-slate-500 font-mono">Loading past research dossiers...</div>
+              </div>
+            </div>
+
+            <!-- Right: Active Research Output & Mermaid Dossier (2 Cols) -->
+            <div class="p-6 rounded-2xl theme-card border space-y-4 lg:col-span-2 min-h-[500px]" id="research-output-panel">
+              <div class="flex items-center justify-between border-b theme-border pb-3">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                  <span class="font-bold text-sm text-white" id="research-dossier-title">Research Workspace</span>
+                </div>
+                <div class="flex items-center space-x-2" id="research-action-bar" style="display: none;">
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✓ Saved to Obsidian</span>
+                </div>
+              </div>
+
+              <!-- Live Progress Stepper (hidden by default) -->
+              <div id="research-stepper" class="hidden p-4 rounded-xl bg-black/40 border theme-border space-y-3">
+                <div class="text-xs font-mono text-cyan-300 font-bold flex items-center space-x-2">
+                  <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-cyan-400"></i>
+                  <span id="research-stepper-label">Executing autonomous research pipeline...</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2 text-[10px] font-mono">
+                  <div class="p-2 rounded bg-black/50 border border-cyan-500/30 text-cyan-300 text-center" id="step-1">1. Deconstruct Query</div>
+                  <div class="p-2 rounded bg-black/50 border theme-border text-slate-500 text-center" id="step-2">2. Search Web</div>
+                  <div class="p-2 rounded bg-black/50 border theme-border text-slate-500 text-center" id="step-3">3. Extract Citations</div>
+                  <div class="p-2 rounded bg-black/50 border theme-border text-slate-500 text-center" id="step-4">4. Synthesize Diagram</div>
+                </div>
+              </div>
+
+              <!-- Rendered Markdown & Mermaid Container -->
+              <div id="research-dossier-content" class="space-y-4 text-xs text-slate-200 leading-relaxed font-sans select-text">
+                <div class="p-12 text-center text-slate-500 font-mono space-y-2">
+                  <i data-lucide="microscope" class="w-8 h-8 text-slate-600 mx-auto"></i>
+                  <p>Enter a technical topic above to begin multi-step autonomous research.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════ TAB 12: UNIVERSAL DOCUMENT INGESTION ════════ -->
+        <section id="view-documents" class="hidden space-y-6 max-w-7xl mx-auto">
+          <!-- Ingestion Dropzone Banner -->
+          <div class="p-6 rounded-2xl theme-card border space-y-4 shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+                    <i data-lucide="folder-down" class="w-4 h-4"></i>
+                  </div>
+                  <h2 class="text-lg font-display font-bold text-white tracking-tight">Universal Document Ingestion Pipeline</h2>
+                </div>
+                <p class="text-xs text-slate-300 font-mono">Drop PDFs, CSVs, research papers, invoices, or specifications for automated classification, schema extraction & vector indexing.</p>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <button onclick="syncDropFolder()" class="px-4 py-2.5 rounded-xl theme-card border hover:border-emerald-400 text-slate-200 text-xs flex items-center space-x-2 cursor-pointer transition">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  <span>Sync Folder (<code>data/inbox_drop/</code>)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Drag & Drop Upload Zone -->
+            <div id="dropzone-doc-upload" onclick="document.getElementById('dropzone-file-input').click()" class="border-2 border-dashed border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-8 bg-emerald-950/10 hover:bg-emerald-950/20 text-center space-y-2.5 cursor-pointer transition group">
+              <input type="file" id="dropzone-file-input" accept=".pdf,.csv,.tsv,.md,.txt,.json" onchange="handleDropzoneUpload(event)" class="hidden" />
+              <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+              </div>
+              <div class="text-sm font-bold text-white">Click to Upload or Drag & Drop Documents Here</div>
+              <p class="text-xs text-slate-400 font-mono">Supports <span class="text-emerald-300 font-bold">.PDF</span> (Papers/Invoices), <span class="text-cyan-300 font-bold">.CSV</span> (Tabular data), <span class="text-purple-300 font-bold">.MD / .TXT</span></p>
+            </div>
+          </div>
+
+          <!-- Ingested Documents Stream -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+                <span class="font-bold text-xs text-white uppercase font-mono tracking-wider">Ingested Documents & Summaries</span>
+              </div>
+              <span id="doc-total-count-badge" class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">0 items</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="ingested-documents-grid">
+              <div class="p-8 text-center text-xs text-slate-500 font-mono col-span-full">No documents ingested yet. Drop a PDF or CSV above to start.</div>
             </div>
           </div>
         </section>
@@ -2152,13 +2702,205 @@ DASHBOARD_HTML = """
         <button onclick="closeCalendarEventModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
         <button id="btn-save-calendar-event" onclick="saveCalendarEventFromModal()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
           <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
-          <span>Confirm & Schedule</span>
+          <span>Save Event</span>
         </button>
       </div>
     </div>
   </div>
 
+  <!-- ─── 5.9 LANGGRAPH TOPOLOGY DAG SIMULATION MODAL ───────────────── -->
+  <div id="dag-simulate-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+
+    <div class="theme-modal max-w-xl w-full p-6 rounded-2xl border space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+            <i data-lucide="play-circle" class="w-4 h-4 text-purple-400"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display">Run Interactive DAG Simulation</h3>
+            <p class="text-[11px] text-slate-400 font-mono">Observe step-by-step traversal across LangGraph nodes in real time.</p>
+          </div>
+        </div>
+        <button onclick="closeDAGSimulateModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="space-y-1.5">
+          <label class="font-mono text-[11px] text-slate-300">Choose Test Scenario Preset:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-[11px]">
+            <button onclick="selectDAGPreset('rag')" id="dag-preset-rag" class="p-2.5 rounded-xl border bg-purple-600/20 border-purple-500 text-purple-300 text-left cursor-pointer transition">
+              <div class="font-bold">🧠 Knowledge Base RAG</div>
+              <div class="text-[10px] text-slate-400 truncate">Explain Personal AI OS architecture</div>
+            </button>
+            <button onclick="selectDAGPreset('phishing')" id="dag-preset-phishing" class="p-2.5 rounded-xl border theme-card border-transparent text-slate-300 text-left hover:border-cyan-400 cursor-pointer transition">
+              <div class="font-bold">🚨 Untrusted Email Triage</div>
+              <div class="text-[10px] text-slate-400 truncate">Suspicious promo email quarantine</div>
+            </button>
+            <button onclick="selectDAGPreset('high_risk')" id="dag-preset-high_risk" class="p-2.5 rounded-xl border theme-card border-transparent text-slate-300 text-left hover:border-amber-400 cursor-pointer transition">
+              <div class="font-bold">⚠️ High-Risk Outbound Gate</div>
+              <div class="text-[10px] text-slate-400 truncate">Send invoice email to external client</div>
+            </button>
+            <button onclick="selectDAGPreset('calendar')" id="dag-preset-calendar" class="p-2.5 rounded-xl border theme-card border-transparent text-slate-300 text-left hover:border-emerald-400 cursor-pointer transition">
+              <div class="font-bold">📅 Calendar Event Scheduling</div>
+              <div class="text-[10px] text-slate-400 truncate">Schedule team sync meeting</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="font-mono text-[11px] text-slate-300">Custom Input Prompt / Message:</label>
+          <textarea id="dag-sim-custom-prompt" rows="3" class="w-full bg-black/40 border theme-border rounded-xl p-3 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-purple-400 resize-none">Explain the Personal AI OS multi-agent architecture and quarantine security.</textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeDAGSimulateModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+        <button id="btn-run-dag-sim" onclick="executeDAGSimulationFromModal()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          <span>Execute Simulation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.10 AI EMAIL STUDIO & COMPOSE MODAL ───────────────────────── -->
+  <div id="ai-compose-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
+    <div class="theme-modal max-w-2xl w-full p-6 rounded-2xl border space-y-4 shadow-2xl overflow-y-auto max-h-[92vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-cyan-500/20">
+            <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white font-display flex items-center space-x-2">
+              <span>AI Email Studio & Smart Composer</span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Qwen 2.5 Copilot</span>
+            </h3>
+            <p class="text-[11px] text-slate-400 font-mono">Compose, refine, and dispatch professional emails with local AI generation.</p>
+          </div>
+        </div>
+        <button onclick="closeAiComposeModal()" class="text-slate-400 hover:text-white transition cursor-pointer p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Recipient & Quick Contacts -->
+      <div class="space-y-2 text-xs">
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="font-mono text-[11px] text-slate-300">To (Recipient Email):</label>
+            <div class="flex items-center space-x-1 font-mono text-[10px] text-slate-400">
+              <span>Quick:</span>
+              <button onclick="setComposeRecipient('rahul@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Rahul</button>
+              <button onclick="setComposeRecipient('sarah.j@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Sarah</button>
+              <button onclick="setComposeRecipient('jashanjashan372@gmail.com')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Jashan</button>
+            </div>
+          </div>
+          <input type="email" id="compose-to" placeholder="recipient@example.com" class="w-full bg-black/40 border theme-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-cyan-400" />
+        </div>
+
+        <!-- Subject Line -->
+        <div class="space-y-1">
+          <label class="font-mono text-[11px] text-slate-300">Subject Line:</label>
+          <input type="text" id="compose-subject" placeholder="e.g. Project Update & Next Steps" class="w-full bg-black/40 border theme-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-cyan-400" />
+        </div>
+
+        <!-- AI Assistant Assistance Card -->
+        <div class="p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-cyan-300 flex items-center space-x-1.5">
+              <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+              <span>AI Writing Directives & Intent</span>
+            </span>
+            <!-- Tone selector -->
+            <div class="flex items-center space-x-1 text-[10px] font-mono" id="compose-tone-selector">
+              <button onclick="setComposeTone('professional')" id="tone-btn-professional" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md bg-cyan-500/30 text-cyan-200 border border-cyan-500/50 font-bold transition">Professional</button>
+              <button onclick="setComposeTone('concise')" id="tone-btn-concise" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Concise</button>
+              <button onclick="setComposeTone('friendly')" id="tone-btn-friendly" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Friendly</button>
+              <button onclick="setComposeTone('urgent')" id="tone-btn-urgent" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Urgent</button>
+              <button onclick="setComposeTone('executive')" id="tone-btn-executive" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Executive</button>
+            </div>
+          </div>
+
+          <textarea id="compose-ai-prompt" rows="2" placeholder="Tell AI what to write (e.g. Follow up on yesterday's architecture sync, confirm RAG pipeline status, and ask for a 15-min call tomorrow afternoon)" class="w-full bg-black/50 border border-indigo-500/20 rounded-xl p-2.5 text-xs text-white placeholder-slate-400 font-sans focus:outline-none focus:border-cyan-400 resize-none"></textarea>
+
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5">
+            <!-- Quick Intent Pills -->
+            <div class="flex items-center space-x-1 overflow-x-auto text-[10px] font-mono text-slate-400">
+              <span class="text-slate-500">Preset:</span>
+              <button onclick="setComposeIntent('Follow up on our previous discussion and check if you have any questions on the proposal.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Follow Up</button>
+              <button onclick="setComposeIntent('Propose a 30-minute sync meeting this week to review project milestones and sprint goals.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Meeting Request</button>
+              <button onclick="setComposeIntent('Provide a status report on the Personal AI OS deployment, test results, and next deliverables.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Project Update</button>
+              <button onclick="setComposeIntent('Thank you for the productive meeting and sharing the helpful documentation.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Thank You</button>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="btn-generate-ai-compose" onclick="generateAiComposeDraft()" type="button" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition active:scale-95">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span id="btn-generate-ai-text">✨ Generate Draft</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Editable Draft Body Area -->
+        <div class="space-y-1 pt-1">
+          <div class="flex items-center justify-between">
+            <label class="font-mono text-[11px] text-slate-300">Message Body (Editable):</label>
+            <span id="compose-word-count" class="font-mono text-[10px] text-slate-500">0 words</span>
+          </div>
+          <textarea id="compose-body" oninput="updateComposeWordCount()" rows="7" placeholder="Email body will appear here or you can type directly..." class="w-full bg-black/60 border theme-border rounded-xl p-3.5 text-xs text-slate-100 placeholder-slate-500 font-sans leading-relaxed focus:outline-none focus:border-cyan-400 resize-y"></textarea>
+        </div>
+      </div>
+
+      <!-- Action Buttons Footer -->
+      <div class="flex items-center justify-between pt-2 border-t theme-border">
+        <button onclick="closeAiComposeModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Discard</button>
+        <div class="flex items-center space-x-2">
+          <button onclick="sendComposedEmail(true)" id="btn-compose-draft" class="px-4 py-2 rounded-xl theme-card border hover:border-amber-400 text-amber-300 text-xs flex items-center space-x-1.5 cursor-pointer transition">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>Save as Draft</span>
+          </button>
+          <button onclick="sendComposedEmail(false)" id="btn-compose-send" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-lg shadow-emerald-500/20 transition active:scale-95">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>🚀 Send Email</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.11 QUICK-ACCESS SPOTLIGHT HUD MODAL (⌘K / CTRL+K) ───────── -->
+  <div id="spotlight-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;" onclick="if(event.target===this) closeSpotlightModal()">
+    <div class="theme-modal max-w-2xl w-full p-4 rounded-2xl border border-cyan-500/30 bg-slate-950/95 backdrop-blur-2xl space-y-3 shadow-2xl shadow-cyan-500/10">
+      <!-- Search Input Header -->
+      <div class="relative flex items-center">
+        <i data-lucide="search" class="w-5 h-5 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="spotlight-search-input" placeholder="Type a command, search notes & docs, or ask AI... (e.g. 'research vLLM', 'inbox', 'sync')" class="w-full pl-11 pr-20 py-3 rounded-xl bg-black/60 border border-white/10 text-sm text-white placeholder-slate-400 font-sans focus:outline-none focus:border-cyan-400 transition" oninput="handleSpotlightInput(this.value)" onkeydown="handleSpotlightKeydown(event)" autocomplete="off" />
+        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">ESC to close</span>
+      </div>
+
+      <!-- Live Search Results Categorized -->
+      <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1" id="spotlight-results-container">
+        <!-- Injected dynamically by JS -->
+      </div>
+
+      <!-- Keyboard shortcuts legend -->
+      <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-white/10 pt-2 px-1">
+        <div class="flex items-center space-x-3">
+          <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">↓</kbd> Navigate</span>
+          <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">ENTER</kbd> Select</span>
+        </div>
+        <span class="text-cyan-400">Personal AI OS Spotlight HUD</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── 6. INTERACTIVE JAVASCRIPT LOGIC ────────────────────────────── -->
+
   <script>
     // ── Global State & Local Storage Keys ──
     const STORAGE_THEME = 'omarchy_theme';
@@ -2169,6 +2911,11 @@ DASHBOARD_HTML = """
     const STORAGE_CRT = 'omarchy_crt_enabled';
     const STORAGE_AUDIO = 'omarchy_audio_enabled';
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
+
+    function initThemeState() {
+      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'cyberpunk';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
 
     let currentSessionId = null;
     let currentSessionMessages = [];
@@ -2836,7 +3583,7 @@ DASHBOARD_HTML = """
 
     // ── Navigation & Workspace Switching ──
     function switchTab(tabId) {
-      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'obsidian', 'calendar', 'activity', 'system'];
+      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'obsidian', 'calendar', 'activity', 'system', 'research', 'documents'];
       
       tabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
@@ -2870,7 +3617,9 @@ DASHBOARD_HTML = """
           obsidian: 'Obsidian Knowledge Vault',
           calendar: 'Schedule & Google Calendar',
           activity: 'Activity Event Logs',
-          system: 'System Telemetry'
+          system: 'System Telemetry',
+          research: 'Deep Autonomous Research & Intelligence',
+          documents: 'Universal Document Ingestion Pipeline'
         };
         breadcrumb.textContent = titles[tabId] || 'Workspace';
       }
@@ -2886,6 +3635,11 @@ DASHBOARD_HTML = """
       }
       if (tabId === 'approvals') {
         fetchPendingApprovals();
+        fetchApprovalHistory();
+        fetchApprovalPolicies();
+      }
+      if (tabId === 'topology') {
+        fetchTopologyGraph();
       }
       if (tabId === 'obsidian') {
         fetchObsidianNotes();
@@ -2894,11 +3648,26 @@ DASHBOARD_HTML = """
       if (tabId === 'calendar') {
         fetchCalendarEvents();
       }
+      if (tabId === 'research') {
+        fetchResearchHistory();
+      }
+      if (tabId === 'documents') {
+        fetchIngestedDocuments();
+      }
       refreshIcons();
+
     }
 
-    // ── Keyboard Shortcuts (Alt+1 to Alt+9) ──
+    // ── Keyboard Shortcuts (Alt+1 to Alt+9, Ctrl+K) ──
     window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openSpotlightModal();
+        return;
+      }
+      if (e.key === 'Escape') {
+        closeSpotlightModal();
+      }
       if (e.altKey && e.key >= '1' && e.key <= '9') {
         e.preventDefault();
         const map = {
@@ -3782,13 +4551,21 @@ DASHBOARD_HTML = """
       } catch (e) {}
     }
 
-    // ── Traces (LangSmith Inspector) ──
+    // ── Traces (LangSmith Inspector & Profiler) ──
+    let currentTraceFilterStatus = 'ALL';
+    let currentTraceSearchQuery = '';
+
     async function fetchTraces() {
       try {
         const res = await fetch('/api/traces');
         const data = await res.json();
         allTraces = data.traces || [];
-        renderTracesList(allTraces);
+        
+        // Fetch and render aggregate stats
+        fetchTraceStats();
+
+        // Render filtered traces list
+        applyTracesFilter();
 
         const homeCount = document.getElementById('home-trace-count');
         const badge = document.getElementById('nav-traces-badge');
@@ -3803,13 +4580,129 @@ DASHBOARD_HTML = """
       } catch (err) {}
     }
 
+    async function fetchTraceStats() {
+      try {
+        const res = await fetch('/api/traces/stats');
+        const data = await res.json();
+        const stats = data.stats || {};
+        
+        const totalEl = document.getElementById('stat-traces-total');
+        const avgDurEl = document.getElementById('stat-traces-avg-dur');
+        const successRateEl = document.getElementById('stat-traces-success-rate');
+        const gatedEl = document.getElementById('stat-traces-gated');
+
+        if (totalEl) totalEl.textContent = stats.total_runs || 0;
+        if (avgDurEl) avgDurEl.textContent = `${stats.avg_duration_ms || 0}ms`;
+        if (successRateEl) successRateEl.textContent = `${stats.success_rate_pct || 100}%`;
+        if (gatedEl) gatedEl.textContent = stats.gated_count || 0;
+      } catch (e) {}
+    }
+
+    function toggleTraceSimulateMenu() {
+      const menu = document.getElementById('trace-simulate-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    async function triggerSimulatedTrace(scenario = 'rag') {
+      try {
+        const res = await fetch('/api/traces/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario })
+        });
+        const data = await res.json();
+        playHudBeep(1200);
+        showProactiveToast('Trace Captured', `Simulated ${scenario} run added to trace store.`);
+        await fetchTraces();
+        if (data.run_id) {
+          inspectSpecificTrace(data.run_id, true);
+        }
+      } catch (e) {
+        alert('Failed to simulate trace: ' + e);
+      }
+    }
+
+    function exportTracesJSON() {
+      if (!allTraces || allTraces.length === 0) {
+        alert('No execution traces to export.');
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allTraces, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `personal_ai_os_traces_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      playHudBeep(1400);
+    }
+
+    async function clearAllTraces() {
+      if (!confirm('Are you sure you want to clear all execution traces?')) return;
+      try {
+        await fetch('/api/traces/clear', { method: 'POST' });
+        selectedRunId = null;
+        allTraces = [];
+        renderTracesList([]);
+        fetchTraceStats();
+        
+        const container = document.getElementById('trace-nodes-container');
+        if (container) container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono">All traces cleared.</div>`;
+        const title = document.getElementById('trace-selected-title');
+        if (title) title.textContent = 'Select a Trace Run';
+        const dagStrip = document.getElementById('trace-dag-visual-strip');
+        if (dagStrip) dagStrip.classList.add('hidden');
+        const latencyBox = document.getElementById('trace-latency-breakdown-box');
+        if (latencyBox) latencyBox.classList.add('hidden');
+
+        playHudBeep(800);
+      } catch (e) {
+        alert('Failed to clear traces: ' + e);
+      }
+    }
+
+    function handleTracesSearch(query) {
+      currentTraceSearchQuery = (query || '').toLowerCase().trim();
+      applyTracesFilter();
+    }
+
+    function filterTracesByStatus(status) {
+      currentTraceFilterStatus = status;
+      const pills = ['ALL', 'SUCCESS', 'AWAITING_APPROVAL', 'ERROR'];
+      pills.forEach(p => {
+        const btn = document.getElementById(`trace-filter-${p}`);
+        if (!btn) return;
+        if (p === status) {
+          btn.className = "trace-filter-pill px-3 py-1 rounded-lg bg-cyan-600/30 border border-cyan-500 text-cyan-300 font-bold cursor-pointer";
+        } else {
+          btn.className = "trace-filter-pill px-3 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer";
+        }
+      });
+      applyTracesFilter();
+    }
+
+    function applyTracesFilter() {
+      let filtered = allTraces || [];
+      if (currentTraceFilterStatus !== 'ALL') {
+        filtered = filtered.filter(t => t.status === currentTraceFilterStatus);
+      }
+      if (currentTraceSearchQuery) {
+        filtered = filtered.filter(t => 
+          (t.query && t.query.toLowerCase().includes(currentTraceSearchQuery)) ||
+          (t.run_id && t.run_id.toLowerCase().includes(currentTraceSearchQuery)) ||
+          (t.planned_tool && t.planned_tool.toLowerCase().includes(currentTraceSearchQuery))
+        );
+      }
+      renderTracesList(filtered);
+    }
+
     function renderTracesList(traces) {
       const container = document.getElementById('traces-list-container');
       if (!container) return;
       container.innerHTML = '';
 
       if (traces.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">No traces captured yet</div>`;
+        container.innerHTML = `<div class="text-xs text-slate-500 text-center py-6 font-mono">No matching traces found</div>`;
         return;
       }
 
@@ -3823,7 +4716,7 @@ DASHBOARD_HTML = """
         };
         const colorCls = statusColors[t.status] || 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
 
-        item.className = `p-3 rounded-xl border transition cursor-pointer text-xs space-y-1.5 ${isSelected ? 'bg-indigo-600/20 border-cyan-400' : 'theme-card border hover:border-slate-500'}`;
+        item.className = `p-3 rounded-xl border transition cursor-pointer text-xs space-y-1.5 ${isSelected ? 'bg-indigo-600/20 border-cyan-400 ring-1 ring-cyan-500/30' : 'theme-card border hover:border-slate-500'}`;
         item.onclick = () => inspectSpecificTrace(t.run_id, false);
         item.innerHTML = `
           <div class="flex items-center justify-between">
@@ -3832,8 +4725,8 @@ DASHBOARD_HTML = """
           </div>
           <div class="font-medium text-slate-200 truncate">${escapeHtml(t.query)}</div>
           <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1 border-t border-white/5">
-            <span>${t.nodes.length} Nodes • ${t.total_duration_ms}ms</span>
-            <span class="text-indigo-400">${t.planned_tool || 'no tool'}</span>
+            <span>${t.nodes ? t.nodes.length : 0} Nodes • ${t.total_duration_ms}ms</span>
+            <span class="text-indigo-400 truncate max-w-[110px]">${t.planned_tool || 'no tool'}</span>
           </div>
         `;
         container.appendChild(item);
@@ -3843,7 +4736,7 @@ DASHBOARD_HTML = """
     async function inspectSpecificTrace(runId, shouldSwitchTab = true) {
       selectedRunId = runId;
       if (shouldSwitchTab) switchTab('traces');
-      renderTracesList(allTraces);
+      applyTracesFilter();
 
       try {
         const res = await fetch(`/api/traces/${runId}`);
@@ -3859,22 +4752,22 @@ DASHBOARD_HTML = """
     function getNodeIconAndMeta(nodeName) {
       const name = (nodeName || '').toLowerCase();
       if (name.includes('quarantine') || name.includes('sanitize')) {
-        return { icon: 'shield-check', label: 'Quarantine & Sanitize', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' };
+        return { icon: 'shield-check', label: 'Quarantine & Sanitize', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' };
       }
       if (name.includes('triage') || name.includes('classify')) {
-        return { icon: 'zap', label: 'ML Gatekeeper & Triage', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' };
+        return { icon: 'layers', label: 'ML Gatekeeper & Triage', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30' };
       }
       if (name.includes('retriev') || name.includes('rag') || name.includes('vector')) {
-        return { icon: 'database', label: 'Hybrid RAG Retrieval', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30' };
+        return { icon: 'database', label: 'Hybrid RAG Retrieval', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' };
       }
       if (name.includes('reason') || name.includes('plan') || name.includes('agent')) {
-        return { icon: 'brain', label: 'LLM Reasoning & Planner', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' };
+        return { icon: 'brain', label: 'LLM Reasoning & Planner', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30' };
       }
       if (name.includes('tool') || name.includes('action') || name.includes('exec')) {
-        return { icon: 'wrench', label: 'Tool Execution', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30' };
+        return { icon: 'cpu', label: 'Tool Execution', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30' };
       }
       if (name.includes('approval') || name.includes('gate') || name.includes('hitl')) {
-        return { icon: 'lock', label: 'HITL Security Gate', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/30' };
+        return { icon: 'shield-alert', label: 'HITL Security Gate', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' };
       }
       return { icon: 'activity', label: nodeName || 'Pipeline Step', color: 'text-slate-300', bg: 'bg-slate-500/10', border: 'border-slate-500/30' };
     }
@@ -3932,10 +4825,13 @@ DASHBOARD_HTML = """
       const expandBtn = document.getElementById('btn-expand-all-nodes');
       const dagStrip = document.getElementById('trace-dag-visual-strip');
       const dagRow = document.getElementById('trace-dag-nodes-row');
+      const latencyBox = document.getElementById('trace-latency-breakdown-box');
+      const latencyBar = document.getElementById('trace-latency-bar');
+      const latencyTotal = document.getElementById('trace-total-latency-label');
       const container = document.getElementById('trace-nodes-container');
 
       if (title) title.textContent = `Run ${trace.run_id}: "${trace.query}"`;
-      if (sub) sub.textContent = `Thread: ${trace.thread_id} • Total Latency: ${trace.total_duration_ms}ms • ${trace.nodes.length} Executed Nodes`;
+      if (sub) sub.textContent = `Thread: ${trace.thread_id} • Total Latency: ${trace.total_duration_ms}ms • ${(trace.nodes || []).length} Executed Nodes`;
       if (badge) {
         badge.classList.remove('hidden');
         const statusColors = {
@@ -3948,13 +4844,33 @@ DASHBOARD_HTML = """
       }
       if (expandBtn) expandBtn.classList.remove('hidden');
 
+      // ── Render Latency Stacked Breakdown Bar ──
+      if (latencyBox && latencyBar && trace.nodes && trace.nodes.length > 0) {
+        latencyBox.classList.remove('hidden');
+        if (latencyTotal) latencyTotal.textContent = `Total: ${trace.total_duration_ms}ms`;
+        latencyBar.innerHTML = '';
+        const totalDur = trace.total_duration_ms || trace.nodes.reduce((acc, n) => acc + (n.duration_ms || 0), 0) || 1;
+        
+        const segmentColors = ['bg-cyan-400', 'bg-indigo-400', 'bg-emerald-400', 'bg-purple-400', 'bg-amber-400', 'bg-blue-400'];
+        trace.nodes.forEach((node, idx) => {
+          const pct = Math.max(2, Math.round(((node.duration_ms || 0) / totalDur) * 100));
+          const segColor = segmentColors[idx % segmentColors.length];
+          const seg = document.createElement('div');
+          seg.className = `h-full ${segColor} hover:opacity-80 transition cursor-pointer`;
+          seg.style.width = `${pct}%`;
+          seg.title = `${node.node_name}: ${node.duration_ms}ms (${pct}%)`;
+          seg.onclick = () => scrollToAndExpandTraceNode(idx);
+          latencyBar.appendChild(seg);
+        });
+      }
+
       // ── Render Visual Interactive DAG Flow Strip ──
       if (dagStrip && dagRow) {
         dagStrip.classList.remove('hidden');
         dagRow.innerHTML = '';
 
         if (!trace.nodes || trace.nodes.length === 0) {
-          dagRow.innerHTML = `<div class="text-[11px] text-slate-500 py-2">No DAG nodes captured for this run</div>`;
+          dagRow.innerHTML = `<div class="text-[11px] text-slate-500 py-2 font-mono">No DAG nodes captured for this run</div>`;
         } else {
           trace.nodes.forEach((node, idx) => {
             const meta = getNodeIconAndMeta(node.node_name);
@@ -4068,27 +4984,37 @@ DASHBOARD_HTML = """
       refreshIcons();
     }
 
+
     // ── Smart Gmail-Style Inbox & Categorization Engine ──
     let currentInboxCategory = 'all';
     let cachedInboxItems = [];
+    let cachedSentItems = [];
 
     function filterInboxCategory(categoryKey) {
       currentInboxCategory = categoryKey;
       playCyberClick(900);
 
       // Update Tab Buttons UI
-      const tabs = ['all', 'important', 'job_career', 'system_update', 'marketing_promo', 'likely_scam'];
+      const tabs = ['all', 'important', 'job_career', 'system_update', 'marketing_promo', 'likely_scam', 'sent'];
       tabs.forEach(t => {
         const btn = document.getElementById(`inbox-tab-${t}`);
         if (!btn) return;
         if (t === categoryKey) {
-          btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/40 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+          if (t === 'sent') {
+            btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-emerald-600/40 border-emerald-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+          } else {
+            btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/40 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+          }
         } else {
           btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5 transition cursor-pointer";
         }
       });
 
-      renderInboxRows();
+      if (categoryKey === 'sent') {
+        renderSentRows();
+      } else {
+        renderInboxRows();
+      }
     }
 
     async function fetchInbox(forceSync = false) {
@@ -4104,12 +5030,25 @@ DASHBOARD_HTML = """
         const data = await res.json();
         cachedInboxItems = data.inbox || [];
 
+        // Also fetch sent items
+        try {
+          const sentRes = await fetch('/api/inbox/sent');
+          const sentData = await sentRes.json();
+          cachedSentItems = sentData.sent || [];
+          const sentBadge = document.getElementById('tab-count-sent');
+          if (sentBadge) sentBadge.textContent = cachedSentItems.length;
+        } catch (e) {}
+
         const navBadge = document.getElementById('nav-inbox-badge');
         const cardBadge = document.getElementById('card-inbox-count');
         if (navBadge) navBadge.textContent = cachedInboxItems.length;
         if (cardBadge) cardBadge.textContent = cachedInboxItems.length;
 
-        renderInboxRows();
+        if (currentInboxCategory === 'sent') {
+          renderSentRows();
+        } else {
+          renderInboxRows();
+        }
       } catch (err) {
         console.error("Failed to fetch inbox:", err);
       }
@@ -4299,6 +5238,108 @@ DASHBOARD_HTML = """
                   <span>Chat</span>
                 </button>
               </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      refreshIcons();
+    }
+
+    function renderSentRows() {
+      const container = document.getElementById('inbox-cards-stream');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (cachedSentItems.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mx-auto">
+              <i data-lucide="send" class="w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-bold text-white">No Sent Messages Recorded Yet</div>
+            <p class="text-[11px] text-slate-400">Outbound emails dispatched via Gmail API or AI Composer will appear here.</p>
+            <button onclick="openAiComposeModal(); playCyberClick();" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs inline-flex items-center space-x-1.5 shadow-md transition cursor-pointer">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <span>Compose an Email with AI</span>
+            </button>
+          </div>
+        `;
+        refreshIcons();
+        return;
+      }
+
+      cachedSentItems.forEach((em, idx) => {
+        const dateFormatted = formatEmailDate(em.sent_at_timestamp);
+        let recipientDisplay = em.to || 'Unknown Recipient';
+        if (recipientDisplay.includes('<')) {
+          recipientDisplay = recipientDisplay.split('<')[0].trim().replace(/['"]/g, '');
+        }
+
+        const safeSubject = escapeHtml(em.subject || 'No Subject');
+        const safeTo = escapeHtml(em.to || '');
+        const safeSnippet = escapeHtml(em.snippet || (em.body ? em.body.slice(0, 110) : 'Sent message'));
+        const safeBody = escapeHtml(em.body || '');
+
+        const row = document.createElement('div');
+        row.id = `sent-item-row-${em.id}`;
+        row.className = `group transition bg-white/[0.02] hover:bg-white/[0.04]`;
+        row.innerHTML = `
+          <!-- Concise Header Row (Gmail Style) -->
+          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.05] flex items-center justify-between cursor-pointer space-x-3 transition">
+            <!-- Left: Recipient -->
+            <div class="flex items-center space-x-3 w-56 flex-shrink-0">
+              <div class="w-6 h-6 rounded-lg bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 font-mono text-[10px] flex items-center justify-center font-bold">
+                ${escapeHtml((recipientDisplay[0] || 'T').toUpperCase())}
+              </div>
+              <span class="text-xs font-bold text-white truncate max-w-[170px]" title="${safeTo}">
+                To: ${escapeHtml(recipientDisplay)}
+              </span>
+            </div>
+
+            <!-- Middle: Subject & 1-line Snippet -->
+            <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
+              <span class="font-bold text-slate-200 flex-shrink-0 truncate max-w-[280px]">${safeSubject}</span>
+              <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${safeSnippet}</span>
+            </div>
+
+            <!-- Right: Sent Badge + Quick Actions + Timestamp + Expand -->
+            <div class="flex items-center space-x-2 flex-shrink-0">
+              <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-1" onclick="event.stopPropagation()">
+                <button onclick="openAiComposeModal('${safeTo}', 'Follow-up: ${safeSubject}', 'Draft a polite follow-up regarding our earlier message')" title="Compose Follow-up with AI" class="p-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 transition cursor-pointer shadow-sm">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 Sent</span>
+              <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
+              <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
+            </div>
+          </div>
+
+          <!-- Expandable Detail Drawer -->
+          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3">
+            <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
+              <div class="space-y-0.5">
+                <div class="text-slate-300 font-mono text-[11px]">To: <span class="text-emerald-300 font-bold">${safeTo}</span></div>
+                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-white font-bold">${safeSubject}</span></div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Google Gmail Outbound</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
+              ${safeBody}
+            </div>
+
+            <div class="flex items-center justify-between pt-1 text-xs font-mono">
+              <span class="text-[10px] text-slate-500">Message ID: ${em.id}</span>
+              <button onclick="openAiComposeModal('${safeTo}', 'Follow-up: ${safeSubject}', 'Follow up on the sent email above')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 text-xs flex items-center space-x-1.5 cursor-pointer transition">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>✨ Compose Follow-up with AI</span>
+              </button>
             </div>
           </div>
         `;
@@ -4543,70 +5584,661 @@ DASHBOARD_HTML = """
       }
     }
 
-    // ── HITL Approvals ──
+    // ── AI Email Studio & Smart Composer Handlers ──
+    let currentComposeTone = 'professional';
+
+    function openAiComposeModal(to = '', subject = '', prompt = '', body = '') {
+      playCyberClick(900);
+      const toEl = document.getElementById('compose-to');
+      const subjEl = document.getElementById('compose-subject');
+      const promptEl = document.getElementById('compose-ai-prompt');
+      const bodyEl = document.getElementById('compose-body');
+
+      if (toEl) toEl.value = to || '';
+      if (subjEl) subjEl.value = subject || '';
+      if (promptEl) promptEl.value = prompt || '';
+      if (bodyEl) bodyEl.value = body || '';
+      
+      setComposeTone('professional');
+      updateComposeWordCount();
+
+      const modal = document.getElementById('ai-compose-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        refreshIcons();
+      }
+      setTimeout(() => {
+        if (!to) toEl?.focus();
+        else if (!prompt) promptEl?.focus();
+        else bodyEl?.focus();
+      }, 100);
+    }
+
+    function closeAiComposeModal() {
+      const modal = document.getElementById('ai-compose-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function setComposeRecipient(email) {
+      playCyberClick(700);
+      const input = document.getElementById('compose-to');
+      if (input) {
+        input.value = email;
+        input.classList.add('border-cyan-400');
+        setTimeout(() => input.classList.remove('border-cyan-400'), 400);
+      }
+    }
+
+    function setComposeIntent(text) {
+      playCyberClick(700);
+      const promptArea = document.getElementById('compose-ai-prompt');
+      if (promptArea) {
+        promptArea.value = text;
+        promptArea.focus();
+      }
+    }
+
+    function setComposeTone(tone) {
+      currentComposeTone = tone;
+      playCyberClick(700);
+      const tones = ['professional', 'concise', 'friendly', 'urgent', 'executive'];
+      tones.forEach(t => {
+        const btn = document.getElementById(`tone-btn-${t}`);
+        if (!btn) return;
+        if (t === tone) {
+          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md bg-cyan-500/30 text-cyan-200 border border-cyan-500/50 font-bold transition";
+        } else {
+          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition";
+        }
+      });
+    }
+
+    function updateComposeWordCount() {
+      const bodyText = (document.getElementById('compose-body')?.value || '').trim();
+      const count = bodyText ? bodyText.split(/\\s+/).length : 0;
+      const countEl = document.getElementById('compose-word-count');
+      if (countEl) countEl.textContent = `${count} word${count === 1 ? '' : 's'}`;
+    }
+
+    async function generateAiComposeDraft() {
+      const to = document.getElementById('compose-to')?.value.trim();
+      const subject = document.getElementById('compose-subject')?.value.trim();
+      const prompt = document.getElementById('compose-ai-prompt')?.value.trim();
+      const bodyEl = document.getElementById('compose-body');
+      const btn = document.getElementById('btn-generate-ai-compose');
+      const btnText = document.getElementById('btn-generate-ai-text');
+
+      if (!prompt && !subject) {
+        alert('Please enter instructions in the AI prompt box or provide a subject line.');
+        document.getElementById('compose-ai-prompt')?.focus();
+        return;
+      }
+
+      playCyberClick(1100);
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = "Drafting...";
+      if (bodyEl) bodyEl.placeholder = "Generating structured email draft with Qwen 2.5...";
+
+      try {
+        const res = await fetch('/api/inbox/compose/ai-assist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: to,
+            subject: subject,
+            prompt: prompt || `Compose email about ${subject}`,
+            tone: currentComposeTone
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          if (data.subject && (!subject || subject.startsWith('e.g.'))) {
+            document.getElementById('compose-subject').value = data.subject;
+          }
+          if (bodyEl) {
+            bodyEl.value = data.body || '';
+            updateComposeWordCount();
+            bodyEl.classList.add('border-cyan-400', 'bg-cyan-950/20');
+            setTimeout(() => bodyEl.classList.remove('border-cyan-400', 'bg-cyan-950/20'), 800);
+          }
+          playHudBeep(1400);
+          appendSystemLog(`[AI Compose Studio] Generated ${currentComposeTone} email for ${to || 'unspecified'}`);
+        } else {
+          alert(`Failed to generate draft: ${data.detail || 'Error'}`);
+        }
+      } catch (err) {
+        alert(`Error generating draft: ${err.message}`);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = "✨ Generate Draft";
+      }
+    }
+
+    async function sendComposedEmail(isDraft = false) {
+      const to = document.getElementById('compose-to')?.value.trim();
+      const subject = document.getElementById('compose-subject')?.value.trim();
+      const body = document.getElementById('compose-body')?.value.trim();
+      const sendBtn = document.getElementById('btn-compose-send');
+      const draftBtn = document.getElementById('btn-compose-draft');
+
+      if (!to) {
+        alert('Please specify a recipient email address.');
+        document.getElementById('compose-to')?.focus();
+        return;
+      }
+
+      if (!subject) {
+        alert('Please enter a subject line.');
+        document.getElementById('compose-subject')?.focus();
+        return;
+      }
+
+      if (!body) {
+        alert('Please write or generate the email body before sending.');
+        document.getElementById('compose-body')?.focus();
+        return;
+      }
+
+      if (!isDraft && !confirm(`Send email to ${to}?\n\nSubject: ${subject}`)) {
+        return;
+      }
+
+      if (sendBtn) sendBtn.disabled = true;
+      if (draftBtn) draftBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/inbox/compose/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: to,
+            subject: subject,
+            body: body,
+            is_draft: isDraft
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          playHudBeep(1600);
+          showProactiveToast(
+            isDraft ? 'Draft Saved' : '🚀 Email Sent!',
+            isDraft ? `Saved draft to ${to}` : `Successfully dispatched email to ${to} via Gmail API.`
+          );
+          appendSystemLog(`[Email Studio] ${isDraft ? 'Draft saved' : 'Dispatched email'} to ${to} (${subject})`);
+          closeAiComposeModal();
+          fetchInbox(false);
+        } else {
+          alert(`Failed: ${data.detail || 'Error'}`);
+        }
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      } finally {
+        if (sendBtn) sendBtn.disabled = false;
+        if (draftBtn) draftBtn.disabled = false;
+      }
+    }
+
+    // ── HITL Approvals & Authorization Center ──
+    let currentApprovalSubTab = 'pending';
+    let cachedPendingApprovals = [];
+
+    function switchApprovalSubTab(subTab) {
+      currentApprovalSubTab = subTab;
+      playCyberClick(900);
+
+      const tabs = ['pending', 'history', 'policies'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`subtab-hitl-${t}`);
+        const view = document.getElementById(`hitl-subview-${t}`);
+        if (!btn || !view) return;
+
+        if (t === subTab) {
+          btn.className = "px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 font-bold flex items-center space-x-2 cursor-pointer transition shadow-sm";
+          view.classList.remove('hidden');
+        } else {
+          btn.className = "px-4 py-2 rounded-xl theme-card border border-transparent text-slate-400 hover:text-white flex items-center space-x-2 cursor-pointer transition";
+          view.classList.add('hidden');
+        }
+      });
+
+      if (subTab === 'pending') fetchPendingApprovals();
+      if (subTab === 'history') fetchApprovalHistory();
+      if (subTab === 'policies') fetchApprovalPolicies();
+    }
+
     async function fetchPendingApprovals() {
       try {
         const res = await fetch('/api/approvals');
         const data = await res.json();
-        const approvals = data.pending_approvals || [];
+        cachedPendingApprovals = data.pending_approvals || [];
         
         const badge = document.getElementById('nav-approval-badge');
         const cardBadge = document.getElementById('card-pending-approvals');
         const heroAlerts = document.getElementById('hero-alerts-count');
-        if (badge) badge.textContent = approvals.length;
-        if (cardBadge) cardBadge.textContent = approvals.length;
-        if (heroAlerts) heroAlerts.textContent = `${approvals.length} Pending`;
+        const hitlCountBadge = document.getElementById('badge-hitl-pending-count');
+
+        if (badge) badge.textContent = cachedPendingApprovals.length;
+        if (cardBadge) cardBadge.textContent = cachedPendingApprovals.length;
+        if (heroAlerts) heroAlerts.textContent = `${cachedPendingApprovals.length} Pending`;
+        if (hitlCountBadge) hitlCountBadge.textContent = cachedPendingApprovals.length;
 
         const container = document.getElementById('approvals-cards-container');
         if (!container) return;
         container.innerHTML = '';
 
-        if (approvals.length === 0) {
-          container.innerHTML = `<div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400">No pending approvals. All safety gates clear.</div>`;
+        if (cachedPendingApprovals.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-400 font-mono space-y-2">
+              <i data-lucide="shield-check" class="w-8 h-8 mx-auto text-emerald-400"></i>
+              <div>No pending authorization requests. All safety gates are clear.</div>
+            </div>
+          `;
+          refreshIcons();
           return;
         }
 
-        approvals.forEach(req => {
+        cachedPendingApprovals.forEach(req => {
           const card = document.createElement('div');
-          card.className = 'p-5 rounded-2xl theme-card border border-amber-500/40 space-y-3';
+          const isHighRisk = (req.risk_level || '').toUpperCase() === 'HIGH';
+          const borderColor = isHighRisk ? 'border-rose-500/50 hover:border-rose-400' : 'border-amber-500/50 hover:border-amber-400';
+          const badgeBg = isHighRisk ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+
+          const createdDateStr = req.created_at ? new Date(req.created_at * 1000).toLocaleTimeString() : 'Just now';
+
+          card.className = `p-5 rounded-2xl theme-card border ${borderColor} space-y-3 shadow-lg transition`;
           card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <span class="text-xs font-bold text-amber-400 font-mono">⚠️ [${req.tier}] High-Risk Tool Request</span>
-                <span class="text-[10px] font-mono text-slate-400">ID: ${req.request_id}</span>
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-2.5 h-2.5 rounded-full ${isHighRisk ? 'bg-rose-500 animate-ping' : 'bg-amber-500'}"></span>
+                <span class="text-xs font-bold font-mono text-white">⚠️ ${req.risk_level || 'HIGH'} RISK AUTHORIZATION GATE</span>
+                <span class="text-[10px] font-mono text-slate-400">ID: ${req.id} • ${createdDateStr}</span>
               </div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${badgeBg}">AWAITING DECISION</span>
             </div>
-            <p class="text-xs text-slate-200">${escapeHtml(req.description)}</p>
-            <div class="p-2.5 rounded-xl bg-black/40 text-xs font-mono text-slate-300">
-              <div><b>Tool:</b> ${req.tool_name}</div>
-              <div><b>Args:</b> ${JSON.stringify(req.tool_args)}</div>
+
+            <p class="text-xs text-slate-200 leading-relaxed font-medium">${escapeHtml(req.human_readable_summary || `Agent attempted to execute tool: ${req.tool_name}`)}</p>
+
+            <div class="p-3 rounded-xl bg-black/50 border theme-border space-y-2 text-xs font-mono">
+              <div class="flex items-center justify-between text-[11px] text-cyan-300 font-bold">
+                <span>Tool: <span class="text-white">${escapeHtml(req.tool_name)}</span></span>
+                <button onclick="toggleEditApprovalArgs('${req.id}')" class="text-slate-400 hover:text-cyan-300 flex items-center space-x-1 cursor-pointer transition">
+                  <i data-lucide="edit-3" class="w-3 h-3"></i>
+                  <span>Edit Parameters</span>
+                </button>
+              </div>
+
+              <!-- Read-only Parameters Preview -->
+              <div id="approval-args-preview-${req.id}" class="text-[10px] text-slate-300 max-h-28 overflow-x-auto">
+                <pre>${JSON.stringify(req.tool_args || {}, null, 2)}</pre>
+              </div>
+
+              <!-- Inline Editable Parameters Textarea -->
+              <div id="approval-args-edit-box-${req.id}" class="hidden space-y-1 pt-1 border-t border-white/5">
+                <label class="text-[10px] text-amber-300 font-bold">Modify JSON Arguments Before Execution:</label>
+                <textarea id="approval-args-textarea-${req.id}" rows="4" class="w-full bg-black/80 border border-amber-500/40 rounded-lg p-2 text-[10px] text-emerald-300 font-mono focus:outline-none resize-none">${JSON.stringify(req.tool_args || {}, null, 2)}</textarea>
+              </div>
             </div>
+
+            <!-- Operator Notes Field -->
+            <div class="space-y-1">
+              <input type="text" id="approval-notes-${req.id}" placeholder="Operator notes / audit reason (optional)..." class="w-full bg-black/30 border theme-border rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-amber-400">
+            </div>
+
             <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/5">
-              <button onclick="resolveApproval('${req.request_id}', false)" class="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium cursor-pointer">Reject</button>
-              <button onclick="resolveApproval('${req.request_id}', true)" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium cursor-pointer">Authorize & Execute</button>
+              <button onclick="resolveApprovalWithModifications('${req.id}', false)" class="px-4 py-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                <span>Reject Action</span>
+              </button>
+              <button onclick="resolveApprovalWithModifications('${req.id}', true)" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-md">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>Authorize & Execute</span>
+              </button>
             </div>
           `;
           container.appendChild(card);
         });
+
+        refreshIcons();
       } catch (err) {}
     }
 
-    async function resolveApproval(requestId, approved) {
+    function toggleEditApprovalArgs(requestId) {
+      const preview = document.getElementById(`approval-args-preview-${requestId}`);
+      const editBox = document.getElementById(`approval-args-edit-box-${requestId}`);
+      if (!preview || !editBox) return;
+
+      preview.classList.toggle('hidden');
+      editBox.classList.toggle('hidden');
+      playCyberClick();
+    }
+
+    async function resolveApprovalWithModifications(requestId, approved) {
       try {
+        let modifiedArgs = null;
+        const textarea = document.getElementById(`approval-args-textarea-${requestId}`);
+        if (textarea && approved) {
+          try {
+            modifiedArgs = JSON.parse(textarea.value.trim());
+          } catch (jsonErr) {
+            alert('Invalid JSON in modified tool parameters: ' + jsonErr.message);
+            return;
+          }
+        }
+
+        const notesInput = document.getElementById(`approval-notes-${requestId}`);
+        const notes = notesInput ? notesInput.value.trim() : null;
+
         const res = await fetch(`/api/approvals/${requestId}/resolve`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ approved })
+          body: JSON.stringify({
+            approved,
+            modified_args: modifiedArgs,
+            notes: notes,
+          })
         });
+
         const data = await res.json();
-        playHudBeep(approved ? 1300 : 500);
-        appendSystemLog(`[HITL Gate] Request ${requestId} was ${approved ? 'APPROVED & EXECUTED' : 'REJECTED'}. Output: ${data.execution_output || 'None'}`);
-        fetchPendingApprovals();
+        playHudBeep(approved ? 1400 : 600);
+        showProactiveToast(
+          approved ? 'Action Authorized' : 'Action Rejected',
+          `Gate resolved. ${data.execution_output ? 'Output: ' + data.execution_output.slice(0, 70) : ''}`
+        );
+        appendSystemLog(`[HITL Gate] Request ${requestId} ${approved ? 'APPROVED & EXECUTED' : 'REJECTED'}. Output: ${data.execution_output || 'None'}`);
+        
+        await fetchPendingApprovals();
+        if (currentApprovalSubTab === 'history') {
+          await fetchApprovalHistory();
+        }
       } catch (err) {
         alert('Failed to resolve approval: ' + err);
       }
     }
+
+    async function simulateHighRiskApproval() {
+      try {
+        const res = await fetch('/api/approvals/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tool_name: "email.send",
+            tool_args: {
+              to: "partner@global-corp.com",
+              subject: "Confidential Project Blueprint & Deployment Access",
+              body: "Attached is the latest secret infrastructure deployment key and API credentials for our shared integration."
+            },
+            summary: "Agent attempted high-risk outbound email dispatch with sensitive credentials."
+          })
+        });
+        const data = await res.json();
+        playHudBeep(1500);
+        showProactiveToast('HITL Gate Triggered', 'Simulated high-risk action intercepted.');
+        switchTab('approvals');
+        switchApprovalSubTab('pending');
+      } catch (e) {
+        alert('Failed to simulate approval: ' + e);
+      }
+    }
+
+    async function fetchApprovalHistory() {
+      try {
+        const res = await fetch('/api/approvals/history');
+        const data = await res.json();
+        const history = data.history || [];
+
+        const container = document.getElementById('approvals-history-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (history.length === 0) {
+          container.innerHTML = `<div class="p-8 rounded-2xl theme-card border text-center text-xs text-slate-500 font-mono">No past authorization history on record.</div>`;
+          return;
+        }
+
+        history.forEach(item => {
+          const card = document.createElement('div');
+          const isApproved = item.status === 'APPROVED';
+          const dateStr = item.resolved_at ? new Date(item.resolved_at * 1000).toLocaleString() : 'Recent';
+
+          card.className = 'p-4 rounded-xl theme-card border space-y-2 text-xs font-mono';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${isApproved ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'}">${item.status}</span>
+                <span class="text-white font-bold">${escapeHtml(item.tool_name)}</span>
+                <span class="text-[10px] text-slate-400">ID: ${item.id}</span>
+              </div>
+              <span class="text-[10px] text-slate-400">${dateStr}</span>
+            </div>
+            <p class="text-slate-300 font-sans text-xs">${escapeHtml(item.human_readable_summary || '')}</p>
+            ${item.operator_notes ? `<div class="p-2 rounded-lg bg-black/40 text-[11px] text-amber-300"><b>Operator Note:</b> ${escapeHtml(item.operator_notes)}</div>` : ''}
+            ${item.execution_result ? `
+              <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-300">
+                <b>Execution Result:</b> ${escapeHtml(item.execution_result)}
+              </div>
+            ` : ''}
+          `;
+          container.appendChild(card);
+        });
+
+        refreshIcons();
+      } catch (e) {}
+    }
+
+    async function clearApprovalHistory() {
+      if (!confirm('Clear all resolved approval records?')) return;
+      try {
+        await fetch('/api/approvals/history/clear', { method: 'POST' });
+        fetchApprovalHistory();
+        playHudBeep(700);
+      } catch (e) {}
+    }
+
+    async function fetchApprovalPolicies() {
+      try {
+        const res = await fetch('/api/approvals/policies');
+        const data = await res.json();
+        const p = data.policies || {};
+
+        const highEl = document.getElementById('policy-high-risk');
+        const medEl = document.getElementById('policy-medium-risk');
+        const lowEl = document.getElementById('policy-low-risk');
+
+        if (highEl) highEl.checked = !!p.require_high_risk;
+        if (medEl) medEl.checked = !!p.auto_approve_medium_risk;
+        if (lowEl) lowEl.checked = !!p.auto_approve_low_risk;
+      } catch (e) {}
+    }
+
+    async function saveApprovalPolicies() {
+      try {
+        const highEl = document.getElementById('policy-high-risk');
+        const medEl = document.getElementById('policy-medium-risk');
+        const lowEl = document.getElementById('policy-low-risk');
+
+        await fetch('/api/approvals/policies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            require_high_risk: highEl ? highEl.checked : true,
+            auto_approve_medium_risk: medEl ? medEl.checked : false,
+            auto_approve_low_risk: lowEl ? lowEl.checked : true,
+          })
+        });
+        playHudBeep(1100);
+        showProactiveToast('Policy Saved', 'HITL Gatekeeper policies updated.');
+      } catch (e) {
+        alert('Failed to save policies: ' + e);
+      }
+    }
+
+
+    // ── Topology DAG Architecture & Simulation Engine ──
+    let topologyGraphData = null;
+    let selectedTopologyNodeId = 'quarantine_node';
+
+    async function fetchTopologyGraph() {
+      try {
+        const res = await fetch('/api/graph/topology');
+        const data = await res.json();
+        topologyGraphData = data;
+        inspectTopologyNode(selectedTopologyNodeId);
+      } catch (e) {}
+    }
+
+    function inspectTopologyNode(nodeId) {
+      selectedTopologyNodeId = nodeId;
+
+      // Update Node Highlight border
+      const allNodes = document.querySelectorAll('.dag-visual-node');
+      allNodes.forEach(n => {
+        n.classList.remove('ring-2', 'ring-cyan-400', 'shadow-[0_0_20px_rgba(6,182,212,0.5)]');
+      });
+      const activeEl = document.getElementById(`dag-node-${nodeId}`);
+      if (activeEl) {
+        activeEl.classList.add('ring-2', 'ring-cyan-400', 'shadow-[0_0_20px_rgba(6,182,212,0.5)]');
+      }
+
+      if (!topologyGraphData || !topologyGraphData.nodes) return;
+      const node = topologyGraphData.nodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      const title = document.getElementById('topology-node-title');
+      const role = document.getElementById('topology-node-role');
+      const model = document.getElementById('topology-node-model');
+      const isolation = document.getElementById('topology-node-isolation');
+      const desc = document.getElementById('topology-node-desc');
+      const inputs = document.getElementById('topology-node-inputs');
+      const outputs = document.getElementById('topology-node-outputs');
+      const latency = document.getElementById('topology-node-latency');
+
+      if (title) title.textContent = node.label || node.id;
+      if (role) role.textContent = node.tier || 'Architecture Node';
+      if (model) model.textContent = node.model || 'Standard Engine';
+      if (isolation) isolation.textContent = node.isolation || 'Standard Sandbox';
+      if (desc) desc.textContent = node.description || '';
+      if (inputs) inputs.textContent = JSON.stringify(node.inputs || []);
+      if (outputs) outputs.textContent = JSON.stringify(node.outputs || []);
+      if (latency) latency.textContent = `~${node.typical_latency_ms || 25}ms`;
+    }
+
+    let selectedDAGPresetKey = 'rag';
+
+    function openDAGSimulateModal() {
+      const m = document.getElementById('dag-simulate-modal');
+      if (m) m.style.display = 'flex';
+      playHudBeep(1100);
+      refreshIcons();
+    }
+
+    function closeDAGSimulateModal() {
+      const m = document.getElementById('dag-simulate-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function selectDAGPreset(presetKey) {
+      selectedDAGPresetKey = presetKey;
+      playCyberClick();
+
+      const presets = ['rag', 'phishing', 'high_risk', 'calendar'];
+      presets.forEach(p => {
+        const btn = document.getElementById(`dag-preset-${p}`);
+        if (!btn) return;
+        if (p === presetKey) {
+          btn.className = "p-2.5 rounded-xl border bg-purple-600/30 border-purple-500 text-purple-300 text-left cursor-pointer transition shadow-sm";
+        } else {
+          btn.className = "p-2.5 rounded-xl border theme-card border-transparent text-slate-300 text-left hover:border-cyan-400 cursor-pointer transition";
+        }
+      });
+
+      const promptBox = document.getElementById('dag-sim-custom-prompt');
+      if (!promptBox) return;
+
+      const prompts = {
+        rag: "Explain the Personal AI OS multi-agent architecture and quarantine security.",
+        phishing: "URGENT: Click here to claim your $5,000 lottery award from the bank!",
+        high_risk: "Send confidential Q3 architecture blueprint and credentials to external auditor.",
+        calendar: "Schedule project roadmap review meeting with design team tomorrow at 2pm."
+      };
+      promptBox.value = prompts[presetKey] || promptBox.value;
+    }
+
+    async function executeDAGSimulationFromModal() {
+      const promptBox = document.getElementById('dag-sim-custom-prompt');
+      const prompt = promptBox ? promptBox.value.trim() : "Explain Personal AI OS architecture";
+      
+      closeDAGSimulateModal();
+      switchTab('topology');
+
+      const consoleBox = document.getElementById('dag-live-console');
+      const logStream = document.getElementById('dag-sim-log-stream');
+      const durationBadge = document.getElementById('dag-sim-duration-badge');
+
+      if (consoleBox) consoleBox.classList.remove('hidden');
+      if (logStream) logStream.innerHTML = '';
+      if (durationBadge) durationBadge.textContent = 'Simulating...';
+
+      const appendDAGLog = (icon, text, colorCls = 'text-slate-300') => {
+        if (!logStream) return;
+        const row = document.createElement('div');
+        row.className = `flex items-center space-x-2 ${colorCls} animate-fade-in`;
+        row.innerHTML = `<span class="text-slate-500">[${new Date().toLocaleTimeString()}]</span> <span>${icon}</span> <span>${text}</span>`;
+        logStream.appendChild(row);
+      };
+
+      appendDAGLog('🚀', `Starting DAG simulation for: "${prompt}"`, 'text-cyan-300 font-bold');
+
+      // Sequential Node Animation Helper
+      const animateNode = async (nodeId, label, stepMs = 350) => {
+        inspectTopologyNode(nodeId);
+        const nodeEl = document.getElementById(`dag-node-${nodeId}`);
+        if (nodeEl) {
+          nodeEl.classList.add('ring-4', 'ring-emerald-400', 'bg-emerald-950/50');
+        }
+        appendDAGLog('⚡', `Traversing Node: ${label}`, 'text-emerald-300');
+        playHudBeep(1200);
+        await new Promise(r => setTimeout(r, stepMs));
+        if (nodeEl) {
+          nodeEl.classList.remove('ring-4', 'ring-emerald-400', 'bg-emerald-950/50');
+        }
+      };
+
+      try {
+        await animateNode('quarantine_node', 'Quarantine Sandbox (Sanitizing Input)', 300);
+        await animateNode('triaging_node', 'ML Triaging (Calculating Importance Probability)', 300);
+
+        if (selectedDAGPresetKey === 'phishing') {
+          await animateNode('low_priority_store_node', 'Low-Priority Store (Archiving Untrusted Noise)', 300);
+        } else {
+          await animateNode('retrieval_node', 'Hybrid RAG (Retrieving Relevant Vault Directives)', 350);
+          await animateNode('reasoning_node', 'ReAct Reasoning (Formulating Execution Plan)', 400);
+
+          if (selectedDAGPresetKey === 'high_risk') {
+            await animateNode('approval_gate_node', 'HITL Safety Gate (Intercepted Tier 3 Action)', 400);
+          } else if (selectedDAGPresetKey === 'calendar') {
+            await animateNode('approval_gate_node', 'HITL Safety Gate (Auto-Approved Tier 2 Action)', 250);
+            await animateNode('tool_execution_node', 'Tool Execution (Google Calendar Connector)', 350);
+          }
+        }
+
+        // Call backend simulation endpoint
+        const res = await fetch('/api/graph/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario: selectedDAGPresetKey, prompt: prompt })
+        });
+        const data = await res.json();
+
+        if (durationBadge) durationBadge.textContent = `${data.total_duration_ms || 420}ms Total`;
+        appendDAGLog('✅', `Simulation Complete! Output: ${data.state_snapshot ? (data.state_snapshot.final_output || 'Done') : 'Success'}`, 'text-emerald-400 font-bold');
+        playHudBeep(1600);
+      } catch (err) {
+        appendDAGLog('❌', `Simulation Error: ${err}`, 'text-rose-400');
+      }
+    }
+
 
     // ── RAG Hybrid Search ──
     async function triggerRagSearch() {
@@ -5548,6 +7180,479 @@ DASHBOARD_HTML = """
       document.getElementById('obsidian-input-folder').value = 'Meetings';
       document.getElementById('obsidian-input-tags').value = 'meeting, agenda, prep';
       document.getElementById('obsidian-input-content').value = `# Meeting Prep: ${summary}\n\n**Scheduled Time:** ${dateStr}\n\n## Objectives\n- \n\n## Key Talking Points\n1. \n2. \n\n## Action Items\n- [ ] `;
+    }
+
+    // ── 7. SPOTLIGHT HUD LOGIC ──
+    let spotlightResultsList = [];
+    let spotlightSelectedIndex = 0;
+    let spotlightDebounceTimer = null;
+
+    function openSpotlightModal() {
+      playCyberClick(1100);
+      const m = document.getElementById('spotlight-modal');
+      if (!m) return;
+      m.style.display = 'flex';
+      const input = document.getElementById('spotlight-search-input');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      handleSpotlightInput('');
+      refreshIcons();
+    }
+
+    function closeSpotlightModal() {
+      const m = document.getElementById('spotlight-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function handleSpotlightInput(val) {
+      if (spotlightDebounceTimer) clearTimeout(spotlightDebounceTimer);
+      spotlightDebounceTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/spotlight/search?q=${encodeURIComponent(val.trim())}`);
+          const data = await res.json();
+          renderSpotlightResults(data.results);
+        } catch (e) {}
+      }, 120);
+    }
+
+    function renderSpotlightResults(results) {
+      const container = document.getElementById('spotlight-results-container');
+      if (!container) return;
+      container.innerHTML = '';
+      spotlightResultsList = [];
+      spotlightSelectedIndex = 0;
+
+      const actions = results.actions || [];
+      const notes = results.notes_and_docs || [];
+      const prompts = results.ai_prompts || [];
+
+      // 1. Quick Actions Section
+      if (actions.length > 0) {
+        const sec = document.createElement('div');
+        sec.className = 'space-y-1';
+        sec.innerHTML = `<div class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider px-2">⚡ Quick Actions</div>`;
+        actions.forEach(act => {
+          const idx = spotlightResultsList.length;
+          spotlightResultsList.push(act);
+          const el = createSpotlightItemElement(act, idx);
+          sec.appendChild(el);
+        });
+        container.appendChild(sec);
+      }
+
+      // 2. Notes & Documents Section
+      if (notes.length > 0) {
+        const sec = document.createElement('div');
+        sec.className = 'space-y-1 pt-1';
+        sec.innerHTML = `<div class="text-[10px] font-mono text-purple-400 font-bold uppercase tracking-wider px-2">📄 Notes & Ingested Documents</div>`;
+        notes.forEach(note => {
+          const idx = spotlightResultsList.length;
+          spotlightResultsList.push(note);
+          const el = createSpotlightItemElement(note, idx);
+          sec.appendChild(el);
+        });
+        container.appendChild(sec);
+      }
+
+      // 3. AI Prompts Section
+      if (prompts.length > 0) {
+        const sec = document.createElement('div');
+        sec.className = 'space-y-1 pt-1';
+        sec.innerHTML = `<div class="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider px-2">🤖 AI Agent Directives</div>`;
+        prompts.forEach(p => {
+          const idx = spotlightResultsList.length;
+          spotlightResultsList.push(p);
+          const el = createSpotlightItemElement(p, idx);
+          sec.appendChild(el);
+        });
+        container.appendChild(sec);
+      }
+
+      if (spotlightResultsList.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 font-mono">No matching actions, notes, or suggestions.</div>`;
+      } else {
+        highlightSpotlightIndex(0);
+      }
+      refreshIcons();
+    }
+
+    function createSpotlightItemElement(item, index) {
+      const div = document.createElement('div');
+      div.id = `spotlight-item-${index}`;
+      div.className = `p-2.5 rounded-xl border border-transparent transition cursor-pointer text-xs flex items-center justify-between hover:bg-cyan-500/10 hover:border-cyan-500/30 ${index === 0 ? 'bg-cyan-500/15 border-cyan-500/40 text-white' : 'text-slate-300'}`;
+      div.onclick = () => executeSpotlightItem(item);
+
+      div.innerHTML = `
+        <div class="flex items-center space-x-3 truncate">
+          <div class="leading-tight truncate">
+            <div class="font-bold text-white truncate">${escapeHtml(item.title)}</div>
+            <div class="text-[10px] text-slate-400 truncate">${escapeHtml(item.description || '')}</div>
+          </div>
+        </div>
+        ${item.shortcut ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300 font-bold">${item.shortcut}</span>` : ''}
+      `;
+      return div;
+    }
+
+    function highlightSpotlightIndex(index) {
+      spotlightResultsList.forEach((_, i) => {
+        const el = document.getElementById(`spotlight-item-${i}`);
+        if (!el) return;
+        if (i === index) {
+          el.className = 'p-2.5 rounded-xl border border-cyan-500/40 bg-cyan-500/20 text-white transition cursor-pointer text-xs flex items-center justify-between';
+          el.scrollIntoView({ block: 'nearest' });
+        } else {
+          el.className = 'p-2.5 rounded-xl border border-transparent text-slate-300 transition cursor-pointer text-xs flex items-center justify-between hover:bg-cyan-500/10 hover:border-cyan-500/30';
+        }
+      });
+      spotlightSelectedIndex = index;
+    }
+
+    function handleSpotlightKeydown(e) {
+      if (spotlightResultsList.length === 0) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = (spotlightSelectedIndex + 1) % spotlightResultsList.length;
+        highlightSpotlightIndex(next);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = (spotlightSelectedIndex - 1 + spotlightResultsList.length) % spotlightResultsList.length;
+        highlightSpotlightIndex(prev);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const item = spotlightResultsList[spotlightSelectedIndex];
+        if (item) executeSpotlightItem(item);
+      }
+    }
+
+    function executeSpotlightItem(item) {
+      playCyberClick();
+      closeSpotlightModal();
+      if (!item) return;
+
+      if (item.command === 'open_tab') {
+        switchTab(item.payload?.tab || 'home');
+      } else if (item.command === 'trigger_briefing') {
+        switchTab('chat');
+        setChatPrompt('Generate my daily morning briefing summarizing today schedule and urgent emails.');
+      } else if (item.command === 'open_note') {
+        switchTab('obsidian');
+        searchObsidianNotesDirect(item.payload?.title || '');
+      } else if (item.command === 'open_doc') {
+        switchTab('documents');
+      } else if (item.command === 'ask_ai') {
+        switchTab('chat');
+        setChatPrompt(item.payload?.prompt || '');
+      } else if (item.command === 'trigger_research') {
+        switchTab('research');
+        setResearchPrompt(item.payload?.topic || '');
+        executeDeepResearch();
+      }
+    }
+
+    // ── 8. DEEP RESEARCH ENGINE HANDLERS ──
+    let activeResearchDepth = 2;
+
+    function setResearchDepth(depth) {
+      activeResearchDepth = depth;
+      playCyberClick(700);
+      [1, 2, 3].forEach(d => {
+        const btn = document.getElementById(`depth-btn-${d}`);
+        if (!btn) return;
+        if (d === depth) {
+          btn.className = "px-2.5 py-1 rounded-lg transition cursor-pointer bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 font-bold";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg transition cursor-pointer text-slate-400 hover:text-white";
+        }
+      });
+    }
+
+    function setResearchPrompt(topic) {
+      const input = document.getElementById('research-topic-input');
+      if (input) {
+        input.value = topic;
+        input.focus();
+      }
+      playCyberClick(600);
+    }
+
+    async function executeDeepResearch() {
+      const topic = document.getElementById('research-topic-input')?.value.trim();
+      if (!topic) {
+        alert('Please enter a research topic.');
+        return;
+      }
+
+      playCyberClick(1200);
+      const btn = document.getElementById('btn-start-research');
+      const stepper = document.getElementById('research-stepper');
+      const stepLabel = document.getElementById('research-stepper-label');
+      const content = document.getElementById('research-dossier-content');
+      const titleEl = document.getElementById('research-dossier-title');
+      const actionBar = document.getElementById('research-action-bar');
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Researching...</span>`;
+      }
+      if (stepper) stepper.classList.remove('hidden');
+      if (actionBar) actionBar.style.display = 'none';
+      if (titleEl) titleEl.textContent = `Researching: ${topic}`;
+
+      if (stepLabel) stepLabel.textContent = "1/4: Deconstructing topic into targeted queries...";
+      document.getElementById('step-1')?.classList.add('border-cyan-400', 'text-cyan-200');
+
+      setTimeout(() => {
+        if (stepLabel) stepLabel.textContent = "2/4: Crawling web engines & extracting technical documentation...";
+        document.getElementById('step-2')?.classList.add('border-cyan-400', 'text-cyan-200');
+      }, 1500);
+
+      setTimeout(() => {
+        if (stepLabel) stepLabel.textContent = "3/4: Parsing citations and synthesizing architectural trade-offs...";
+        document.getElementById('step-3')?.classList.add('border-cyan-400', 'text-cyan-200');
+      }, 3000);
+
+      try {
+        const res = await fetch('/api/research/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic: topic, depth: activeResearchDepth })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          playHudBeep(1600);
+          showProactiveToast('Research Complete', `Synthesized dossier for "${topic}" and saved to Obsidian.`);
+          renderDossierInUI(data.dossier);
+          if (actionBar) actionBar.style.display = 'flex';
+          fetchResearchHistory();
+          fetchTraces();
+        } else {
+          content.innerHTML = `<div class="p-6 rounded-xl bg-rose-950/30 border border-rose-500/40 text-rose-300">⚠️ Research execution error: ${data.detail || 'Unknown error'}</div>`;
+        }
+      } catch (err) {
+        content.innerHTML = `<div class="p-6 rounded-xl bg-rose-950/30 border border-rose-500/40 text-rose-300">⚠️ Failed to connect to research agent: ${err.message}</div>`;
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i><span>Launch Research</span>`;
+        }
+        if (stepper) stepper.classList.add('hidden');
+        refreshIcons();
+      }
+    }
+
+    function renderDossierInUI(dossier) {
+      const content = document.getElementById('research-dossier-content');
+      const titleEl = document.getElementById('research-dossier-title');
+      if (!content || !dossier) return;
+
+      if (titleEl) titleEl.textContent = `🔬 ${dossier.topic}`;
+
+      let html = `
+        <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2">
+          <div class="font-bold text-cyan-300 text-xs uppercase font-mono tracking-wider">Executive Summary</div>
+          <p class="text-xs text-slate-200 leading-relaxed font-sans">${escapeHtml(dossier.executive_summary || '')}</p>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
+            <i data-lucide="git-merge" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>Architecture & Workflow Diagram</span>
+          </div>
+          <div class="p-4 rounded-xl bg-black/60 border theme-border overflow-x-auto text-center">
+            <pre class="mermaid text-xs font-mono">${dossier.mermaid_diagram || ''}</pre>
+          </div>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-purple-400"></i>
+            <span>Structured Technical Analysis</span>
+          </div>
+      `;
+
+      (dossier.sections || []).forEach(sec => {
+        html += `
+          <div class="p-3.5 rounded-xl bg-black/40 border theme-border space-y-2">
+            <div class="text-xs font-bold text-indigo-300">${escapeHtml(sec.aspect)}</div>
+            <p class="text-xs text-slate-300 font-sans leading-relaxed">${escapeHtml(sec.summary)}</p>
+            ${(sec.highlights && sec.highlights.length > 0) ? `
+              <ul class="list-disc list-inside text-[11px] text-slate-400 space-y-1 font-mono pl-1">
+                ${sec.highlights.map(h => `<li>${escapeHtml(h)}</li>`).join('')}
+              </ul>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+
+      if (dossier.sources && dossier.sources.length > 0) {
+        html += `
+          <div class="space-y-2 pt-2 border-t border-white/5">
+            <div class="font-bold text-white text-xs font-mono">📚 Citations & Verified Sources</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+              ${dossier.sources.map(s => `
+                <a href="${escapeHtml(s.url)}" target="_blank" class="p-2 rounded-lg bg-black/30 border theme-border hover:border-cyan-400 text-cyan-300 truncate flex items-center space-x-1.5 transition">
+                  <i data-lucide="external-link" class="w-3 h-3 flex-shrink-0"></i>
+                  <span class="truncate">${escapeHtml(s.title || s.url)}</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      content.innerHTML = html;
+      refreshIcons();
+
+      // Render Mermaid diagrams dynamically
+      if (typeof mermaid !== 'undefined') {
+        try {
+          mermaid.run({ nodes: content.querySelectorAll('.mermaid') });
+        } catch (e) {
+          console.warn("[Mermaid] Render error:", e);
+        }
+      }
+    }
+
+    async function fetchResearchHistory() {
+      try {
+        const res = await fetch('/api/research/history');
+        const data = await res.json();
+        const listEl = document.getElementById('research-history-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        const history = data.history || [];
+        if (history.length === 0) {
+          listEl.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 font-mono">No research dossiers found in vault.</div>`;
+          return;
+        }
+
+        history.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'p-3 rounded-xl theme-card border hover:border-cyan-400 transition cursor-pointer space-y-1 text-xs';
+          card.onclick = () => {
+            playCyberClick(700);
+            switchTab('obsidian');
+            searchObsidianNotesDirect(item.title);
+          };
+          card.innerHTML = `
+            <div class="font-bold text-white truncate">${escapeHtml(item.title)}</div>
+            <div class="text-[10px] text-slate-400 line-clamp-2">${escapeHtml(item.preview)}</div>
+            <div class="text-[9px] font-mono text-cyan-400 pt-1">Click to view in Obsidian Vault ➔</div>
+          `;
+          listEl.appendChild(card);
+        });
+      } catch (e) {}
+    }
+
+    // ── 9. UNIVERSAL DOCUMENT INGESTION HANDLERS ──
+    async function handleDropzoneUpload(e) {
+      const file = e.target.files?.[0];
+      if (file) {
+        await uploadDropzoneFile(file);
+      }
+    }
+
+    async function uploadDropzoneFile(file) {
+      playCyberClick(1100);
+      showProactiveToast('Ingesting Document', `Processing "${file.name}"...`);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          playHudBeep(1600);
+          showProactiveToast('Document Ingested', `Saved to Obsidian & indexed in Qdrant.`);
+          appendSystemLog(`[Ingestion Pipeline] Ingested "${file.name}" (${data.document?.doc_type})`);
+          await fetchIngestedDocuments();
+        } else {
+          alert(`Failed to ingest document: ${data.detail || 'Error'}`);
+        }
+      } catch (err) {
+        alert(`Error uploading file: ${err.message}`);
+      }
+    }
+
+    async function syncDropFolder() {
+      playCyberClick(1000);
+      try {
+        const res = await fetch('/api/documents/sync', { method: 'POST' });
+        const data = await res.json();
+        playHudBeep(1400);
+        showProactiveToast('Folder Synced', `Processed ${data.newly_processed} new files.`);
+        await fetchIngestedDocuments();
+      } catch (e) {
+        alert(`Sync error: ${e.message}`);
+      }
+    }
+
+    async function fetchIngestedDocuments() {
+      try {
+        const res = await fetch('/api/documents');
+        const data = await res.json();
+        const docs = data.documents || [];
+        const grid = document.getElementById('ingested-documents-grid');
+        const badge = document.getElementById('doc-total-count-badge');
+        const navBadge = document.getElementById('nav-documents-badge');
+
+        if (badge) badge.textContent = `${docs.length} items`;
+        if (navBadge) navBadge.textContent = `${docs.length}`;
+
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (docs.length === 0) {
+          grid.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-mono col-span-full">No documents ingested yet. Drop a PDF or CSV in the box above.</div>`;
+          return;
+        }
+
+        docs.forEach(doc => {
+          const card = document.createElement('div');
+          const isPaper = doc.doc_type === 'research_paper';
+          const isFinance = doc.doc_type === 'invoice_financial';
+          const isData = doc.doc_type === 'dataset';
+
+          let badgeColor = "bg-slate-700 text-slate-300";
+          if (isPaper) badgeColor = "bg-purple-500/20 text-purple-300 border-purple-500/40";
+          else if (isFinance) badgeColor = "bg-amber-500/20 text-amber-300 border-amber-500/40";
+          else if (isData) badgeColor = "bg-cyan-500/20 text-cyan-300 border-cyan-500/40";
+
+          card.className = 'p-4 rounded-xl theme-card border hover:border-emerald-400 transition space-y-2.5 text-xs';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white truncate max-w-[200px]">${escapeHtml(doc.title)}</span>
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded border ${badgeColor}">${escapeHtml(doc.doc_type)}</span>
+            </div>
+            <p class="text-[11px] text-slate-300 font-sans line-clamp-3 leading-relaxed">${escapeHtml(doc.summary)}</p>
+            ${doc.key_takeaways && doc.key_takeaways.length > 0 ? `
+              <div class="p-2 rounded-lg bg-black/40 text-[10px] text-slate-400 font-mono space-y-1">
+                <div class="text-emerald-300 font-bold">Highlights:</div>
+                <div class="truncate">• ${escapeHtml(doc.key_takeaways[0])}</div>
+              </div>
+            ` : ''}
+            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] font-mono text-slate-400">
+              <span>${doc.filename}</span>
+              <button onclick="switchTab('obsidian'); searchObsidianNotesDirect('${escapeHtml(doc.title)}')" class="text-emerald-400 hover:text-emerald-300 cursor-pointer">
+                View Vault Note ➔
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        refreshIcons();
+      } catch (e) {}
     }
 
     // ── Setup Window Drag & Drop Document Ingestion ──

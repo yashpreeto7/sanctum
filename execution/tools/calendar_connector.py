@@ -138,7 +138,37 @@ class CalendarConnector:
         self._custom_service = service
         self.storage_path = storage_path or (settings.TEMP_DIR / "calendar_events.json")
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
+        self.deleted_path = self.storage_path.parent / "calendar_deleted_ids.json"
+        self._deleted_ids: set = set()
+        self._deleted_keys: set = set()
+        self._load_deleted()
         self._mock_events: List[CalendarEvent] = self._load_local_events()
+        self._cached_events: List[CalendarEvent] = []
+        self._cache_timestamp: float = 0.0
+        self._cache_ttl_seconds: float = 60.0
+
+    def _load_deleted(self):
+        """Loads deleted event IDs and keys from persistent storage."""
+        if not self.deleted_path.exists():
+            return
+        try:
+            raw = json.loads(self.deleted_path.read_text(encoding="utf-8"))
+            self._deleted_ids = set(raw.get("ids", []))
+            self._deleted_keys = set(raw.get("keys", []))
+        except Exception:
+            self._deleted_ids = set()
+            self._deleted_keys = set()
+
+    def _save_deleted(self):
+        """Saves deleted event IDs and keys to persistent storage."""
+        try:
+            data = {
+                "ids": list(self._deleted_ids),
+                "keys": list(self._deleted_keys),
+            }
+            self.deleted_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
     def _get_service(self):
         if self._custom_service is not None:
@@ -159,7 +189,14 @@ class CalendarConnector:
             return []
         try:
             data = json.loads(self.storage_path.read_text(encoding="utf-8"))
-            return [CalendarEvent(**item) for item in data]
+            events = []
+            for item in data:
+                ev = CalendarEvent(**item)
+                key16 = (ev.summary.strip().lower(), ev.start_time[:16])
+                key10 = (ev.summary.strip().lower(), ev.start_time[:10])
+                if ev.id not in self._deleted_ids and key16 not in self._deleted_keys and key10 not in self._deleted_keys:
+                    events.append(ev)
+            return events
         except Exception:
             return []
 
@@ -181,9 +218,16 @@ class CalendarConnector:
             items = FESTIVALS_DATA.get(y, [])
             for item in items:
                 d_str = item["date"]
+                f_id = f"festival-{d_str}-{item['summary'].replace(' ', '_').lower()}"
+                key10 = (item["summary"].strip().lower(), d_str[:10])
+                emoji_key10 = (f"{item['emoji']} {item['summary']}".strip().lower(), d_str[:10])
+                
+                if f_id in self._deleted_ids or key10 in self._deleted_keys or emoji_key10 in self._deleted_keys:
+                    continue
+
                 festivals.append(
                     CalendarEvent(
-                        id=f"festival-{d_str}-{item['summary'].replace(' ', '_').lower()}",
+                        id=f_id,
                         summary=f"{item['emoji']} {item['summary']}",
                         start_time=f"{d_str}T00:00:00",
                         end_time=f"{d_str}T23:59:59",
@@ -200,9 +244,15 @@ class CalendarConnector:
         self,
         days_back: int = 120,
         days_ahead: int = 365,
-        include_festivals: bool = True
+        include_festivals: bool = True,
+        force_refresh: bool = False,
     ) -> List[CalendarEvent]:
-        """Lists past, present, and upcoming events with strict deduplication."""
+        """Lists past, present, and upcoming events with strict deduplication and deleted tombstone filtering."""
+        now_ts = time.time()
+        if not force_refresh and self._cached_events and (now_ts - self._cache_timestamp < self._cache_ttl_seconds):
+            return self._cached_events
+
+        self._load_deleted()
         events_dict: Dict[str, CalendarEvent] = {}
         seen_keys = set()
 
@@ -228,6 +278,10 @@ class CalendarConnector:
                     summary = i.get("summary", "Untitled")
 
                     key = (summary.strip().lower(), start[:16])
+                    key10 = (summary.strip().lower(), start[:10])
+                    
+                    if eid in self._deleted_ids or key in self._deleted_keys or key10 in self._deleted_keys:
+                        continue
                     if key in seen_keys or eid in events_dict:
                         continue
 
@@ -252,6 +306,10 @@ class CalendarConnector:
             if not ev.id:
                 ev.id = f"local-{uuid.uuid4().hex[:8]}"
             key = (ev.summary.strip().lower(), ev.start_time[:16])
+            key10 = (ev.summary.strip().lower(), ev.start_time[:10])
+            
+            if ev.id in self._deleted_ids or key in self._deleted_keys or key10 in self._deleted_keys:
+                continue
             if ev.id not in events_dict and key not in seen_keys:
                 events_dict[ev.id] = ev
                 seen_keys.add(key)
@@ -260,12 +318,16 @@ class CalendarConnector:
         if include_festivals:
             for f_ev in self.list_festivals():
                 key = (f_ev.summary.strip().lower(), f_ev.start_time[:10])
+                if f_ev.id in self._deleted_ids or key in self._deleted_keys:
+                    continue
                 if f_ev.id not in events_dict and key not in seen_keys:
                     events_dict[f_ev.id] = f_ev
                     seen_keys.add(key)
 
         # 4. Sort chronologically
         sorted_events = sorted(events_dict.values(), key=lambda e: e.start_time or "")
+        self._cached_events = sorted_events
+        self._cache_timestamp = time.time()
         return sorted_events
 
     def check_conflicts(self, start_time_iso: str, end_time_iso: str) -> List[CalendarEvent]:
@@ -293,6 +355,15 @@ class CalendarConnector:
         event.end_time = _to_rfc3339(event.end_time)
         event.event_type = "schedule"
 
+        # If re-creating an event that was previously deleted, un-tombstone it
+        key16 = (event.summary.strip().lower(), event.start_time[:16])
+        key10 = (event.summary.strip().lower(), event.start_time[:10])
+        self._deleted_keys.discard(key16)
+        self._deleted_keys.discard(key10)
+        if event.id:
+            self._deleted_ids.discard(event.id)
+        self._save_deleted()
+
         service = self._get_service()
         if service is not None:
             body = {
@@ -306,6 +377,8 @@ class CalendarConnector:
             try:
                 created = service.events().insert(calendarId="primary", body=body).execute()
                 event.id = created.get("id")
+                if event.id:
+                    self._deleted_ids.discard(event.id)
                 self._upsert_local_event(event)
                 return {
                     "status": "success",
@@ -350,6 +423,8 @@ class CalendarConnector:
 
     def _upsert_local_event(self, event: CalendarEvent):
         """Adds or updates an event in the local persistent list without duplicates."""
+        self._cache_timestamp = 0.0
+        self._cached_events = []
         self._mock_events = self._load_local_events()
         key = (event.summary.strip().lower(), event.start_time[:16])
         filtered = [
@@ -361,7 +436,32 @@ class CalendarConnector:
         self._save_local_events()
 
     def delete_event(self, event_id: str) -> bool:
-        """Deletes an event by ID from Google Calendar and local store."""
+        """Deletes an event by ID from Google Calendar, local store, and records tombstone."""
+        self._cache_timestamp = 0.0
+        self._cached_events = []
+        self._load_deleted()
+        self._deleted_ids.add(event_id)
+
+        # Look up event in local store or memory to also record its summary/date key
+        target_event = None
+        for e in self._load_local_events():
+            if e.id == event_id:
+                target_event = e
+                break
+
+        if target_event:
+            self._deleted_keys.add((target_event.summary.strip().lower(), target_event.start_time[:16]))
+            self._deleted_keys.add((target_event.summary.strip().lower(), target_event.start_time[:10]))
+
+        # Also check festivals
+        for f in self.list_festivals():
+            if f.id == event_id:
+                self._deleted_keys.add((f.summary.strip().lower(), f.start_time[:10]))
+                clean_name = f.summary.split(" ", 1)[-1].strip().lower()
+                self._deleted_keys.add((clean_name, f.start_time[:10]))
+
+        self._save_deleted()
+
         service = self._get_service()
         if service is not None:
             try:
@@ -369,7 +469,6 @@ class CalendarConnector:
             except Exception:
                 pass
 
-        self._mock_events = self._load_local_events()
         self._mock_events = [e for e in self._mock_events if e.id != event_id]
         self._save_local_events()
         return True

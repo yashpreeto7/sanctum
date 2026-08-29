@@ -1,5 +1,8 @@
 import base64
 import re
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -101,6 +104,9 @@ def _extract_body_from_payload(payload: Dict[str, Any]) -> str:
     return ""
 
 
+_thread_local = threading.local()
+
+
 class GmailConnector:
     """Manages Gmail operations: searching, reading threads, caching recent queries, drafting, and sending."""
 
@@ -110,6 +116,9 @@ class GmailConnector:
         self._sent_emails: List[OutboundEmail] = []
         self._drafts: List[OutboundEmail] = []
         self._recent_cache: List[InboundEmail] = []
+        self._cached_sent: List[Dict[str, Any]] = []
+        self._cached_sent_time: float = 0.0
+        self._cache_ttl_seconds: float = 60.0
 
     def _get_service(self):
         if self._custom_service is not None:
@@ -124,6 +133,20 @@ class GmailConnector:
                 pass
         return None
 
+    def _get_thread_safe_service(self):
+        """Returns a thread-isolated service instance to prevent socket race conditions."""
+        if self._custom_service is not None:
+            return self._custom_service
+        if not hasattr(_thread_local, "gmail_service") or _thread_local.gmail_service is None:
+            token_path = Path(__file__).resolve().parent.parent.parent / ".tmp" / "google_token.json"
+            if token_path.exists():
+                try:
+                    creds = Credentials.from_authorized_user_file(str(token_path))
+                    _thread_local.gmail_service = build("gmail", "v1", credentials=creds)
+                except Exception:
+                    pass
+        return getattr(_thread_local, "gmail_service", None) or self._get_service()
+
     def list_unread(self, max_results: int = 15) -> List[InboundEmail]:
         """Fetch unread emails and populate recent cache."""
         emails = self.search_emails(query="is:unread", max_results=max_results)
@@ -133,6 +156,70 @@ class GmailConnector:
         """Fetch recent emails from inbox regardless of read status."""
         emails = self.search_emails(query="in:inbox", max_results=max_results)
         return emails
+
+    def list_sent_messages(self, max_results: int = 35, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """Fetch recent sent emails from Gmail or local sent cache with 60s TTL."""
+        now = time.time()
+        if not force_refresh and self._cached_sent and (now - self._cached_sent_time) < self._cache_ttl_seconds:
+            return self._cached_sent
+
+        service = self._get_service()
+        if service is not None:
+            try:
+                results = service.users().messages().list(
+                    userId="me", q="in:sent", maxResults=max_results
+                ).execute()
+                messages = results.get("messages", [])
+                
+                def _fetch_sent(m):
+                    try:
+                        svc = self._get_thread_safe_service()
+                        if not svc:
+                            return None
+                        msg = svc.users().messages().get(userId="me", id=m["id"], format="full").execute()
+                        payload = msg.get("payload", {})
+                        headers = {h["name"].lower(): h["value"] for h in payload.get("headers", [])}
+                        full_body = _extract_body_from_payload(payload) or msg.get("snippet", "")
+                        return {
+                            "id": m["id"],
+                            "thread_id": m.get("threadId", m["id"]),
+                            "to": headers.get("to", "Unknown Recipient"),
+                            "subject": headers.get("subject", "No Subject"),
+                            "body": full_body,
+                            "snippet": full_body[:130] if full_body else (msg.get("snippet", "No preview available")),
+                            "sent_at_timestamp": float(msg.get("internalDate", 0)) / 1000.0 if msg.get("internalDate") else time.time(),
+                            "is_sent": True,
+                        }
+                    except Exception:
+                        return None
+
+                with ThreadPoolExecutor(max_workers=4) as executor:
+                    fetched = list(executor.map(_fetch_sent, messages))
+                sent_list = [item for item in fetched if item is not None]
+                if sent_list:
+                    self._cached_sent = sent_list
+                    self._cached_sent_time = now
+                    return sent_list
+            except Exception:
+                pass
+
+        # Fallback to local sent cache
+        fallback_sent = []
+        for idx, em in enumerate(reversed(self._sent_emails)):
+            fallback_sent.append({
+                "id": f"sent-local-{idx}",
+                "thread_id": em.thread_id or f"thread-{idx}",
+                "to": em.to,
+                "subject": em.subject,
+                "body": em.body,
+                "snippet": em.body[:130] if em.body else "No preview available",
+                "sent_at_timestamp": time.time() - (idx * 60),
+                "is_sent": True,
+            })
+        if fallback_sent:
+            self._cached_sent = fallback_sent
+            self._cached_sent_time = now
+        return fallback_sent
 
     def search_emails(self, query: str, max_results: int = 5) -> List[InboundEmail]:
         """Searches Gmail by query (e.g. 'linkedin', 'from:linkedin', 'Udemy', 'is:unread', 'in:inbox') and extracts full body."""
@@ -146,36 +233,29 @@ class GmailConnector:
                 and not clean_q.startswith("in:")
                 and not clean_q.startswith("label:")
                 and not clean_q.startswith("from:")
+                and not clean_q.startswith("to:")
                 and not clean_q.startswith("subject:")
             ):
-                search_queries.append(f"from:{clean_q}")
-                search_queries.append(f"{clean_q}")
+                search_queries.extend([
+                    f"from:{clean_q}",
+                    f"subject:{clean_q}",
+                    f"{clean_q}",
+                ])
 
-            for q_term in search_queries:
+            all_messages = []
+            seen_ids = set()
+
+            for sq in search_queries:
                 try:
-                    results = service.users().messages().list(
-                        userId="me", q=q_term, maxResults=max_results
+                    res = service.users().messages().list(
+                        userId="me", q=sq, maxResults=max_results
                     ).execute()
-                    messages = results.get("messages", [])
                     if not messages:
                         continue
-                    inbound_list = []
-                    for m in messages:
-                        msg = service.users().messages().get(userId="me", id=m["id"], format="full").execute()
-                        payload = msg.get("payload", {})
-                        headers = {h["name"].lower(): h["value"] for h in payload.get("headers", [])}
-                        full_body = _extract_body_from_payload(payload) or msg.get("snippet", "")
-                        inbound_list.append(
-                            InboundEmail(
-                                id=m["id"],
-                                thread_id=m.get("threadId", m["id"]),
-                                sender=headers.get("from", "unknown"),
-                                subject=headers.get("subject", "No Subject"),
-                                body=full_body,
-                                received_at_timestamp=float(msg.get("internalDate", 0)) / 1000.0,
-                                is_read="UNREAD" not in msg.get("labelIds", []),
-                            )
-                        )
+
+                    with ThreadPoolExecutor(max_workers=8) as executor:
+                        fetched = list(executor.map(_fetch_inbound, messages))
+                    inbound_list = [item for item in fetched if item is not None]
                     if inbound_list:
                         # Cache these recent emails
                         self._update_cache(inbound_list)
@@ -260,6 +340,8 @@ class GmailConnector:
 
     def send_email(self, email: OutboundEmail) -> Dict[str, Any]:
         """Sends an email directly (High Risk - Requires HITL Approval)."""
+        self._cached_sent = []
+        self._cached_sent_time = 0.0
         service = self._get_service()
         if service is not None:
             try:

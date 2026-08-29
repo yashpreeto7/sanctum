@@ -34,10 +34,13 @@ class ApprovalRequest(BaseModel):
     status: ApprovalStatus = ApprovalStatus.PENDING
     created_at: float = Field(default_factory=time.time)
     resolved_at: Optional[float] = None
+    execution_result: Optional[str] = None
+    operator_notes: Optional[str] = None
+
 
 
 class PermissionManager:
-    """Enforces safety policies and manages the pending approval queue."""
+    """Enforces safety policies, manages pending approval queue, and maintains an audit log."""
 
     # Default tool registry risk classifications
     TOOL_RISK_MAP: Dict[str, RiskLevel] = {
@@ -61,6 +64,10 @@ class PermissionManager:
 
     def __init__(self):
         self._approval_queue: Dict[str, ApprovalRequest] = {}
+        self._history: List[ApprovalRequest] = []
+        self._require_high_risk: bool = True
+        self._auto_approve_low_risk: bool = True
+        self._auto_approve_medium_risk: bool = False
 
     def get_tool_risk(self, tool_name: str) -> RiskLevel:
         """Look up the risk level for a tool."""
@@ -68,12 +75,33 @@ class PermissionManager:
 
     def can_auto_execute(self, tool_name: str) -> bool:
         """Determines if a tool call can proceed without prompting the user."""
-        if not settings.REQUIRE_APPROVAL_FOR_HIGH_RISK:
-            return True
         risk = self.get_tool_risk(tool_name)
-        if risk == RiskLevel.LOW and settings.AUTO_APPROVE_LOW_RISK:
+        if risk == RiskLevel.LOW and self._auto_approve_low_risk:
+            return True
+        if risk == RiskLevel.MEDIUM and self._auto_approve_medium_risk:
+            return True
+        if not self._require_high_risk and risk == RiskLevel.HIGH:
             return True
         return False
+
+    def get_policies(self) -> Dict[str, Any]:
+        """Returns current safety policy settings and risk mapping."""
+        return {
+            "require_high_risk": self._require_high_risk,
+            "auto_approve_low_risk": self._auto_approve_low_risk,
+            "auto_approve_medium_risk": self._auto_approve_medium_risk,
+            "tool_risk_map": {k: v.value for k, v in self.TOOL_RISK_MAP.items()},
+        }
+
+    def update_policies(self, policies: Dict[str, Any]) -> Dict[str, Any]:
+        """Updates active security policies."""
+        if "require_high_risk" in policies:
+            self._require_high_risk = bool(policies["require_high_risk"])
+        if "auto_approve_low_risk" in policies:
+            self._auto_approve_low_risk = bool(policies["auto_approve_low_risk"])
+        if "auto_approve_medium_risk" in policies:
+            self._auto_approve_medium_risk = bool(policies["auto_approve_medium_risk"])
+        return self.get_policies()
 
     def create_approval_request(
         self,
@@ -95,20 +123,48 @@ class PermissionManager:
         self._approval_queue[request.id] = request
         return request
 
-    def resolve_request(self, request_id: str, approved: bool) -> Optional[ApprovalRequest]:
+    def resolve_request(
+        self,
+        request_id: str,
+        approved: bool,
+        edited_args: Optional[Dict[str, Any]] = None,
+        notes: Optional[str] = None,
+        execution_result: Optional[str] = None,
+    ) -> Optional[ApprovalRequest]:
         """User approves or rejects a pending action in the UI."""
         if request_id not in self._approval_queue:
             return None
 
         req = self._approval_queue[request_id]
+        if edited_args:
+            req.tool_args = edited_args
         req.status = ApprovalStatus.APPROVED if approved else ApprovalStatus.REJECTED
         req.resolved_at = time.time()
+        if notes:
+            req.operator_notes = notes
+        if execution_result:
+            req.execution_result = execution_result
+
+        # Move from active queue to history
+        self._history.insert(0, req)
+        if len(self._history) > 100:
+            self._history.pop()
+
         return req
 
     def list_pending_requests(self) -> List[ApprovalRequest]:
         """Returns all approval requests currently awaiting human input."""
         return [r for r in self._approval_queue.values() if r.status == ApprovalStatus.PENDING]
 
+    def list_history(self, limit: int = 50) -> List[ApprovalRequest]:
+        """Returns past resolved approvals for the audit log."""
+        return self._history[:limit]
+
+    def clear_history(self) -> None:
+        """Clears audit history log."""
+        self._history.clear()
+
 
 # Singleton instance
 permission_manager = PermissionManager()
+

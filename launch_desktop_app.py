@@ -41,12 +41,15 @@ def start_backend_server():
 
     py_exe = get_python_exe()
     print(f"[Desktop App] Starting Personal AI OS backend server on {APP_URL} using {py_exe}...")
+    log_file = ROOT_DIR / ".tmp" / "desktop_server.log"
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    log_handle = open(log_file, "a", encoding="utf-8")
     cmd = [py_exe, "-m", "uvicorn", "server.app:app", "--host", "127.0.0.1", "--port", str(PORT)]
     proc = subprocess.Popen(
         cmd,
         cwd=str(ROOT_DIR),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_handle,
+        stderr=log_handle,
     )
 
     # Wait for server to become responsive (allow up to 45s for model warmup)
