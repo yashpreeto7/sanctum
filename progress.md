@@ -23,3 +23,14 @@
   - Folder Watcher & Local Tools ([test_folder_watcher.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/tests/unit/test_folder_watcher.py), [test_tools.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/tests/unit/test_tools.py))
   - FastAPI Server & Spotlight / Research Endpoints ([test_api_server.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/tests/integration/test_api_server.py), [test_spotlight_and_research_api.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/tests/integration/test_spotlight_and_research_api.py))
 - **Status:** All 56 tests passed (100% pass rate).
+
+## Session: Research Readability, Export Suite & Sidebar Collapse
+- **Action:** Committed and pushed stable baseline to `origin/main`.
+- **Action:** Created feature branch `feature/research-ux-and-sidebar-toggle` and pushed to remote.
+- **Action:** Implemented left sidebar hide/collapse toggle in Waybar header, sidebar title header, and `Ctrl+B` / `Cmd+B` shortcut with localStorage persistence and full width expansion.
+- **Action:** Upgraded [formatMarkdownText](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/server/dashboard_template.py) to parse full GFM with headers, tables, blockquotes, callout alerts, code copy blocks, and Mermaid diagrams.
+- **Action:** Redesigned Deep Autonomous Research workspace with metadata tags, executive intelligence summary card, collapsible DeepSeek R1 reasoning trace accordion, interactive Mermaid workflow, structured aspect breakdown cards, and verified citation cards.
+- **Action:** Implemented download suite for **Save as Microsoft Word (.doc)**, **Save as PDF**, **Save as Markdown (.md)**, and **Copy** across Research dossiers and Obsidian vault notes.
+- **Action:** Implemented `/api/research/dossier` endpoint in [app.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/server/app.py) and added integration tests in [test_spotlight_and_research_api.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/tests/integration/test_spotlight_and_research_api.py).
+- **Status:** All integration and unit test suites passed. Branch pushed to `origin/feature/research-ux-and-sidebar-toggle`.
+
