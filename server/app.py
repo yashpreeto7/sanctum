@@ -1217,6 +1217,29 @@ async def get_research_history():
     return {"history": res_list}
 
 
+@app.get("/api/research/dossier")
+async def get_research_dossier(filename: str):
+    """Retrieves full text and parsed metadata of a specific research dossier."""
+    research_dir = obsidian_connector.vault_path / "Research"
+    target_file = research_dir / filename
+    if not target_file.exists() or not target_file.is_file():
+        # Try matching by stem or safe search
+        matched = list(research_dir.glob(f"*{filename}*"))
+        if matched and matched[0].is_file():
+            target_file = matched[0]
+        else:
+            raise HTTPException(status_code=404, detail=f"Dossier '{filename}' not found")
+
+    content = target_file.read_text(encoding="utf-8", errors="replace")
+    return {
+        "filename": target_file.name,
+        "title": target_file.stem,
+        "filepath": str(target_file),
+        "modified": target_file.stat().st_mtime,
+        "content": content
+    }
+
+
 @app.get("/api/documents")
 async def list_documents():
     """List all ingested documents and their extracted metadata."""

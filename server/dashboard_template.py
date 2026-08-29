@@ -10,7 +10,7 @@ Features:
 - Standalone Desktop App Launcher Integration & PWA Manifest
 """
 
-DASHBOARD_HTML = """
+DASHBOARD_HTML = r"""
 <!DOCTYPE html>
 <html lang="en" class="dark" data-theme="omarchy-cyberpunk">
 <head>
@@ -445,6 +445,41 @@ DASHBOARD_HTML = """
       background: rgba(0, 0, 0, 0.72);
       backdrop-filter: blur(10px);
     }
+
+    /* Left Dashboard / Sidebar Collapse State */
+    #app-sidebar.collapsed {
+      width: 0px !important;
+      min-width: 0px !important;
+      max-width: 0px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border-right: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      overflow: hidden !important;
+    }
+
+    /* Print & PDF Export Formatting */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-document-area, #printable-document-area * {
+        visibility: visible !important;
+      }
+      #printable-document-area {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 999999 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        overflow: visible !important;
+        padding: 40px !important;
+      }
+    }
   </style>
 </head>
 <body class="flex flex-col h-screen w-screen relative overflow-hidden">
@@ -465,7 +500,7 @@ DASHBOARD_HTML = """
   <!-- ─── 1. OMARCHY TOP WAYBAR / STATUS BAR ───────────────────────── -->
   <header class="waybar-hud h-10 px-3 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none w-full border-b theme-border bg-black/50 backdrop-blur-xl">
     
-    <!-- Left: Distro Logo & Workspaces (scrollable if needed without scrollbars) -->
+    <!-- Left: Distro Logo, Sidebar Toggle & Workspaces -->
     <div class="flex items-center space-x-2 min-w-0 flex-shrink">
       <!-- Distro Pill -->
       <div class="flex items-center space-x-1 px-2 py-0.5 rounded-lg bg-black/40 border border-white/10 text-white shadow-sm flex-shrink-0">
@@ -475,6 +510,11 @@ DASHBOARD_HTML = """
         <span class="font-bold tracking-wider text-[10px] text-white">OMARCHY</span>
         <span class="text-[8px] px-1 py-0.1 rounded bg-indigo-500/30 text-indigo-300 font-mono hidden sm:inline">v2.4</span>
       </div>
+
+      <!-- Sidebar Hide/Show Toggle Button -->
+      <button onclick="toggleAppSidebar()" id="btn-toggle-sidebar" title="Toggle Left Dashboard / Sidebar (Ctrl+B / ⌘B)" class="p-1 rounded-lg bg-black/40 hover:bg-cyan-500/20 text-cyan-400 hover:text-white border border-white/10 text-xs flex items-center justify-center transition cursor-pointer flex-shrink-0">
+        <i data-lucide="panel-left-close" class="w-3.5 h-3.5" id="icon-sidebar-toggle"></i>
+      </button>
 
       <!-- Hyprland Workspace Switcher -->
       <div class="flex items-center space-x-1 bg-black/30 p-0.5 rounded-lg border border-white/5 overflow-x-auto no-scrollbar max-w-[44vw] flex-shrink">
@@ -579,18 +619,24 @@ DASHBOARD_HTML = """
   <div class="flex-1 flex overflow-hidden z-10">
 
     <!-- ─── LEFT SIDEBAR ─────────────────────────────────────────────── -->
-    <aside class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 transition-all duration-300">
+    <aside id="app-sidebar" class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 transition-all duration-300">
       
       <!-- Top Brand & New Chat -->
       <div class="p-4 space-y-4">
-        <div class="flex items-center space-x-2.5 px-2">
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-            <i data-lucide="cpu" class="w-4 h-4"></i>
+        <div class="flex items-center justify-between px-2">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Personal AI OS</span>
+              <span class="text-[9px] font-mono text-cyan-400 leading-none">Arch / Omarchy Edition</span>
+            </div>
           </div>
-          <div>
-            <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Personal AI OS</span>
-            <span class="text-[9px] font-mono text-cyan-400 leading-none">Arch / Omarchy Edition</span>
-          </div>
+          <!-- Quick Collapse Sidebar Button -->
+          <button onclick="toggleAppSidebar()" title="Hide Sidebar (Ctrl+B / ⌘B)" class="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition cursor-pointer">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
         </div>
 
         <!-- New Chat Button -->
@@ -1873,6 +1919,18 @@ DASHBOARD_HTML = """
                   </div>
 
                   <div class="flex items-center space-x-1.5 flex-shrink-0">
+                    <button onclick="exportCurrentObsidianNoteAsWord()" class="px-2 py-1.5 rounded-lg bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/40 text-blue-300 text-xs flex items-center space-x-1 cursor-pointer transition" title="Export Note as Microsoft Word (.doc)">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-400"></i>
+                      <span>Word</span>
+                    </button>
+                    <button onclick="exportCurrentObsidianNoteAsPDF()" class="px-2 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-1 cursor-pointer transition" title="Save / Print Note as PDF">
+                      <i data-lucide="printer" class="w-3.5 h-3.5 text-rose-400"></i>
+                      <span>PDF</span>
+                    </button>
+                    <button onclick="exportCurrentObsidianNoteAsMarkdown()" class="px-2 py-1.5 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition" title="Download Markdown .md">
+                      <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+                      <span>.md</span>
+                    </button>
                     <button onclick="askCopilotAboutCurrentNote()" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 text-xs flex items-center space-x-1 cursor-pointer transition" title="Ask Personal AI about this note">
                       <i data-lucide="bot" class="w-3.5 h-3.5"></i>
                       <span>Ask AI</span>
@@ -2082,13 +2140,29 @@ DASHBOARD_HTML = """
 
             <!-- Right: Active Research Output & Mermaid Dossier (2 Cols) -->
             <div class="p-6 rounded-2xl theme-card border space-y-4 lg:col-span-2 min-h-[500px]" id="research-output-panel">
-              <div class="flex items-center justify-between border-b theme-border pb-3">
-                <div class="flex items-center space-x-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-                  <span class="font-bold text-sm text-white" id="research-dossier-title">Research Workspace</span>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b theme-border pb-3 gap-2">
+                <div class="flex items-center space-x-2 min-w-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 flex-shrink-0 animate-pulse"></span>
+                  <span class="font-bold text-sm text-white truncate font-display" id="research-dossier-title">Research Workspace</span>
                 </div>
-                <div class="flex items-center space-x-2" id="research-action-bar" style="display: none;">
-                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✓ Saved to Obsidian</span>
+                <div class="flex items-center space-x-1.5 flex-wrap flex-shrink-0" id="research-action-bar">
+                  <button onclick="exportActiveResearchAsWord()" class="px-2.5 py-1 rounded-lg bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/40 text-blue-300 text-xs flex items-center space-x-1 cursor-pointer transition" title="Export Dossier as Microsoft Word (.doc)">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span>Word</span>
+                  </button>
+                  <button onclick="exportActiveResearchAsPDF()" class="px-2.5 py-1 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-1 cursor-pointer transition" title="Save Dossier as PDF / Print">
+                    <i data-lucide="printer" class="w-3.5 h-3.5 text-rose-400"></i>
+                    <span>PDF</span>
+                  </button>
+                  <button onclick="exportActiveResearchAsMarkdown()" class="px-2.5 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 text-xs flex items-center space-x-1 cursor-pointer transition" title="Download Markdown .md">
+                    <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    <span>.md</span>
+                  </button>
+                  <button onclick="copyActiveResearchDossier(this)" class="px-2.5 py-1 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition" title="Copy Dossier Text">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    <span>Copy</span>
+                  </button>
+                  <span id="research-obsidian-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hidden">✓ Saved to Obsidian</span>
                 </div>
               </div>
 
@@ -3658,11 +3732,52 @@ DASHBOARD_HTML = """
 
     }
 
-    // ── Keyboard Shortcuts (Alt+1 to Alt+9, Ctrl+K) ──
+    // ── Sidebar Toggle & Persistence (Left Dashboard Hide Option) ──
+    function toggleAppSidebar(forceState) {
+      const sidebar = document.getElementById('app-sidebar');
+      const toggleIcon = document.getElementById('icon-sidebar-toggle');
+      if (!sidebar) return;
+
+      const willCollapse = (typeof forceState === 'boolean') ? forceState : !sidebar.classList.contains('collapsed');
+      if (willCollapse) {
+        sidebar.classList.add('collapsed');
+        localStorage.setItem('personal_ai_sidebar_collapsed', 'true');
+        if (toggleIcon) {
+          toggleIcon.setAttribute('data-lucide', 'panel-left-open');
+        }
+        showProactiveToast('Dashboard Sidebar Hidden', 'Press Ctrl+B or click top icon to expand.');
+      } else {
+        sidebar.classList.remove('collapsed');
+        localStorage.setItem('personal_ai_sidebar_collapsed', 'false');
+        if (toggleIcon) {
+          toggleIcon.setAttribute('data-lucide', 'panel-left-close');
+        }
+      }
+      playCyberClick(900);
+      refreshIcons();
+    }
+
+    // Initialize sidebar state on boot
+    (function initSidebarState() {
+      const saved = localStorage.getItem('personal_ai_sidebar_collapsed');
+      if (saved === 'true') {
+        const sidebar = document.getElementById('app-sidebar');
+        const toggleIcon = document.getElementById('icon-sidebar-toggle');
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (toggleIcon) toggleIcon.setAttribute('data-lucide', 'panel-left-open');
+      }
+    })();
+
+    // ── Keyboard Shortcuts (Alt+1 to Alt+9, Ctrl+K, Ctrl+B) ──
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         openSpotlightModal();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleAppSidebar();
         return;
       }
       if (e.key === 'Escape') {
@@ -6370,109 +6485,126 @@ DASHBOARD_HTML = """
     function formatMarkdownText(rawText) {
       if (!rawText) return '';
       var text = String(rawText);
-      var nl = String.fromCharCode(10);
 
-      // 1. Basic formatting & code blocks
+      // Handle frontmatter if present
+      if (text.indexOf('---') === 0) {
+        var fmEnd = text.indexOf('---', 3);
+        if (fmEnd !== -1) {
+          var frontmatter = text.substring(3, fmEnd).trim();
+          text = text.substring(fmEnd + 3).trim();
+          var fmLines = frontmatter.split('\n').map(function(l) {
+            var parts = l.split(':');
+            var k = parts[0].trim();
+            var v = parts.slice(1).join(':').trim();
+            if (!k) return '';
+            return '<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-[10px] font-mono text-cyan-300 mr-1.5 mb-1"><span class="text-slate-400">' + escapeHtml(k) + ':</span> <b class="text-white">' + escapeHtml(v) + '</b></span>';
+          }).filter(Boolean).join('');
+          text = '<div class="mb-3 p-2.5 rounded-xl bg-black/30 border border-white/10 flex flex-wrap items-center">' + fmLines + '</div>\n\n' + text;
+        }
+      }
+
+      // 1. Extract code blocks & mermaid blocks first
+      var codeBlocks = [];
+      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+        var placeholder = '__CODE_BLOCK_' + codeBlocks.length + '__';
+        if (lang === 'mermaid') {
+          codeBlocks.push(
+            '<div class="my-3 p-4 rounded-xl bg-black/60 border theme-border overflow-x-auto text-center">' +
+              '<pre class="mermaid text-xs font-mono">' + code.trim() + '</pre>' +
+            '</div>'
+          );
+        } else {
+          codeBlocks.push(
+            '<div class="code-container relative my-2.5 rounded-xl border border-white/10 overflow-hidden bg-black/80">' +
+              '<div class="flex items-center justify-between px-3 py-1.5 bg-black/70 border-b border-white/5 text-[10px] font-mono text-slate-400">' +
+                '<span class="text-cyan-400 font-bold">' + escapeHtml(lang || 'code') + '</span>' +
+                '<button onclick="copyCodeSnippet(this)" class="copy-btn hover:text-white text-slate-400 flex items-center space-x-1 cursor-pointer transition">' +
+                  '<i data-lucide="copy" class="w-3 h-3"></i>' +
+                  '<span>Copy</span>' +
+                '</button>' +
+              '</div>' +
+              '<pre class="p-3.5 font-mono text-[11px] text-cyan-300 overflow-x-auto select-text">' + escapeHtml(code.trim()) + '</pre>' +
+            '</div>'
+          );
+        }
+        return placeholder;
+      });
+
+      // 2. Escape HTML for remaining markdown body
       text = text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
-      text = text.split('```').map(function(chunk, i) {
-        if (i % 2 === 1) {
-          return '<div class="code-container relative my-2.5 rounded-xl border border-white/10 overflow-hidden bg-black/70">' +
-            '<div class="flex items-center justify-between px-3 py-1 bg-black/60 border-b border-white/5 text-[10px] font-mono text-slate-400">' +
-              '<span class="text-cyan-400">code snippet</span>' +
-              '<button onclick="copyCodeSnippet(this)" class="copy-btn hover:text-white text-slate-400 flex items-center space-x-1 cursor-pointer transition">' +
-                '<i data-lucide="copy" class="w-3 h-3"></i>' +
-                '<span>Copy</span>' +
-              '</button>' +
-            '</div>' +
-            '<pre class="p-3 font-mono text-[11px] text-cyan-300 overflow-x-auto select-text">' + chunk + '</pre>' +
-          '</div>';
-        }
-        return chunk;
-      }).join('');
-      text = text.split('`').map(function(chunk, i) { return i % 2 === 1 ? '<code class="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-mono text-[11px] border border-white/5">' + chunk + '</code>' : chunk; }).join('');
-      text = text.split('**').map(function(chunk, i) { return i % 2 === 1 ? '<b>' + chunk + '</b>' : chunk; }).join('');
-      text = text.split('*').map(function(chunk, i) { return i % 2 === 1 ? '<i>' + chunk + '</i>' : chunk; }).join('');
-      text = text.split(nl).map(function(line) {
-        if (line.indexOf('### ') === 0) return '<h3 class="text-sm font-bold text-cyan-300 mt-2 mb-1">' + line.replace('### ', '') + '</h3>';
-        return line;
-      }).join('<br/>');
 
-      // 2. Email cards
-      if (text.indexOf(':::email-card') !== -1) {
-        var cardParts = text.split(':::email-card');
-        var out = cardParts[0];
-        for (var ci = 1; ci < cardParts.length; ci++) {
-          var subParts = cardParts[ci].split(':::');
-          var cardBody = subParts[0];
-          var remainder = subParts.slice(1).join(':::');
-          // Replace <br/> back to newlines for parsing lines
-          var lines = cardBody.replace(new RegExp('<br/>', 'g'), nl).trim().split(nl);
-          var index = '', id = '', sender = '', subject = '', date = '', preview = '';
-          lines.forEach(function(l) {
-            l = l.trim();
-            if (l.indexOf('index:') === 0) index = l.replace('index:', '').trim();
-            else if (l.indexOf('id:') === 0) id = l.replace('id:', '').trim();
-            else if (l.indexOf('sender:') === 0) sender = l.replace('sender:', '').trim();
-            else if (l.indexOf('subject:') === 0) subject = l.replace('subject:', '').trim();
-            else if (l.indexOf('date:') === 0) date = l.replace('date:', '').trim();
-            else if (l.indexOf('preview:') === 0) preview = l.replace('preview:', '').trim();
+      // 3. Markdown Tables
+      text = text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, function(tableBlock) {
+        var lines = tableBlock.trim().split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+        if (lines.length >= 2 && lines[1].indexOf('---') !== -1) {
+          var headers = lines[0].split('|').slice(1, -1).map(function(h) { return h.trim(); });
+          var rows = lines.slice(2).map(function(r) { return r.split('|').slice(1, -1).map(function(c) { return c.trim(); }); });
+          
+          var tableHtml = '<div class="my-3 overflow-x-auto rounded-xl border border-white/10 shadow-sm"><table class="w-full text-left text-xs border-collapse font-sans">';
+          tableHtml += '<thead class="bg-black/60 border-b border-white/10 text-cyan-300 font-mono text-[11px]"><tr>';
+          headers.forEach(function(h) { tableHtml += '<th class="p-2.5 font-bold">' + h + '</th>'; });
+          tableHtml += '</tr></thead><tbody class="divide-y divide-white/5">';
+          rows.forEach(function(r) {
+            tableHtml += '<tr class="hover:bg-white/5 transition">';
+            r.forEach(function(c) { tableHtml += '<td class="p-2.5 text-slate-200">' + c + '</td>'; });
+            tableHtml += '</tr>';
           });
-          out += '<div class="my-2.5 p-3.5 rounded-xl bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500/50 transition space-y-2 shadow-md">' +
-            '<div class="flex items-center justify-between">' +
-              '<div class="flex items-center space-x-2">' +
-                '<span class="w-5 h-5 rounded-full bg-indigo-600/50 text-indigo-300 font-mono text-[10px] flex items-center justify-center font-bold">#' + index + '</span>' +
-                '<span class="text-xs font-semibold text-slate-200">' + sender + '</span>' +
-              '</div>' +
-              '<span class="text-[10px] font-mono text-slate-400">' + date + '</span>' +
-            '</div>' +
-            '<div class="text-xs font-medium text-cyan-300">' + subject + '</div>' +
-            '<div class="text-[11px] text-slate-300 leading-relaxed">' + preview + '</div>' +
-            '<div class="pt-1.5 flex items-center space-x-2 border-t border-white/5">' +
-              '<button data-cmd="read email ' + index + '" onclick="setChatPrompt(this.dataset.cmd); sendChatMessage();" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 cursor-pointer transition">' +
-                '📖 Read Full Email' +
-              '</button>' +
-            '</div>' +
-          '</div>' + remainder;
+          tableHtml += '</tbody></table></div>';
+          return tableHtml;
         }
-        text = out;
-      }
+        return tableBlock;
+      });
 
-      // 3. Email full
-      if (text.indexOf(':::email-full') !== -1) {
-        var fullParts = text.split(':::email-full');
-        var fullOut = fullParts[0];
-        for (var fi = 1; fi < fullParts.length; fi++) {
-          var subFullParts = fullParts[fi].split(':::');
-          var fullBodyText = subFullParts[0];
-          var fullRemainder = subFullParts.slice(1).join(':::');
-          var fullLines = fullBodyText.replace(new RegExp('<br/>', 'g'), nl).trim().split(nl);
-          var fId = '', fSender = '', fSubject = '', fDate = '', fBody = '';
-          var fReadingBody = false;
-          fullLines.forEach(function(l) {
-            l = l.trim();
-            if (fReadingBody) {
-              fBody += l + '<br/>';
-            } else if (l.indexOf('id:') === 0) fId = l.replace('id:', '').trim();
-            else if (l.indexOf('sender:') === 0) fSender = l.replace('sender:', '').trim();
-            else if (l.indexOf('subject:') === 0) fSubject = l.replace('subject:', '').trim();
-            else if (l.indexOf('date:') === 0) fDate = l.replace('date:', '').trim();
-            else if (l.indexOf('body:') === 0) {
-              fReadingBody = true;
-            }
-          });
-          fullOut += '<div class="my-3 p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 space-y-3 shadow-lg">' +
-            '<div class="flex items-center justify-between border-b border-white/10 pb-2">' +
-              '<div>' +
-                '<div class="text-xs font-bold text-white">' + fSubject + '</div>' +
-                '<div class="text-[11px] text-cyan-300">From: ' + fSender + '</div>' +
-              '</div>' +
-              '<span class="text-[10px] font-mono text-slate-400">' + fDate + '</span>' +
-            '</div>' +
-            '<div class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans max-h-80 overflow-y-auto pr-1">' + fBody + '</div>' +
-          '</div>' + fullRemainder;
-        }
-        text = fullOut;
-      }
+      // 4. Alert & Callout blocks (> [!NOTE], > [!TIP], etc.)
+      text = text.replace(/&gt;\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]([^\n]*)\n((?:&gt;[^\n]*\n?)*)/gi, function(match, type, title, body) {
+        var cleanBody = body.replace(/&gt;\s?/g, '').trim();
+        var upperType = type.toUpperCase();
+        var colorClass = "border-indigo-500/50 bg-indigo-950/30 text-indigo-300";
+        var icon = "info";
+        if (upperType === 'TIP') { colorClass = "border-emerald-500/50 bg-emerald-950/30 text-emerald-300"; icon = "lightbulb"; }
+        if (upperType === 'IMPORTANT') { colorClass = "border-cyan-500/50 bg-cyan-950/30 text-cyan-300"; icon = "alert-circle"; }
+        if (upperType === 'WARNING') { colorClass = "border-amber-500/50 bg-amber-950/30 text-amber-300"; icon = "alert-triangle"; }
+        if (upperType === 'CAUTION') { colorClass = "border-rose-500/50 bg-rose-950/30 text-rose-300"; icon = "shield-alert"; }
+
+        return '<div class="my-3 p-3.5 rounded-xl border ' + colorClass + ' space-y-1 shadow-sm">' +
+          '<div class="font-bold text-xs uppercase font-mono tracking-wider flex items-center space-x-1.5">' +
+            '<i data-lucide="' + icon + '" class="w-3.5 h-3.5"></i>' +
+            '<span>' + escapeHtml(title ? title.trim() : upperType) + '</span>' +
+          '</div>' +
+          '<div class="text-xs text-slate-200 leading-relaxed font-sans">' + cleanBody + '</div>' +
+        '</div>';
+      });
+
+      // 5. Standard Blockquotes (&gt; text)
+      text = text.replace(/((?:&gt;[^\n]*\n?)+)/g, function(quoteBlock) {
+        var clean = quoteBlock.replace(/&gt;\s?/g, '').trim();
+        return '<blockquote class="my-2.5 pl-3.5 py-1.5 border-l-4 border-cyan-400 bg-cyan-950/20 text-slate-200 text-xs italic rounded-r-lg font-sans leading-relaxed shadow-sm">' + clean + '</blockquote>';
+      });
+
+      // 6. Headers
+      text = text.replace(/^####\s+(.*$)/gim, '<h4 class="text-xs font-bold text-indigo-300 mt-3 mb-1 font-display tracking-tight">$1</h4>');
+      text = text.replace(/^###\s+(.*$)/gim, '<h3 class="text-sm font-bold text-cyan-300 mt-4 mb-1.5 font-display flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span>$1</span></h3>');
+      text = text.replace(/^##\s+(.*$)/gim, '<h2 class="text-base font-bold text-white mt-5 mb-2 font-display border-b border-white/10 pb-1.5 tracking-tight flex items-center space-x-2"><span class="w-2 h-2 rounded bg-indigo-500"></span><span>$1</span></h2>');
+      text = text.replace(/^#\s+(.*$)/gim, '<h1 class="text-lg font-extrabold text-white mt-6 mb-3 font-display border-b-2 border-indigo-500 pb-2 tracking-tight">$1</h1>');
+
+      // 7. Horizontal rules
+      text = text.replace(/^(?:---|___|\*\*\*)$/gim, '<hr class="my-4 border-white/10" />');
+
+      // 8. Bold, Italics, Inline Code, Links
+      text = text.replace(/\*\*(.*?)\*\*/g, '<b class="font-bold text-white">$1</b>');
+      text = text.replace(/\*(.*?)\*/g, '<i class="italic text-slate-300">$1</i>');
+      text = text.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-mono text-[11px] border border-white/10">$1</code>');
+      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center space-x-0.5">$1 <i data-lucide="external-link" class="w-2.5 h-2.5 ml-0.5 inline"></i></a>');
+
+      // 9. Bullet lists & Numbered lists
+      text = text.replace(/^-\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-disc">$1</li>');
+      text = text.replace(/^\*\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-disc">$1</li>');
+      text = text.replace(/^\d+\.\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-decimal">$1</li>');
+
+      // 10. Restore code & mermaid blocks
+      codeBlocks.forEach(function(block, idx) {
+        text = text.replace('__CODE_BLOCK_' + idx + '__', block);
+      });
 
       return text;
     }
@@ -7444,45 +7576,320 @@ DASHBOARD_HTML = """
       }
     }
 
+    let activeResearchDossier = null;
+
+    // ── Standalone Export Helpers (Word, PDF, Markdown) ──
+    function exportHTMLAsWordDocument(filename, title, htmlBody) {
+      playCyberClick(1100);
+      var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+        '<head><meta charset="utf-8"><title>' + escapeHtml(title) + '</title>' +
+        '<style>' +
+          'body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1e293b; margin: 40px; }' +
+          'h1 { font-size: 20pt; color: #1e1b4b; border-bottom: 2px solid #6366f1; padding-bottom: 6px; margin-bottom: 12px; font-weight: bold; }' +
+          'h2 { font-size: 14pt; color: #312e81; margin-top: 18px; margin-bottom: 8px; font-weight: bold; }' +
+          'h3 { font-size: 12pt; color: #4338ca; margin-top: 14px; margin-bottom: 6px; font-weight: bold; }' +
+          'p { margin-bottom: 10px; }' +
+          '.exec-summary { background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 12px; margin-bottom: 16px; border-radius: 4px; font-style: italic; }' +
+          '.think-trace { background-color: #f5f3ff; border-left: 4px solid #8b5cf6; padding: 12px; margin-bottom: 16px; font-family: Consolas, monospace; font-size: 9.5pt; color: #4c1d95; }' +
+          '.section-card { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; margin-bottom: 14px; border-radius: 6px; }' +
+          'ul { margin-top: 4px; margin-bottom: 10px; padding-left: 20px; }' +
+          'li { margin-bottom: 4px; }' +
+          'table { border-collapse: collapse; width: 100%; margin: 12px 0; }' +
+          'th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }' +
+          'th { background-color: #f1f5f9; font-weight: bold; }' +
+          'code { font-family: Consolas, monospace; background: #e2e8f0; padding: 2px 4px; border-radius: 3px; font-size: 10pt; }' +
+          'pre { background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-family: Consolas, monospace; font-size: 9pt; }' +
+          '.footer { margin-top: 30px; font-size: 9pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }' +
+        '</style>' +
+        '</head><body>' +
+        '<h1>' + escapeHtml(title) + '</h1>';
+      var footer = '<div class="footer">Generated autonomously by Personal AI OS — Deep Autonomous Research & Intelligence Engine on ' + new Date().toLocaleString() + '</div></body></html>';
+      var fullDoc = header + htmlBody + footer;
+      var blob = new Blob(['\ufeff' + fullDoc], { type: 'application/msword' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var cleanName = (filename || 'Personal_AI_OS_Document').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
+      a.download = cleanName.endsWith('.doc') ? cleanName : cleanName + '.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showProactiveToast('Word Document Downloaded', 'Exported "' + a.download + '" successfully.');
+    }
+
+    function exportHTMLAsPDFDocument(title, htmlBody) {
+      playCyberClick(1100);
+      var printArea = document.getElementById('printable-document-area');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'printable-document-area';
+        document.body.appendChild(printArea);
+      }
+      printArea.innerHTML = '<div style="font-family: \'Inter\', -apple-system, sans-serif; color: #0f172a; background: #ffffff; padding: 20px; max-width: 900px; margin: 0 auto; line-height: 1.6;">' +
+        '<div style="border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px;">' +
+          '<h1 style="font-size: 22px; font-weight: 800; color: #1e1b4b; margin: 0 0 6px 0;">' + escapeHtml(title) + '</h1>' +
+          '<div style="font-size: 11px; color: #64748b; font-family: monospace;">Personal AI OS — Autonomous Research & Knowledge Dossier | ' + new Date().toLocaleDateString() + '</div>' +
+        '</div>' +
+        htmlBody +
+        '<div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #94a3b8; font-family: monospace;">Personal AI OS Intelligence Engine | Standalone Print Export</div>' +
+      '</div>';
+      window.print();
+    }
+
+    function exportDocumentAsMarkdown(filename, markdownContent) {
+      playCyberClick(900);
+      var blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var cleanName = (filename || 'document').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
+      a.download = cleanName.endsWith('.md') ? cleanName : cleanName + '.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showProactiveToast('Markdown File Saved', 'Downloaded "' + a.download + '".');
+    }
+
+    // ── Research Dossier Export Handlers ──
+    function exportActiveResearchAsWord() {
+      if (!activeResearchDossier) {
+        alert('No research dossier currently loaded to export.');
+        return;
+      }
+      var title = activeResearchDossier.topic || 'Deep Technical Research';
+      var bodyHtml = '';
+      if (activeResearchDossier.executive_summary) {
+        bodyHtml += '<div class="exec-summary"><b>Executive Summary:</b> ' + escapeHtml(activeResearchDossier.executive_summary) + '</div>';
+      }
+      if (activeResearchDossier.thought_process) {
+        bodyHtml += '<h2>DeepSeek R1 Reasoning Trace</h2><div class="think-trace">' + escapeHtml(activeResearchDossier.thought_process) + '</div>';
+      }
+      if (activeResearchDossier.mermaid_diagram) {
+        bodyHtml += '<h2>System Architecture Workflow</h2><pre>' + escapeHtml(activeResearchDossier.mermaid_diagram) + '</pre>';
+      }
+      if (activeResearchDossier.sections && activeResearchDossier.sections.length > 0) {
+        bodyHtml += '<h2>In-Depth Technical Analysis</h2>';
+        activeResearchDossier.sections.forEach(function(sec) {
+          bodyHtml += '<div class="section-card"><h3>' + escapeHtml(sec.aspect) + '</h3><p>' + escapeHtml(sec.summary) + '</p>';
+          if (sec.highlights && sec.highlights.length > 0) {
+            bodyHtml += '<ul>' + sec.highlights.map(function(h) { return '<li>' + escapeHtml(h) + '</li>'; }).join('') + '</ul>';
+          }
+          bodyHtml += '</div>';
+        });
+      }
+      if (activeResearchDossier.sources && activeResearchDossier.sources.length > 0) {
+        bodyHtml += '<h2>Citations & Sources</h2><ul>';
+        activeResearchDossier.sources.forEach(function(s) {
+          bodyHtml += '<li><a href="' + escapeHtml(s.url) + '">' + escapeHtml(s.title || s.url) + '</a></li>';
+        });
+        bodyHtml += '</ul>';
+      }
+      exportHTMLAsWordDocument('Deep_Research_' + title, title, bodyHtml);
+    }
+
+    function exportActiveResearchAsPDF() {
+      if (!activeResearchDossier) {
+        alert('No research dossier currently loaded to export.');
+        return;
+      }
+      var title = activeResearchDossier.topic || 'Deep Technical Research';
+      var contentEl = document.getElementById('research-dossier-content');
+      if (contentEl) {
+        exportHTMLAsPDFDocument(title, contentEl.innerHTML);
+      }
+    }
+
+    function exportActiveResearchAsMarkdown() {
+      if (!activeResearchDossier) {
+        alert('No research dossier currently loaded to export.');
+        return;
+      }
+      var topic = activeResearchDossier.topic || 'Research';
+      var md = '---\n' +
+        'title: "Deep Research: ' + topic + '"\n' +
+        'date: ' + (activeResearchDossier.timestamp || new Date().toISOString()) + '\n' +
+        'model: ' + (activeResearchDossier.model || 'deepseek-r1:7b') + '\n' +
+        'tags: [research, deepseek-r1, architecture]\n' +
+        '---\n\n' +
+        '# 🔬 Deep Research Dossier: ' + topic + '\n\n' +
+        '> **Executive Summary**: ' + (activeResearchDossier.executive_summary || '') + '\n\n';
+      if (activeResearchDossier.thought_process) {
+        md += '### 🧠 DeepSeek R1 Reasoning Trace\n> *' + activeResearchDossier.thought_process + '*\n\n';
+      }
+      if (activeResearchDossier.mermaid_diagram) {
+        md += '## 📐 System & Architecture Workflow\n```mermaid\n' + activeResearchDossier.mermaid_diagram + '\n```\n\n';
+      }
+      if (activeResearchDossier.sections) {
+        md += '## 🔍 In-Depth Research Sections\n\n';
+        activeResearchDossier.sections.forEach(function(s) {
+          md += '### ⚡ ' + s.aspect + '\n*' + s.summary + '*\n\n';
+          if (s.highlights) {
+            md += '**Key Insights:**\n';
+            s.highlights.forEach(function(h) { md += '- ' + h + '\n'; });
+            md += '\n';
+          }
+        });
+      }
+      if (activeResearchDossier.sources) {
+        md += '## 📚 Citations & References\n';
+        activeResearchDossier.sources.forEach(function(src) {
+          md += '- [' + (src.title || src.url) + '](' + src.url + ')\n';
+        });
+      }
+      exportDocumentAsMarkdown('Deep_Research_' + topic, md);
+    }
+
+    function copyActiveResearchDossier(btn) {
+      if (!activeResearchDossier) return;
+      var text = activeResearchDossier.executive_summary || '';
+      if (activeResearchDossier.sections) {
+        text += '\n\n' + activeResearchDossier.sections.map(function(s) { return s.aspect + ':\n' + s.summary; }).join('\n\n');
+      }
+      navigator.clipboard.writeText(text).then(function() {
+        playHudBeep(1400);
+        showProactiveToast('Dossier Copied', 'Research summary copied to clipboard.');
+        if (btn) {
+          var orig = btn.innerHTML;
+          btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span>Copied</span>';
+          refreshIcons();
+          setTimeout(function() { btn.innerHTML = orig; refreshIcons(); }, 2000);
+        }
+      });
+    }
+
+    // ── Obsidian Note Export Handlers ──
+    function exportCurrentObsidianNoteAsWord() {
+      if (!activeObsidianNote) {
+        alert('Please open a note first.');
+        return;
+      }
+      var title = activeObsidianNote.title || 'Obsidian Note';
+      var bodyHtml = formatMarkdownText(activeObsidianNote.content);
+      exportHTMLAsWordDocument('Note_' + title, title, bodyHtml);
+    }
+
+    function exportCurrentObsidianNoteAsPDF() {
+      if (!activeObsidianNote) {
+        alert('Please open a note first.');
+        return;
+      }
+      var title = activeObsidianNote.title || 'Obsidian Note';
+      var bodyHtml = formatMarkdownText(activeObsidianNote.content);
+      exportHTMLAsPDFDocument(title, bodyHtml);
+    }
+
+    function exportCurrentObsidianNoteAsMarkdown() {
+      if (!activeObsidianNote) {
+        alert('Please open a note first.');
+        return;
+      }
+      exportDocumentAsMarkdown(activeObsidianNote.title || 'note', activeObsidianNote.content);
+    }
+
     function renderDossierInUI(dossier) {
+      activeResearchDossier = dossier;
       const content = document.getElementById('research-dossier-content');
       const titleEl = document.getElementById('research-dossier-title');
+      const obsidianBadge = document.getElementById('research-obsidian-badge');
       if (!content || !dossier) return;
 
       if (titleEl) titleEl.textContent = `🔬 ${dossier.topic}`;
+      if (obsidianBadge) obsidianBadge.classList.remove('hidden');
+
+      const modelName = dossier.model || 'DeepSeek R1 (7B Local Reasoner)';
+      const timestamp = dossier.timestamp ? new Date(dossier.timestamp).toLocaleString() : new Date().toLocaleString();
+      const sourcesCount = (dossier.sources || []).length;
+      const sectionsCount = (dossier.sections || []).length;
 
       let html = `
-        <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2">
-          <div class="font-bold text-cyan-300 text-xs uppercase font-mono tracking-wider">Executive Summary</div>
-          <p class="text-xs text-slate-200 leading-relaxed font-sans">${escapeHtml(dossier.executive_summary || '')}</p>
+        <!-- Header Metadata Badges -->
+        <div class="p-3 rounded-xl bg-black/40 border theme-border flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono">
+          <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+            <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🤖 Core: ${escapeHtml(modelName)}</span>
+            <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">📊 Depth: ${dossier.depth || 2} (${sectionsCount} Aspects)</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📚 ${sourcesCount} Verified Citations</span>
+          </div>
+          <span class="text-slate-400">🕒 ${escapeHtml(timestamp)}</span>
         </div>
 
-        <div class="space-y-2 pt-2">
-          <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
-            <i data-lucide="git-merge" class="w-3.5 h-3.5 text-cyan-400"></i>
-            <span>Architecture & Workflow Diagram</span>
+        <!-- Executive Summary Featured Card -->
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-indigo-950/30 to-purple-950/40 border-2 border-cyan-500/40 space-y-2.5 shadow-lg">
+          <div class="flex items-center space-x-2 text-cyan-300 text-xs font-bold uppercase font-mono tracking-wider">
+            <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>
+            <span>Executive Intelligence Summary</span>
           </div>
-          <div class="p-4 rounded-xl bg-black/60 border theme-border overflow-x-auto text-center">
-            <pre class="mermaid text-xs font-mono">${dossier.mermaid_diagram || ''}</pre>
-          </div>
+          <p class="text-sm text-slate-100 leading-relaxed font-sans font-medium select-text">${escapeHtml(dossier.executive_summary || '')}</p>
         </div>
+      `;
 
+      // DeepSeek R1 <think> Chain of Thought Accordion
+      if (dossier.thought_process) {
+        html += `
+          <details class="group rounded-2xl bg-purple-950/20 border border-purple-500/30 overflow-hidden transition">
+            <summary class="p-3.5 flex items-center justify-between cursor-pointer text-xs font-bold text-purple-300 hover:text-white select-none transition">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="brain" class="w-4 h-4 text-purple-400 group-open:rotate-12 transition-transform"></i>
+                <span>DeepSeek R1 Chain-of-Thought Reasoning Trace (<think> Process)</span>
+              </div>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-purple-400 group-open:rotate-180 transition-transform"></i>
+            </summary>
+            <div class="p-4 bg-black/60 border-t border-purple-500/20 text-[11px] font-mono text-purple-200 leading-relaxed italic whitespace-pre-wrap select-text">
+              ${escapeHtml(dossier.thought_process)}
+            </div>
+          </details>
+        `;
+      }
+
+      // Architecture & Workflow Diagram Card
+      if (dossier.mermaid_diagram) {
+        html += `
+          <div class="space-y-2 pt-2">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
+                <i data-lucide="git-merge" class="w-4 h-4 text-cyan-400"></i>
+                <span>System Architecture & Workflow Diagram</span>
+              </div>
+              <button onclick="copyCodeSnippetDirect('${escapeHtml(dossier.mermaid_diagram).replace(/'/g, "\\'")}')" class="text-[10px] font-mono text-cyan-400 hover:text-white flex items-center space-x-1 cursor-pointer transition">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Copy Mermaid Code</span>
+              </button>
+            </div>
+            <div class="p-5 rounded-2xl bg-black/70 border theme-border overflow-x-auto text-center shadow-inner">
+              <pre class="mermaid text-xs font-mono">${dossier.mermaid_diagram}</pre>
+            </div>
+          </div>
+        `;
+      }
+
+      // Structured Technical Analysis Sections
+      html += `
         <div class="space-y-4 pt-2">
           <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
-            <i data-lucide="layers" class="w-3.5 h-3.5 text-purple-400"></i>
-            <span>Structured Technical Analysis</span>
+            <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+            <span>Detailed Architectural Breakdown & Evidence</span>
           </div>
       `;
 
-      (dossier.sections || []).forEach(sec => {
+      (dossier.sections || []).forEach((sec, idx) => {
         html += `
-          <div class="p-3.5 rounded-xl bg-black/40 border theme-border space-y-2">
-            <div class="text-xs font-bold text-indigo-300">${escapeHtml(sec.aspect)}</div>
-            <p class="text-xs text-slate-300 font-sans leading-relaxed">${escapeHtml(sec.summary)}</p>
+          <div class="p-4 rounded-2xl bg-black/40 border theme-border hover:border-indigo-500/50 transition space-y-2.5 shadow-sm">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2">
+              <div class="text-xs font-bold text-cyan-300 flex items-center space-x-2 font-display">
+                <span class="w-5 h-5 rounded-full bg-indigo-600/40 text-indigo-300 text-[10px] font-mono flex items-center justify-center font-bold">0${idx+1}</span>
+                <span>${escapeHtml(sec.aspect)}</span>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500">Query: ${escapeHtml(sec.query || '')}</span>
+            </div>
+            <p class="text-xs text-slate-200 font-sans leading-relaxed select-text">${escapeHtml(sec.summary)}</p>
             ${(sec.highlights && sec.highlights.length > 0) ? `
-              <ul class="list-disc list-inside text-[11px] text-slate-400 space-y-1 font-mono pl-1">
-                ${sec.highlights.map(h => `<li>${escapeHtml(h)}</li>`).join('')}
-              </ul>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/5 space-y-1.5 mt-2">
+                <div class="text-[10px] font-bold uppercase font-mono text-slate-400">Key Evidence & Takeaways:</div>
+                <ul class="list-disc list-inside text-xs text-slate-300 space-y-1 font-sans pl-1 select-text">
+                  ${sec.highlights.map(h => `<li>${escapeHtml(h)}</li>`).join('')}
+                </ul>
+              </div>
             ` : ''}
           </div>
         `;
@@ -7490,15 +7897,22 @@ DASHBOARD_HTML = """
 
       html += `</div>`;
 
+      // Citations & Verified Sources
       if (dossier.sources && dossier.sources.length > 0) {
         html += `
-          <div class="space-y-2 pt-2 border-t border-white/5">
-            <div class="font-bold text-white text-xs font-mono">📚 Citations & Verified Sources</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+          <div class="space-y-3 pt-3 border-t border-white/10">
+            <div class="font-bold text-white text-xs font-mono flex items-center space-x-2">
+              <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+              <span>📚 Verified Citations & Technical Sources</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
               ${dossier.sources.map(s => `
-                <a href="${escapeHtml(s.url)}" target="_blank" class="p-2 rounded-lg bg-black/30 border theme-border hover:border-cyan-400 text-cyan-300 truncate flex items-center space-x-1.5 transition">
-                  <i data-lucide="external-link" class="w-3 h-3 flex-shrink-0"></i>
-                  <span class="truncate">${escapeHtml(s.title || s.url)}</span>
+                <a href="${escapeHtml(s.url)}" target="_blank" class="p-3 rounded-xl bg-black/40 border theme-border hover:border-cyan-400 text-cyan-300 truncate flex flex-col justify-between transition group shadow-sm">
+                  <div class="font-bold text-white truncate group-hover:text-cyan-300 transition text-xs flex items-center space-x-1.5">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-cyan-400 flex-shrink-0"></i>
+                    <span class="truncate">${escapeHtml(s.title || s.url)}</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-slate-400 truncate pt-1">${escapeHtml(s.url)}</span>
                 </a>
               `).join('')}
             </div>
@@ -7519,6 +7933,77 @@ DASHBOARD_HTML = """
       }
     }
 
+    function copyCodeSnippetDirect(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        playHudBeep(1200);
+        showProactiveToast('Code Copied', 'Mermaid code copied to clipboard.');
+      });
+    }
+
+    async function loadPastResearchDossier(filename) {
+      playCyberClick(800);
+      try {
+        const res = await fetch(`/api/research/dossier?filename=${encodeURIComponent(filename)}`);
+        const data = await res.json();
+        if (!res.ok || !data.content) {
+          showProactiveToast('Error', 'Could not load dossier.');
+          return;
+        }
+
+        // Parse markdown into dossier object
+        const content = data.content;
+        let topic = data.title.replace(/^Research\/\d{4}-\d{2}-\d{2}\s*-\s*/, '').replace(/^\d{4}-\d{2}-\d{2}\s*-\s*/, '');
+        let execSummary = '';
+        let thought = '';
+        let mermaidCode = '';
+
+        const summaryMatch = content.match(/> \*\*Executive Summary\*\*:\s*([^\n]+)/);
+        if (summaryMatch) execSummary = summaryMatch[1].trim();
+
+        const thinkMatch = content.match(/### 🧠 DeepSeek R1 Reasoning Trace\s*\n>\s*\*(.*?)\*/s);
+        if (thinkMatch) thought = thinkMatch[1].trim();
+
+        const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)```/);
+        if (mermaidMatch) mermaidCode = mermaidMatch[1].trim();
+
+        // Extract sections
+        const sections = [];
+        const sectionRegex = /### ⚡ (.*?)\n\*(.*?)\*\n(?:\n\*\*Key Insights:\*\*\n([\s\S]*?))?(?=\n###|\n##|$)/g;
+        let match;
+        while ((match = sectionRegex.exec(content)) !== null) {
+          const aspect = match[1].trim();
+          const summary = match[2].trim();
+          const rawHighlights = match[3] || '';
+          const highlights = rawHighlights.split('\n').map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean);
+          sections.push({ aspect: aspect, summary: summary, highlights: highlights });
+        }
+
+        // Extract sources
+        const sources = [];
+        const sourceRegex = /- \[(.*?)\]\((.*?)\)/g;
+        let srcMatch;
+        while ((srcMatch = sourceRegex.exec(content)) !== null) {
+          sources.push({ title: srcMatch[1], url: srcMatch[2] });
+        }
+
+        const dossier = {
+          topic: topic,
+          timestamp: data.modified ? new Date(data.modified * 1000).toISOString() : new Date().toISOString(),
+          executive_summary: execSummary || 'Technical deep-dive and intelligence report.',
+          thought_process: thought,
+          mermaid_diagram: mermaidCode,
+          sections: sections.length > 0 ? sections : [{ aspect: "Overview", summary: content.substring(0, 400), highlights: [] }],
+          sources: sources,
+          model: "deepseek-r1:7b"
+        };
+
+        renderDossierInUI(dossier);
+        showProactiveToast('Dossier Loaded', `Loaded "${topic}".`);
+      } catch (e) {
+        console.error('Failed to load past research dossier:', e);
+      }
+    }
+
     async function fetchResearchHistory() {
       try {
         const res = await fetch('/api/research/history');
@@ -7533,20 +8018,29 @@ DASHBOARD_HTML = """
           return;
         }
 
-        history.forEach(item => {
+        history.forEach((item, idx) => {
           const card = document.createElement('div');
-          card.className = 'p-3 rounded-xl theme-card border hover:border-cyan-400 transition cursor-pointer space-y-1 text-xs';
+          card.className = 'p-3.5 rounded-xl theme-card border hover:border-cyan-400 transition cursor-pointer space-y-1.5 text-xs shadow-sm';
           card.onclick = () => {
-            playCyberClick(700);
-            switchTab('obsidian');
-            searchObsidianNotesDirect(item.title);
+            loadPastResearchDossier(item.filename);
           };
+          const cleanTitle = item.title.replace(/^\d{4}-\d{2}-\d{2}\s*-\s*/, '');
           card.innerHTML = `
-            <div class="font-bold text-white truncate">${escapeHtml(item.title)}</div>
-            <div class="text-[10px] text-slate-400 line-clamp-2">${escapeHtml(item.preview)}</div>
-            <div class="text-[9px] font-mono text-cyan-400 pt-1">Click to view in Obsidian Vault ➔</div>
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-white truncate text-xs flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                <span class="truncate">${escapeHtml(cleanTitle)}</span>
+              </div>
+              <span class="text-[9px] font-mono text-cyan-400 flex-shrink-0">View ➔</span>
+            </div>
+            <div class="text-[10px] text-slate-400 line-clamp-2">${escapeHtml(item.preview.replace(/---[\s\S]*?---/, '').replace(/#.*?\n/, ''))}</div>
           `;
           listEl.appendChild(card);
+
+          // Auto-load the first item if no active dossier
+          if (idx === 0 && !activeResearchDossier) {
+            loadPastResearchDossier(item.filename);
+          }
         });
       } catch (e) {}
     }

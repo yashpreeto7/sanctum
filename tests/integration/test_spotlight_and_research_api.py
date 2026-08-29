@@ -46,6 +46,13 @@ def test_deep_research_endpoint(client: TestClient, monkeypatch):
     assert hist_resp.status_code == 200
     hist_data = hist_resp.json()
     assert "history" in hist_data
+    if hist_data["history"]:
+        sample_file = hist_data["history"][0]["filename"]
+        dossier_resp = client.get(f"/api/research/dossier?filename={sample_file}")
+        assert dossier_resp.status_code == 200
+        dossier_data = dossier_resp.json()
+        assert "content" in dossier_data
+        assert len(dossier_data["content"]) > 0
 
 
 def test_document_upload_and_list_endpoint(client: TestClient):
