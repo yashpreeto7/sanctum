@@ -5,11 +5,12 @@
   - Display / Serif: `Playfair Display` (Classic architectural serif for headings, branding, numbers).
   - Primary UI / Sans: `Space Grotesk` (Geometric modernist typography).
   - Code / Stamps: `JetBrains Mono` (High-density telemetry, log feeds, index stamps).
-- **Continuous Grid System**:
-  - 1px hairline precision borders (`.seamless-card` with `var(--border-main)`).
+- **Continuous Grid System & Sharp Corner Geometry**:
+  - **Zero Border Radius (`border-radius: 0px !important`)**: Directly mirrors `oldregime.github.io`'s pure rectilinear blueprint drafting aesthetic by eliminating all pill/bubble rounding on cards, buttons, badges, modals, inputs, and tabs.
+  - 1px hairline precision borders (`.seamless-card`, `.theme-card` with `var(--border-main)`).
   - Corner crosshairs (`.corner-crosshair` with `+` glyphs at cardinal corners).
   - Monospace eyebrow stamps (`[ 01 // OVERVIEW ]`, `[ 02 // COPILOT ]`, etc.).
-  - Zero disjointed floating rounded cards; structural continuous layout.
+  - Zero disjointed floating rounded cards; structural continuous architectural layout.
 
 ## 2. Dynamic Theming Engine & Color Architecture
 - **Theme Variables**:

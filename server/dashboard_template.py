@@ -644,6 +644,31 @@ DASHBOARD_HTML = r"""
       #blend-cursor { display: none !important; }
     }
 
+    /* ── Old Regime Architectural Precision Cornering & Sharp Blueprint Geometry ── */
+    :root {
+      --radius-corner: 0px;
+      --radius-sm: 0px;
+      --radius-sharp: 0px;
+    }
+
+    /* Universal enforcement: Overrule all Tailwind rounded classes to sharp architectural corners */
+    .rounded-3xl, .rounded-2xl, .rounded-xl, .rounded-lg, .rounded-md, .rounded, .rounded-sm,
+    [class*="rounded-2xl"], [class*="rounded-xl"], [class*="rounded-lg"], [class*="rounded-md"], [class*="rounded-3xl"], [class*="rounded-sm"] {
+      border-radius: 0px !important;
+    }
+
+    /* Convert all pill buttons, badges, and boxes to sharp rectangles while keeping small status dots/avatars circular */
+    .rounded-full:not(.avatar-circle):not(.cur-dot):not(.cur-circle):not(.status-dot):not([id^="status-dot"]):not(.badge-dot):not(.eq-bar):not(.online-pulse-dot):not(.avatar-bot):not(.theme-avatar-bot) {
+      border-radius: 0px !important;
+    }
+
+    .theme-card, .seamless-card, .bubble-card, .user-bubble, 
+    .workspace-pill, .nav-item, .btn-brand-primary, .theme-btn-primary, 
+    button, input, textarea, select, kbd, .modal-card, .toast-notification,
+    .quick-action-card, .tab-btn, .corner-crosshair {
+      border-radius: 0px !important;
+    }
+
     /* Glass Panels with Dynamic Theme & Transparency Variables */
     .theme-bg-base { background-color: var(--bg-base); }
     .theme-bg-sidebar {
@@ -664,7 +689,7 @@ DASHBOARD_HTML = r"""
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
       box-shadow: var(--shadow-card), var(--bevel-highlight);
-      border-radius: 1rem;
+      border-radius: 0px !important;
       transition: var(--card-transition);
     }
     .theme-card:hover {
@@ -679,6 +704,7 @@ DASHBOARD_HTML = r"""
     .nav-item {
       color: var(--text-muted);
       border: 1px solid transparent;
+      border-radius: 0px !important;
       transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .nav-item:hover {
@@ -1046,7 +1072,7 @@ DASHBOARD_HTML = r"""
       background-color: #fcfbfa !important;
       border-color: #0a0a0a !important;
       box-shadow: 2px 2px 0px #0a0a0a !important;
-      border-radius: 8px !important;
+      border-radius: 0px !important;
     }
     [data-theme="sovereign-manifesto"] .theme-card:hover {
       background-color: #ffffff !important;
@@ -1066,7 +1092,7 @@ DASHBOARD_HTML = r"""
     }
     [data-theme="sovereign-manifesto"] .nav-item {
       color: #0a0a0a !important;
-      border-radius: 6px !important;
+      border-radius: 0px !important;
     }
     [data-theme="sovereign-manifesto"] .nav-item:hover {
       background: #e2dac9 !important;

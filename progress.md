@@ -56,8 +56,13 @@
   - Added spring physics (`cubic-bezier(0.16, 1, 0.3, 1)`) for card hover lifts (`translateY(-2px)`), button active clicks (`scale(0.98)`), row hover glides (`translateX(2px)`), and view crossfades (`@keyframes viewFadeIn`).
   - Verified 100% pass rate in test suite.
 
+- **Phase 8: Old Regime 100% Sharp Blueprint Cornering Geometry**:
+  - Eliminated all rounded pill softening (`rounded-2xl`, `rounded-xl`, `rounded-lg`, `border-radius: 1rem`).
+  - Enforced 100% sharp rectilinear blueprint drafting geometry (`border-radius: 0px !important;`) across all cards, buttons, nav items, pills, badges, and modals in all themes.
+  - Matches the exact zero-radius drafting precision of `oldregime.github.io`.
+
 ## Current State
 - Branch: `feature/research-ux-and-sidebar-toggle`
 - Test Pass Rate: 100% (All scenarios passed).
-- UI/UX Feel: Old Regime tactile depth, inertial momentum, and layered ambient lighting active across all 14 themes.
+- UI/UX Feel: Old Regime 100% sharp cornered drafting architecture, tactile depth, inertial momentum, and layered ambient lighting active across all 14 themes.
 - Memory: Synced to on-disk persistent memory files and `claude-mem` MCP server corpus (`sovereign_os_context`).
