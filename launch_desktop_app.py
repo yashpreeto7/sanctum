@@ -65,9 +65,14 @@ def start_backend_server():
 
 
 def launch_with_pywebview():
-    """Attempts to launch a sleek standalone window via pywebview."""
+    """Attempts to launch a sleek standalone window via pywebview with dedicated user data dir."""
     try:
         import webview
+        # Set a dedicated isolated user data folder to prevent 0x8007139F lock collisions
+        data_dir = ROOT_DIR / ".tmp" / "webview2_profile"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["WEBVIEW2_USER_DATA_FOLDER"] = str(data_dir)
+
         print("[Desktop App] Launching standalone window via pywebview...")
         window = webview.create_window(
             title=APP_TITLE,
@@ -82,13 +87,13 @@ def launch_with_pywebview():
         webview.start(debug=False)
         return True
     except Exception as exc:
-        print(f"[Desktop App] pywebview launch failed ({exc}). Falling back to Native App Mode...")
+        print(f"[Desktop App] pywebview failed ({exc}). Launching Native App Mode...")
         return False
 
 
 def launch_with_native_app_mode():
-    """Fallback: Launches standalone chromeless app window via Edge or Chrome."""
-    print("[Desktop App] Launching standalone app mode via native browser engine...")
+    """Launches a standalone chromeless native application window via Edge or Chrome."""
+    print("[Desktop App] Launching standalone desktop window via native browser app mode...")
 
     # Candidate browser executables on Windows
     edge_paths = [
@@ -102,17 +107,22 @@ def launch_with_native_app_mode():
         os.path.expandvars(r"%LocalAppData%\Google\Chrome\Application\chrome.exe"),
     ]
 
+    profile_dir = ROOT_DIR / ".tmp" / "desktop_app_profile"
+    profile_dir.mkdir(parents=True, exist_ok=True)
+
     for p in edge_paths + chrome_paths:
         if os.path.exists(p):
             args = [
                 p,
                 f"--app={APP_URL}",
+                f"--user-data-dir={profile_dir}",
                 "--window-size=1440,900",
                 "--app-auto-launched",
                 f"--app-id=personal_ai_os_{PORT}",
+                "--enable-features=OverlayScrollbar",
             ]
-            print(f"[Desktop App] Launching chromeless desktop window using: {p}")
-            subprocess.Popen(args)
+            print(f"[Desktop App] Launched native standalone window using: {p}")
+            proc = subprocess.Popen(args)
             return True
 
     # Final fallback: default web browser
@@ -123,13 +133,25 @@ def launch_with_native_app_mode():
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Personal AI OS Desktop App Launcher")
+    parser.add_argument("--native", action="store_true", help="Directly launch in Native Chromium/Edge App Mode")
+    parser.add_argument("--browser", action="store_true", help="Directly open in default web browser")
+    args = parser.parse_args()
+
     server_proc = start_backend_server()
     time.sleep(0.5)
 
-    # First try pywebview
-    success = launch_with_pywebview()
-    if not success:
+    if args.browser:
+        import webbrowser
+        webbrowser.open(APP_URL)
+    elif args.native:
         launch_with_native_app_mode()
+    else:
+        # Try native app mode first for best performance and zero-lock reliability, or fallback to pywebview
+        launched = launch_with_native_app_mode()
+        if not launched:
+            launch_with_pywebview()
 
     if server_proc:
         try:
