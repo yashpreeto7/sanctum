@@ -619,6 +619,148 @@ DASHBOARD_HTML = r"""
       animation: topologyFlow 1.2s linear infinite;
     }
 
+    /* ── Dynamic Brand Component Utility Tokens ── */
+    .btn-brand-primary, .theme-btn-primary {
+      background: var(--color-brand) !important;
+      color: #ffffff !important;
+      border: 1px solid var(--border-accent) !important;
+      box-shadow: var(--glow-shadow) !important;
+      transition: all 0.15s ease;
+    }
+    .btn-brand-primary:hover, .theme-btn-primary:hover {
+      background: var(--color-brand-hover) !important;
+      transform: translateY(-1px);
+    }
+    .theme-avatar-bot {
+      background: linear-gradient(135deg, var(--color-brand), var(--color-accent)) !important;
+      color: #ffffff !important;
+      box-shadow: var(--glow-shadow) !important;
+    }
+    .user-bubble {
+      background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover)) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    .bubble-card {
+      background-color: var(--bg-card) !important;
+      border: 1px solid var(--border-main) !important;
+      color: var(--text-main) !important;
+    }
+    .theme-text-brand { color: var(--color-brand) !important; }
+    .theme-border-brand { border-color: var(--color-brand) !important; }
+
+    /* ── Sovereign Light Mode Complete Readability Overrides ── */
+    [data-theme="sovereign-light"] {
+      color-scheme: light;
+    }
+    [data-theme="sovereign-light"] body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+    [data-theme="sovereign-light"] .text-white {
+      color: #0f172a !important;
+    }
+    [data-theme="sovereign-light"] .text-slate-100,
+    [data-theme="sovereign-light"] .text-slate-200,
+    [data-theme="sovereign-light"] .text-slate-300 {
+      color: #1e293b !important;
+    }
+    [data-theme="sovereign-light"] .text-slate-400 {
+      color: #475569 !important;
+    }
+    [data-theme="sovereign-light"] .text-slate-500 {
+      color: #64748b !important;
+    }
+    [data-theme="sovereign-light"] .bg-black\/20,
+    [data-theme="sovereign-light"] .bg-black\/30,
+    [data-theme="sovereign-light"] .bg-black\/40,
+    [data-theme="sovereign-light"] .bg-black\/50,
+    [data-theme="sovereign-light"] .bg-black\/60,
+    [data-theme="sovereign-light"] .bg-black\/80 {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .bg-slate-900,
+    [data-theme="sovereign-light"] .bg-slate-900\/50,
+    [data-theme="sovereign-light"] .bg-slate-900\/60,
+    [data-theme="sovereign-light"] .bg-slate-900\/80,
+    [data-theme="sovereign-light"] .bg-slate-900\/90,
+    [data-theme="sovereign-light"] .bg-slate-800,
+    [data-theme="sovereign-light"] .bg-slate-800\/90 {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] input,
+    [data-theme="sovereign-light"] textarea,
+    [data-theme="sovereign-light"] select {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    [data-theme="sovereign-light"] input::placeholder,
+    [data-theme="sovereign-light"] textarea::placeholder {
+      color: #94a3b8 !important;
+    }
+    [data-theme="sovereign-light"] .border-white\/5,
+    [data-theme="sovereign-light"] .border-white\/10,
+    [data-theme="sovereign-light"] .border-white\/20 {
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .divide-white\/5 {
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .theme-card {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    [data-theme="sovereign-light"] .theme-card:hover {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
+    }
+    [data-theme="sovereign-light"] .theme-bg-sidebar {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .theme-bg-surface {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .waybar-hud {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-theme="sovereign-light"] .nav-item {
+      color: #475569 !important;
+    }
+    [data-theme="sovereign-light"] .nav-item:hover {
+      color: #0f172a !important;
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] .nav-item.active {
+      color: #4f46e5 !important;
+      background: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      border-left: 3px solid #4f46e5 !important;
+    }
+    [data-theme="sovereign-light"] .workspace-pill:not(.active) {
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+    [data-theme="sovereign-light"] #omarchy-crt-overlay {
+      display: none !important;
+    }
+    [data-theme="sovereign-light"] pre, 
+    [data-theme="sovereign-light"] code:not(pre code) {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+
     /* Text Selection Enablement */
     body {
       user-select: auto;
@@ -1326,7 +1468,7 @@ DASHBOARD_HTML = r"""
             <div class="p-3 border-b theme-border space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Conversations</span>
-                <button onclick="createNewChatSession(); playCyberClick();" title="New Chat" class="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition cursor-pointer">
+                <button onclick="createNewChatSession(); playCyberClick();" title="New Chat" class="p-1.5 rounded-lg btn-brand-primary transition cursor-pointer">
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
@@ -1353,7 +1495,7 @@ DASHBOARD_HTML = r"""
             <!-- Chat Topbar -->
             <div class="p-3.5 border-b theme-border bg-black/20 flex items-center justify-between">
               <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white">
+                <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white">
                   <i data-lucide="bot" class="w-4 h-4"></i>
                 </div>
                 <div>
@@ -1382,11 +1524,11 @@ DASHBOARD_HTML = r"""
             <!-- Messages Container -->
             <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-messages-box">
               <div class="flex items-start space-x-3">
-                <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
+                <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white flex-shrink-0">
                   <i data-lucide="bot" class="w-4 h-4"></i>
                 </div>
-                <div class="p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2">
-                  <div class="text-xs font-semibold text-indigo-300">Sovereign Copilot</div>
+                <div class="p-4 rounded-2xl theme-card max-w-2xl space-y-2">
+                  <div class="text-xs font-semibold theme-text-brand">Sovereign Copilot</div>
                   <p class="text-xs text-slate-200 leading-relaxed font-sans">
                     Greetings, Yashpreet. SovereignOS is online. How can I assist with executive email triaging, calendar scheduling, autonomous deep research, or knowledge vault search today?
                   </p>
@@ -1404,7 +1546,7 @@ DASHBOARD_HTML = r"""
                   <i data-lucide="paperclip" class="w-4 h-4"></i>
                 </button>
 
-                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Personal AI or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
+                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sovereign Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
                 
                 <!-- Voice Input Microphone Button -->
                 <button type="button" onclick="toggleVoiceRecording()" id="btn-voice-input" title="Voice Input (Speech-to-Text)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative">
@@ -1413,7 +1555,7 @@ DASHBOARD_HTML = r"""
                 </button>
 
                 <!-- Send Button -->
-                <button type="button" onclick="sendChatMessage(); playCyberClick();" id="chat-send-btn" class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition cursor-pointer">
+                <button type="button" onclick="sendChatMessage(); playCyberClick();" id="chat-send-btn" class="p-2 rounded-lg btn-brand-primary transition cursor-pointer">
                   <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -2602,6 +2744,142 @@ DASHBOARD_HTML = r"""
         </div>
       </div>
 
+      <!-- Section 3: Custom Theme Studio & Palette Creator -->
+      <div class="space-y-4 pt-3 border-t theme-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-300">
+            <i data-lucide="sliders" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>🎨 Custom Theme Studio & Palette Creator</span>
+          </div>
+          <button onclick="toggleCustomThemeStudio()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center space-x-1 font-mono cursor-pointer">
+            <span id="custom-theme-toggle-label">Open Studio</span>
+            <i data-lucide="chevron-down" id="custom-theme-toggle-icon" class="w-3 h-3"></i>
+          </button>
+        </div>
+
+        <div id="custom-theme-studio-panel" class="hidden p-4 rounded-2xl theme-card border space-y-4">
+          <!-- Quick Starters -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-mono text-slate-400 font-bold uppercase">Quick Palette Starters</label>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="loadCustomThemePreset('crimson')" type="button" class="px-2.5 py-1 rounded-lg bg-rose-950/40 border border-rose-500/30 hover:border-rose-400 text-rose-300 text-[11px] font-mono transition cursor-pointer">🌹 Velvet Crimson</button>
+              <button onclick="loadCustomThemePreset('emerald')" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400 text-emerald-300 text-[11px] font-mono transition cursor-pointer">🌲 Forest Emerald</button>
+              <button onclick="loadCustomThemePreset('sunset')" type="button" class="px-2.5 py-1 rounded-lg bg-amber-950/40 border border-amber-500/30 hover:border-amber-400 text-amber-300 text-[11px] font-mono transition cursor-pointer">🌅 Sunset Amber</button>
+              <button onclick="loadCustomThemePreset('cyan')" type="button" class="px-2.5 py-1 rounded-lg bg-cyan-950/40 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 text-[11px] font-mono transition cursor-pointer">🌊 Glacier Cyan</button>
+              <button onclick="loadCustomThemePreset('light_paper')" type="button" class="px-2.5 py-1 rounded-lg bg-slate-200 border border-slate-300 hover:border-indigo-400 text-slate-800 text-[11px] font-mono transition cursor-pointer">📄 Clean Paper (Light)</button>
+            </div>
+          </div>
+
+          <!-- Color Pickers Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+            <!-- 1. Base Background -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Background Base</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-bg-base" value="#0d1017" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-bg-base-hex" value="#0d1017" oninput="syncHexToPicker('custom-bg-base')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 2. Sidebar Background -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Sidebar Background</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-bg-sidebar" value="#121620" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-bg-sidebar-hex" value="#121620" oninput="syncHexToPicker('custom-bg-sidebar')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 3. Card Surface -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Card Surface</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-bg-card" value="#171d2b" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-bg-card-hex" value="#171d2b" oninput="syncHexToPicker('custom-bg-card')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 4. Primary Brand Color -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-indigo-300 font-bold">Primary Brand Accent</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-color-brand" value="#6366f1" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-color-brand-hex" value="#6366f1" oninput="syncHexToPicker('custom-color-brand')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 5. Secondary Highlight -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Secondary Accent</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-color-accent" value="#38bdf8" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-color-accent-hex" value="#38bdf8" oninput="syncHexToPicker('custom-color-accent')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 6. Main Text Color -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Main Text Color</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-text-main" value="#ffffff" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-text-main-hex" value="#ffffff" oninput="syncHexToPicker('custom-text-main')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 7. Border Color -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Border Color</label>
+              <div class="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border theme-border">
+                <input type="color" id="custom-border-main" value="#242d3e" onchange="updateCustomThemePreview()" class="w-7 h-7 rounded border-none cursor-pointer bg-transparent">
+                <input type="text" id="custom-border-main-hex" value="#242d3e" oninput="syncHexToPicker('custom-border-main')" class="w-16 bg-transparent text-[11px] font-mono text-white focus:outline-none uppercase">
+              </div>
+            </div>
+
+            <!-- 8. Theme Name -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-mono text-slate-400">Theme Name</label>
+              <input type="text" id="custom-theme-name" value="My Custom Theme" class="w-full bg-black/40 border theme-border rounded-xl p-2 text-xs text-white focus:outline-none font-mono">
+            </div>
+          </div>
+
+          <!-- Live Preview Box -->
+          <div id="custom-theme-preview-box" class="p-4 rounded-xl border transition space-y-2" style="background-color: #0d1017; border-color: #242d3e; color: #ffffff;">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div id="preview-avatar" class="w-7 h-7 rounded-lg flex items-center justify-center text-white" style="background: linear-gradient(135deg, #6366f1, #38bdf8);">
+                  <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                </div>
+                <span id="preview-title" class="font-bold text-xs" style="color: #6366f1;">Sovereign Copilot Preview</span>
+              </div>
+              <button id="preview-btn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-white shadow-sm" style="background-color: #6366f1;">
+                Primary Button
+              </button>
+            </div>
+            <p id="preview-body" class="text-xs" style="color: #ffffff;">This is a live preview of how cards, text, and buttons will render in your custom palette.</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-2 border-t theme-border">
+            <div class="flex items-center space-x-2">
+              <button onclick="exportCustomThemeJson()" type="button" class="px-3 py-1.5 rounded-lg theme-card border text-slate-300 hover:text-white text-xs font-mono flex items-center space-x-1 cursor-pointer">
+                <i data-lucide="download" class="w-3 h-3"></i>
+                <span>Export JSON</span>
+              </button>
+              <button onclick="document.getElementById('import-theme-file').click()" type="button" class="px-3 py-1.5 rounded-lg theme-card border text-slate-300 hover:text-white text-xs font-mono flex items-center space-x-1 cursor-pointer">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span>Import JSON</span>
+              </button>
+              <input type="file" id="import-theme-file" accept=".json" onchange="importCustomThemeJson(event)" class="hidden">
+            </div>
+
+            <button onclick="saveAndApplyCustomTheme(); playCyberClick();" type="button" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-semibold text-xs flex items-center space-x-1.5 shadow-lg cursor-pointer">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Save & Apply Custom Theme</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="flex items-center justify-between text-xs text-slate-400 border-t theme-border pt-4">
         <span>Themes auto-saved to local state</span>
         <button onclick="closeThemeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer">Done</button>
@@ -3312,8 +3590,16 @@ DASHBOARD_HTML = r"""
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
 
     function initThemeState() {
-      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'cyberpunk';
+      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'sovereign-slate';
       document.documentElement.setAttribute('data-theme', savedTheme);
+      if (savedTheme === 'custom') {
+        const savedCustom = localStorage.getItem('sovereign_custom_theme');
+        if (savedCustom) {
+          try {
+            applyCustomThemeVariables(JSON.parse(savedCustom));
+          } catch(e) {}
+        }
+      }
     }
 
     let currentSessionId = null;
@@ -3526,6 +3812,7 @@ DASHBOARD_HTML = r"""
         'sovereign-studio': 'Minimal Studio',
         'sovereign-obsidian': 'Obsidian Gold',
         'sovereign-light': 'Light Studio',
+        'custom': 'Custom Theme',
         'omarchy-cyberpunk': 'Cyberpunk',
         'omarchy-tokyonight': 'Tokyo Night',
         'omarchy-catppuccin': 'Catppuccin',
@@ -3536,10 +3823,265 @@ DASHBOARD_HTML = r"""
         'omarchy-dracula': 'Dracula'
       };
       
+      if (themeName === 'custom') {
+        const savedCustom = localStorage.getItem('sovereign_custom_theme');
+        if (savedCustom) {
+          try {
+            applyCustomThemeVariables(JSON.parse(savedCustom));
+          } catch(e) {}
+        }
+      }
+      
       const label = document.getElementById('current-theme-label');
       if (label) label.textContent = themeLabels[themeName] || themeName;
       appendSystemLog(`[Theme Engine] Theme switched to: ${themeLabels[themeName] || themeName}`);
       closeThemeModal();
+    }
+
+    // ── Custom Theme Studio & Palette Creator Engine ──
+    const CUSTOM_THEME_STORAGE_KEY = 'sovereign_custom_theme';
+
+    const customThemePresets = {
+      crimson: {
+        name: 'Velvet Crimson',
+        bg_base: '#0f0a0d',
+        bg_sidebar: '#170f14',
+        bg_card: '#22141c',
+        color_brand: '#f43f5e',
+        color_accent: '#fb7185',
+        text_main: '#fff1f2',
+        border_main: '#3f1d2e'
+      },
+      emerald: {
+        name: 'Forest Emerald',
+        bg_base: '#07120c',
+        bg_sidebar: '#0c1c14',
+        bg_card: '#12291d',
+        color_brand: '#10b981',
+        color_accent: '#34d399',
+        text_main: '#ecfdf5',
+        border_main: '#1a3d2c'
+      },
+      sunset: {
+        name: 'Sunset Amber',
+        bg_base: '#140c06',
+        bg_sidebar: '#1c1209',
+        bg_card: '#291b0f',
+        color_brand: '#f59e0b',
+        color_accent: '#fb923c',
+        text_main: '#fffbeb',
+        border_main: '#452b14'
+      },
+      cyan: {
+        name: 'Glacier Cyan',
+        bg_base: '#061017',
+        bg_sidebar: '#0a1924',
+        bg_card: '#0f2434',
+        color_brand: '#06b6d4',
+        color_accent: '#38bdf8',
+        text_main: '#f0fdfa',
+        border_main: '#15384e'
+      },
+      light_paper: {
+        name: 'Clean Paper (Light)',
+        bg_base: '#f8fafc',
+        bg_sidebar: '#ffffff',
+        bg_card: '#ffffff',
+        color_brand: '#4f46e5',
+        color_accent: '#0284c7',
+        text_main: '#0f172a',
+        border_main: '#e2e8f0'
+      }
+    };
+
+    function toggleCustomThemeStudio() {
+      const panel = document.getElementById('custom-theme-studio-panel');
+      const label = document.getElementById('custom-theme-toggle-label');
+      const icon = document.getElementById('custom-theme-toggle-icon');
+      if (!panel) return;
+
+      const isHidden = panel.classList.contains('hidden');
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        if (label) label.textContent = 'Close Studio';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        loadSavedCustomThemeToInputs();
+      } else {
+        panel.classList.add('hidden');
+        if (label) label.textContent = 'Open Studio';
+        if (icon) icon.style.transform = 'rotate(0deg)';
+      }
+      playCyberClick();
+      refreshIcons();
+    }
+
+    function syncHexToPicker(pickerId) {
+      const hexInput = document.getElementById(`${pickerId}-hex`);
+      const picker = document.getElementById(pickerId);
+      if (hexInput && picker && /^#[0-9A-Fa-f]{6}$/.test(hexInput.value)) {
+        picker.value = hexInput.value;
+        updateCustomThemePreview();
+      }
+    }
+
+    function updateCustomThemePreview() {
+      const bgBase = document.getElementById('custom-bg-base')?.value || '#0d1017';
+      const bgSidebar = document.getElementById('custom-bg-sidebar')?.value || '#121620';
+      const bgCard = document.getElementById('custom-bg-card')?.value || '#171d2b';
+      const colorBrand = document.getElementById('custom-color-brand')?.value || '#6366f1';
+      const colorAccent = document.getElementById('custom-color-accent')?.value || '#38bdf8';
+      const textMain = document.getElementById('custom-text-main')?.value || '#ffffff';
+      const borderMain = document.getElementById('custom-border-main')?.value || '#242d3e';
+
+      // Update hex labels
+      ['custom-bg-base', 'custom-bg-sidebar', 'custom-bg-card', 'custom-color-brand', 'custom-color-accent', 'custom-text-main', 'custom-border-main'].forEach(id => {
+        const p = document.getElementById(id);
+        const h = document.getElementById(`${id}-hex`);
+        if (p && h) h.value = p.value;
+      });
+
+      // Update preview card
+      const box = document.getElementById('custom-theme-preview-box');
+      const avatar = document.getElementById('preview-avatar');
+      const title = document.getElementById('preview-title');
+      const btn = document.getElementById('preview-btn');
+      const body = document.getElementById('preview-body');
+
+      if (box) {
+        box.style.backgroundColor = bgCard;
+        box.style.borderColor = borderMain;
+      }
+      if (avatar) avatar.style.background = `linear-gradient(135deg, ${colorBrand}, ${colorAccent})`;
+      if (title) title.style.color = colorBrand;
+      if (btn) {
+        btn.style.backgroundColor = colorBrand;
+        btn.style.boxShadow = `0 4px 14px 0 ${colorBrand}40`;
+      }
+      if (body) body.style.color = textMain;
+    }
+
+    function loadCustomThemePreset(presetKey) {
+      const p = customThemePresets[presetKey];
+      if (!p) return;
+
+      if (document.getElementById('custom-bg-base')) document.getElementById('custom-bg-base').value = p.bg_base;
+      if (document.getElementById('custom-bg-sidebar')) document.getElementById('custom-bg-sidebar').value = p.bg_sidebar;
+      if (document.getElementById('custom-bg-card')) document.getElementById('custom-bg-card').value = p.bg_card;
+      if (document.getElementById('custom-color-brand')) document.getElementById('custom-color-brand').value = p.color_brand;
+      if (document.getElementById('custom-color-accent')) document.getElementById('custom-color-accent').value = p.color_accent;
+      if (document.getElementById('custom-text-main')) document.getElementById('custom-text-main').value = p.text_main;
+      if (document.getElementById('custom-border-main')) document.getElementById('custom-border-main').value = p.border_main;
+      if (document.getElementById('custom-theme-name')) document.getElementById('custom-theme-name').value = p.name;
+
+      updateCustomThemePreview();
+      playCyberClick(1100);
+    }
+
+    function loadSavedCustomThemeToInputs() {
+      const saved = localStorage.getItem(CUSTOM_THEME_STORAGE_KEY);
+      if (saved) {
+        try {
+          const p = JSON.parse(saved);
+          if (p.bg_base && document.getElementById('custom-bg-base')) document.getElementById('custom-bg-base').value = p.bg_base;
+          if (p.bg_sidebar && document.getElementById('custom-bg-sidebar')) document.getElementById('custom-bg-sidebar').value = p.bg_sidebar;
+          if (p.bg_card && document.getElementById('custom-bg-card')) document.getElementById('custom-bg-card').value = p.bg_card;
+          if (p.color_brand && document.getElementById('custom-color-brand')) document.getElementById('custom-color-brand').value = p.color_brand;
+          if (p.color_accent && document.getElementById('custom-color-accent')) document.getElementById('custom-color-accent').value = p.color_accent;
+          if (p.text_main && document.getElementById('custom-text-main')) document.getElementById('custom-text-main').value = p.text_main;
+          if (p.border_main && document.getElementById('custom-border-main')) document.getElementById('custom-border-main').value = p.border_main;
+          if (p.name && document.getElementById('custom-theme-name')) document.getElementById('custom-theme-name').value = p.name;
+        } catch(e) {}
+      }
+      updateCustomThemePreview();
+    }
+
+    function saveAndApplyCustomTheme() {
+      const themeObj = {
+        name: document.getElementById('custom-theme-name')?.value || 'Custom Theme',
+        bg_base: document.getElementById('custom-bg-base')?.value || '#0d1017',
+        bg_sidebar: document.getElementById('custom-bg-sidebar')?.value || '#121620',
+        bg_card: document.getElementById('custom-bg-card')?.value || '#171d2b',
+        color_brand: document.getElementById('custom-color-brand')?.value || '#6366f1',
+        color_accent: document.getElementById('custom-color-accent')?.value || '#38bdf8',
+        text_main: document.getElementById('custom-text-main')?.value || '#ffffff',
+        border_main: document.getElementById('custom-border-main')?.value || '#242d3e'
+      };
+
+      localStorage.setItem(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(themeObj));
+      applyCustomThemeVariables(themeObj);
+      setThemePreset('custom');
+      playHudBeep(1300);
+      appendSystemLog(`[Theme Studio] Custom theme "${themeObj.name}" applied and saved.`);
+      closeThemeModal();
+    }
+
+    function applyCustomThemeVariables(themeObj) {
+      if (!themeObj) return;
+      const root = document.documentElement;
+      
+      root.style.setProperty('--bg-base', themeObj.bg_base);
+      root.style.setProperty('--bg-sidebar', themeObj.bg_sidebar);
+      root.style.setProperty('--bg-surface', themeObj.bg_card);
+      root.style.setProperty('--bg-card', themeObj.bg_card);
+      root.style.setProperty('--color-brand', themeObj.color_brand);
+      root.style.setProperty('--color-brand-hover', themeObj.color_brand);
+      root.style.setProperty('--color-accent', themeObj.color_accent);
+      root.style.setProperty('--text-main', themeObj.text_main);
+      root.style.setProperty('--border-main', themeObj.border_main);
+      root.style.setProperty('--border-accent', themeObj.color_brand);
+      root.style.setProperty('--glow-shadow', `0 4px 20px -2px ${themeObj.color_brand}40`);
+      root.style.setProperty('--waybar-bg', themeObj.bg_sidebar);
+    }
+
+    function exportCustomThemeJson() {
+      const themeObj = {
+        name: document.getElementById('custom-theme-name')?.value || 'Custom Theme',
+        bg_base: document.getElementById('custom-bg-base')?.value || '#0d1017',
+        bg_sidebar: document.getElementById('custom-bg-sidebar')?.value || '#121620',
+        bg_card: document.getElementById('custom-bg-card')?.value || '#171d2b',
+        color_brand: document.getElementById('custom-color-brand')?.value || '#6366f1',
+        color_accent: document.getElementById('custom-color-accent')?.value || '#38bdf8',
+        text_main: document.getElementById('custom-text-main')?.value || '#ffffff',
+        border_main: document.getElementById('custom-border-main')?.value || '#242d3e',
+        author: 'SovereignOS User',
+        created_at: new Date().toISOString()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themeObj, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `sovereign_theme_${themeObj.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      appendSystemLog(`[Theme Studio] Theme exported as JSON.`);
+    }
+
+    function importCustomThemeJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const themeObj = JSON.parse(e.target.result);
+          if (themeObj.bg_base && document.getElementById('custom-bg-base')) document.getElementById('custom-bg-base').value = themeObj.bg_base;
+          if (themeObj.bg_sidebar && document.getElementById('custom-bg-sidebar')) document.getElementById('custom-bg-sidebar').value = themeObj.bg_sidebar;
+          if (themeObj.bg_card && document.getElementById('custom-bg-card')) document.getElementById('custom-bg-card').value = themeObj.bg_card;
+          if (themeObj.color_brand && document.getElementById('custom-color-brand')) document.getElementById('custom-color-brand').value = themeObj.color_brand;
+          if (themeObj.color_accent && document.getElementById('custom-color-accent')) document.getElementById('custom-color-accent').value = themeObj.color_accent;
+          if (themeObj.text_main && document.getElementById('custom-text-main')) document.getElementById('custom-text-main').value = themeObj.text_main;
+          if (themeObj.border_main && document.getElementById('custom-border-main')) document.getElementById('custom-border-main').value = themeObj.border_main;
+          if (themeObj.name && document.getElementById('custom-theme-name')) document.getElementById('custom-theme-name').value = themeObj.name;
+
+          updateCustomThemePreview();
+          saveAndApplyCustomTheme();
+          appendSystemLog(`[Theme Studio] Successfully imported custom theme: ${themeObj.name || file.name}`);
+        } catch (err) {
+          alert("Invalid theme JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
     }
 
     function openThemeModal() {
@@ -4302,17 +4844,17 @@ DASHBOARD_HTML = r"""
       const wrapper = document.createElement('div');
       wrapper.className = 'flex items-start justify-end space-x-3 group';
       wrapper.innerHTML = `
-        <div class="user-bubble p-4 rounded-2xl bg-indigo-600 text-white max-w-2xl space-y-1.5 relative shadow-md">
+        <div class="user-bubble p-4 rounded-2xl text-white max-w-2xl space-y-1.5 relative shadow-md">
           <div class="flex items-center justify-between border-b border-white/20 pb-1">
-            <span class="text-[10px] font-mono text-indigo-200">You</span>
-            <button onclick="copyMessageText(this)" title="Copy message" class="copy-btn text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 hover:bg-black/40 text-indigo-100 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+            <span class="text-[10px] font-mono text-white/90 font-bold">You</span>
+            <button onclick="copyMessageText(this)" title="Copy message" class="copy-btn text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 hover:bg-black/40 text-white/90 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
               <i data-lucide="copy" class="w-2.5 h-2.5"></i>
               <span>Copy</span>
             </button>
           </div>
           <p class="text-xs leading-relaxed whitespace-pre-wrap select-text msg-content">${escapeHtml(text)}</p>
         </div>
-        <div class="w-8 h-8 rounded-xl bg-slate-700 flex items-center justify-center text-white flex-shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-slate-700/80 flex items-center justify-center text-white flex-shrink-0 shadow-sm">
           <i data-lucide="user" class="w-4 h-4"></i>
         </div>
       `;
@@ -4323,29 +4865,29 @@ DASHBOARD_HTML = r"""
       const wrapper = document.createElement('div');
       wrapper.className = 'flex items-start space-x-3 group';
       wrapper.innerHTML = `
-        <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
+        <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white flex-shrink-0 shadow-sm">
           <i data-lucide="bot" class="w-4 h-4"></i>
         </div>
-        <div class="bubble-card p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2 relative">
-          <div class="flex items-center justify-between border-b border-white/5 pb-1.5">
-            <div class="text-xs font-semibold text-cyan-300 flex items-center space-x-1.5">
-              <span>Personal AI</span>
+        <div class="bubble-card theme-card p-4 rounded-2xl max-w-2xl space-y-2 relative shadow-sm">
+          <div class="flex items-center justify-between border-b theme-border pb-1.5">
+            <div class="text-xs font-semibold theme-text-brand flex items-center space-x-1.5">
+              <span>Sovereign Copilot</span>
             </div>
             <div class="flex items-center space-x-1.5">
-              <button onclick="speakMessageBubble(this)" title="Read message aloud (TTS)" class="speak-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-cyan-300 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+              <button onclick="speakMessageBubble(this)" title="Read message aloud (TTS)" class="speak-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-cyan-300 border theme-border flex items-center space-x-1 cursor-pointer transition">
                 <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
                 <span>Listen</span>
               </button>
-              <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+              <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border theme-border flex items-center space-x-1 cursor-pointer transition">
                 <i data-lucide="copy" class="w-3 h-3"></i>
                 <span>Copy</span>
               </button>
             </div>
           </div>
-          <div class="text-xs text-slate-200 leading-relaxed msg-content select-text">${text ? formatMarkdownText(text) : ''}</div>
+          <div class="text-xs leading-relaxed msg-content select-text">${text ? formatMarkdownText(text) : ''}</div>
           ${runId ? `
-            <div class="pt-2 flex items-center space-x-2 border-t border-white/5">
-              <button onclick="inspectSpecificTrace('${runId}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
+            <div class="pt-2 flex items-center space-x-2 border-t theme-border">
+              <button onclick="inspectSpecificTrace('${runId}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
                 <i data-lucide="git-branch" class="w-3 h-3"></i>
                 <span>Inspect Trace (${runId})</span>
               </button>
