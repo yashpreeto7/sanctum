@@ -680,6 +680,31 @@ DASHBOARD_HTML = r"""
     .theme-text-brand { color: var(--color-brand) !important; }
     .theme-border-brand { border-color: var(--color-brand) !important; }
 
+    /* ── Universal Input and Textarea Dynamic Theming ── */
+    input, textarea, select, #chat-input-textarea, #chat-search-input, #spotlight-search-input {
+      color: var(--text-main) !important;
+    }
+    input::placeholder, textarea::placeholder, #chat-input-textarea::placeholder, #chat-search-input::placeholder {
+      color: var(--text-muted) !important;
+    }
+
+    /* ── Full Fluid Width Workspace Layout (Zero Empty Margins on Collapse) ── */
+    .view-container {
+      width: 100% !important;
+      max-width: 100% !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #main-content-scroll {
+      width: 100% !important;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    #app-sidebar.collapsed ~ main #main-content-scroll,
+    #app-sidebar.collapsed + main #main-content-scroll {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
     /* ── Sovereign Light Mode Complete Readability Overrides ── */
     [data-theme="sovereign-light"] {
       color-scheme: light;
@@ -1196,12 +1221,12 @@ DASHBOARD_HTML = r"""
         </div>
 
         <!-- New Chat Button -->
-        <button onclick="switchTab('chat'); createNewChatSession(); playCyberClick();" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs flex items-center justify-between shadow-lg shadow-indigo-500/20 transition cursor-pointer active:scale-[0.98]">
+        <button onclick="switchTab('chat'); createNewChatSession(); playCyberClick();" class="w-full py-2.5 px-4 rounded-xl btn-brand-primary font-semibold text-xs flex items-center justify-between transition cursor-pointer active:scale-[0.98]">
           <div class="flex items-center space-x-2">
             <i data-lucide="plus" class="w-4 h-4"></i>
-            <span class="font-semibold">New Session</span>
+            <span>New Session</span>
           </div>
-          <span class="text-[10px] opacity-70 font-mono">⌘N</span>
+          <span class="text-[10px] opacity-80 font-mono">⌘N</span>
         </button>
 
         <!-- Main Navigation Menu -->
@@ -1367,7 +1392,7 @@ DASHBOARD_HTML = r"""
       <div class="flex-1 overflow-y-auto p-6 space-y-6" id="main-content-scroll">
 
         <!-- ══════════════════ TAB 1: HOME ══════════════════ -->
-        <section id="view-home" class="space-y-6 max-w-7xl mx-auto">
+        <section id="view-home" class="view-container space-y-6">
           
           <!-- Hero Banner -->
           <div class="p-6 rounded-2xl theme-card border flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1390,10 +1415,10 @@ DASHBOARD_HTML = r"""
                 <span class="text-slate-400">HITL Gate</span>
                 <span id="hero-alerts-count" class="text-white font-bold">0 Pending</span>
               </div>
-              <button onclick="switchTab('chat'); focusChatInput();" class="px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs hover:bg-slate-200 transition cursor-pointer">
+              <button onclick="switchTab('chat'); focusChatInput();" class="px-4 py-2 rounded-xl btn-brand-primary font-semibold text-xs transition cursor-pointer">
                 Open Chat
               </button>
-              <button onclick="switchTab('traces')" class="px-4 py-2 rounded-xl theme-card border text-white text-xs hover:border-cyan-400 transition cursor-pointer flex items-center space-x-1.5">
+              <button onclick="switchTab('traces')" class="px-4 py-2 rounded-xl theme-card border text-slate-200 text-xs hover:border-cyan-400 transition cursor-pointer flex items-center space-x-1.5">
                 <i data-lucide="git-branch" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>View Traces</span>
               </button>
@@ -1686,7 +1711,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 2: CHAT & COPILOT ══════════════════ -->
-        <section id="view-chat" class="hidden h-[calc(100vh-140px)] max-w-7xl mx-auto flex gap-4">
+        <section id="view-chat" class="view-container hidden h-[calc(100vh-140px)] flex gap-4">
           
           <!-- LEFT SUB-COLUMN: Chat Sessions History -->
           <div class="w-72 flex-shrink-0 flex flex-col justify-between theme-card border rounded-2xl overflow-hidden">
@@ -1700,7 +1725,7 @@ DASHBOARD_HTML = r"""
               </div>
               <div class="relative">
                 <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-500"></i>
-                <input type="text" id="chat-search-input" oninput="filterChatSessionsList()" placeholder="Filter chats..." class="w-full bg-black/40 border theme-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono">
+                <input type="text" id="chat-search-input" oninput="filterChatSessionsList()" placeholder="Filter chats..." class="w-full bg-black/40 border theme-border rounded-lg pl-8 pr-3 py-1.5 text-xs placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono">
               </div>
             </div>
 
@@ -1772,7 +1797,7 @@ DASHBOARD_HTML = r"""
                   <i data-lucide="paperclip" class="w-4 h-4"></i>
                 </button>
 
-                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sovereign Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
+                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sovereign Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
                 
                 <!-- Voice Input Microphone Button -->
                 <button type="button" onclick="toggleVoiceRecording()" id="btn-voice-input" title="Voice Input (Speech-to-Text)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative">
@@ -1794,14 +1819,12 @@ DASHBOARD_HTML = r"""
                 <span>Enter: Send • Shift+Enter: Multiline</span>
               </div>
             </div>
-
           </div>
 
         </section>
 
         <!-- ══════════════════ TAB 3: TRACES (LANGSMITH INSPECTOR) ═════ -->
-        <!-- ══════════════════ TAB 3: TRACES (LANGSMITH INSPECTOR) ═════ -->
-        <section id="view-traces" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-traces" class="view-container hidden space-y-6">
           <!-- Top Control Header -->
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3 relative z-30">
             <div class="space-y-1">
@@ -1963,7 +1986,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 4: INBOX & TRIAGE ══════════════════ -->
-        <section id="view-inbox" class="hidden space-y-4 max-w-7xl mx-auto">
+        <section id="view-inbox" class="view-container hidden space-y-4">
           <!-- Top Control Header -->
           <div class="p-4 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-0.5">
@@ -1976,7 +1999,7 @@ DASHBOARD_HTML = r"""
               <p class="text-[11px] text-slate-400 font-mono">Live Gmail stream sanitized via Dual-LLM quarantine and classified by ML.</p>
             </div>
             <div class="flex items-center space-x-2 flex-wrap gap-1.5">
-              <button onclick="openAiComposeModal(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-lg shadow-cyan-500/20 active:scale-95">
+              <button onclick="openAiComposeModal(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl btn-brand-primary text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer active:scale-95">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                 <span>✉️ Compose with AI</span>
               </button>
@@ -1988,59 +2011,41 @@ DASHBOARD_HTML = r"""
                 <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>Archive Read</span>
               </button>
-              <button onclick="fetchInbox(true); playCyberClick();" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                <span>Sync Live Gmail</span>
-              </button>
-              <button onclick="simulateNormalEmail(); playCyberClick();" class="px-3 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-cyan-400 transition cursor-pointer">
-                <i data-lucide="mail-plus" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>Simulate Inbound</span>
+              <button onclick="fetchInboxEmails(); fetchSentEmails(); playCyberClick();" class="px-3 py-1.5 rounded-xl theme-card border hover:border-indigo-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span>Sync</span>
               </button>
             </div>
           </div>
 
-          <!-- Category Filter Tabs Bar -->
-          <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs font-mono select-none" id="inbox-category-tabs">
-            <button onclick="filterInboxCategory('all')" id="inbox-tab-all" class="inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/30 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer">
-              <span>📥 All Inbound</span>
-              <span id="tab-count-all" class="px-1.5 py-0.2 rounded-full bg-white/10 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('important')" id="inbox-tab-important" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-amber-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>⚡ Important</span>
-              <span id="tab-count-important" class="px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-400 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('job_career')" id="inbox-tab-job_career" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-cyan-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>💼 Career & Jobs</span>
-              <span id="tab-count-job_career" class="px-1.5 py-0.2 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('system_update')" id="inbox-tab-system_update" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-blue-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>🔔 Updates & Alerts</span>
-              <span id="tab-count-system_update" class="px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-400 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('marketing_promo')" id="inbox-tab-marketing_promo" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-purple-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>📢 Marketing & Promos</span>
-              <span id="tab-count-marketing_promo" class="px-1.5 py-0.2 rounded-full bg-purple-500/10 text-purple-400 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('likely_scam')" id="inbox-tab-likely_scam" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-rose-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>🚨 Suspicious / Scam</span>
-              <span id="tab-count-likely_scam" class="px-1.5 py-0.2 rounded-full bg-rose-500/10 text-rose-400 text-[10px]">0</span>
-            </button>
-            <button onclick="filterInboxCategory('sent')" id="inbox-tab-sent" class="inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-emerald-300 flex items-center space-x-1.5 transition cursor-pointer">
-              <span>📤 Sent Mails</span>
-              <span id="tab-count-sent" class="px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px]">0</span>
-            </button>
+          <!-- Inbox Search & Filter Bar -->
+          <div class="p-3.5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center space-x-2 flex-1 min-w-[240px]">
+              <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-1.5 flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
+                <input type="text" id="inbox-search-input" oninput="filterInboxDisplay()" placeholder="Search emails by sender, subject, or content..." class="w-full bg-transparent text-xs placeholder-slate-500 focus:outline-none font-mono">
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-1.5 font-mono text-xs select-none">
+              <button onclick="setInboxFilter('all')" id="inbox-filter-all" class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold cursor-pointer transition">All</button>
+              <button onclick="setInboxFilter('priority')" id="inbox-filter-priority" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-rose-300 hover:text-white cursor-pointer transition">🔥 Priority</button>
+              <button onclick="setInboxFilter('actionable')" id="inbox-filter-actionable" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-amber-300 hover:text-white cursor-pointer transition">⚡ Action</button>
+              <button onclick="setInboxFilter('spam')" id="inbox-filter-spam" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-slate-400 hover:text-white cursor-pointer transition">Spam</button>
+              <button onclick="setInboxFilter('sent')" id="inbox-filter-sent" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-cyan-300 hover:text-white cursor-pointer transition">📤 Sent</button>
+            </div>
           </div>
 
-          <!-- Crisp Gmail-Style Row Stream -->
-          <div class="rounded-2xl theme-card border divide-y divide-white/5 overflow-hidden shadow-xl" id="inbox-cards-stream">
-            <div class="p-8 text-center text-xs text-slate-400">
+          <!-- Email Messages Feed Stream -->
+          <div class="space-y-3" id="inbox-messages-stream">
+            <div class="p-12 text-center text-xs text-slate-500 font-mono">
               Loading inbox stream...
             </div>
           </div>
         </section>
 
         <!-- ══════════════════ TAB 5: HITL APPROVALS ══════════════════ -->
-        <section id="view-approvals" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-approvals" class="view-container hidden space-y-6">
           <!-- Top Control Header -->
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-1">
@@ -2095,7 +2100,7 @@ DASHBOARD_HTML = r"""
             <div class="p-4 rounded-2xl theme-card border flex items-center justify-between">
               <span class="text-xs font-mono text-slate-300">PAST RESOLUTIONS AUDIT TRAIL</span>
               <button onclick="clearApprovalHistory(); playCyberClick();" class="text-xs text-slate-400 hover:text-rose-400 flex items-center space-x-1 font-mono cursor-pointer">
-                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 <span>Clear Audit Trail</span>
               </button>
             </div>
@@ -2145,7 +2150,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 6: TOPOLOGY DAG ═══════════════════ -->
-        <section id="view-topology" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-topology" class="view-container hidden space-y-6">
           <!-- Header Bar -->
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-1">
@@ -2403,7 +2408,7 @@ DASHBOARD_HTML = r"""
 
 
         <!-- ══════════════════ TAB 7: KNOWLEDGE (RAG) ════════════════ -->
-        <section id="view-rag" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-rag" class="view-container hidden space-y-6">
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between">
             <div class="space-y-1">
               <h2 class="text-base font-display font-bold text-white">Hybrid Knowledge Vault (RAG)</h2>
@@ -2419,8 +2424,8 @@ DASHBOARD_HTML = r"""
           <div class="p-4 rounded-2xl theme-card border space-y-3">
             <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-2">
               <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
-              <input type="text" id="rag-query-input" placeholder="Search knowledge base (e.g., 'DocDispatch project spec', 'rahul contact')..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-mono">
-              <button onclick="triggerRagSearch(); playCyberClick();" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium cursor-pointer">Search</button>
+              <input type="text" id="rag-query-input" placeholder="Search knowledge base (e.g., 'DocDispatch project spec', 'rahul contact')..." class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none font-mono">
+              <button onclick="triggerRagSearch(); playCyberClick();" class="px-3 py-1 rounded-lg btn-brand-primary text-xs font-medium cursor-pointer">Search</button>
             </div>
             <div class="flex items-center space-x-2 text-[11px] text-slate-400">
               <span>Quick tests:</span>
@@ -2439,7 +2444,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 8: OBSIDIAN VAULT ══════════════════ -->
-        <section id="view-obsidian" class="hidden space-y-5 max-w-7xl mx-auto">
+        <section id="view-obsidian" class="view-container hidden space-y-5">
           <!-- Top Vault Status Banner -->
           <div class="p-5 rounded-2xl theme-card border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div class="space-y-1">
@@ -2455,11 +2460,11 @@ DASHBOARD_HTML = r"""
             </div>
 
             <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
-              <button onclick="openCreateObsidianNoteModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+              <button onclick="openCreateObsidianNoteModal()" class="px-3.5 py-2 rounded-xl btn-brand-primary font-semibold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
                 <i data-lucide="file-plus" class="w-3.5 h-3.5"></i>
                 <span>New Note</span>
               </button>
-              <button onclick="openObsidianDailyModal()" class="px-3.5 py-2 rounded-xl bg-indigo-600/40 hover:bg-indigo-600 border border-indigo-500 text-cyan-300 hover:text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition">
+              <button onclick="openObsidianDailyModal()" class="px-3.5 py-2 rounded-xl theme-card border text-cyan-300 hover:text-white text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition">
                 <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
                 <span>Quick Daily Log</span>
               </button>
@@ -2473,7 +2478,7 @@ DASHBOARD_HTML = r"""
           <div class="p-3.5 rounded-2xl theme-card border space-y-3">
             <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-2">
               <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
-              <input type="text" id="obsidian-search-input" oninput="filterObsidianNotes()" placeholder="Filter notes by title, tag (#action), or content..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none font-mono">
+              <input type="text" id="obsidian-search-input" oninput="filterObsidianNotes()" placeholder="Filter notes by title, tag (#action), or content..." class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none font-mono">
               <span id="obsidian-filtered-count" class="text-[10px] font-mono text-slate-400">0 notes</span>
             </div>
 
@@ -2557,7 +2562,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 9: CALENDAR ═══════════════════════ -->
-        <section id="view-calendar" class="hidden space-y-5 max-w-7xl mx-auto">
+        <section id="view-calendar" class="view-container hidden space-y-5">
           <!-- Calendar Header & Navigation Bar -->
           <div class="p-5 rounded-2xl theme-card border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
@@ -2642,7 +2647,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 10: ACTIVITY & TELEMETRY ════════════ -->
-        <section id="view-activity" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-activity" class="view-container hidden space-y-6">
           <div class="p-5 rounded-2xl theme-card border space-y-3">
             <h2 class="text-base font-display font-bold text-white">Full System Activity Stream</h2>
             <p class="text-xs text-slate-400 font-mono">Continuous event log of all API invocations, WebSocket events, and background agent state changes.</p>
@@ -2652,7 +2657,7 @@ DASHBOARD_HTML = r"""
           </div>
         </section>
 
-        <section id="view-system" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-system" class="view-container hidden space-y-6">
           <div class="p-5 rounded-2xl theme-card border space-y-4">
             <h2 class="text-base font-display font-bold text-white">System Config & Runtime Diagnostics</h2>
             <div class="grid grid-cols-2 gap-4 text-xs font-mono">
@@ -2677,7 +2682,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 11: DEEP RESEARCH ══════════════════ -->
-        <section id="view-research" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-research" class="view-container hidden space-y-6">
           <!-- Research Header & Launch Banner -->
           <div class="p-6 rounded-2xl theme-card border space-y-4 shadow-xl">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -2703,9 +2708,9 @@ DASHBOARD_HTML = r"""
             <div class="flex items-center space-x-2">
               <div class="relative flex-1">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="research-topic-input" placeholder="e.g., 'Compare vLLM vs SGLang memory allocation', 'RAG cross-encoder reranking algorithms'..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-black/50 border theme-border text-sm text-white placeholder-slate-500 font-sans focus:outline-none focus:border-cyan-400 transition" onkeydown="if(event.key==='Enter') executeDeepResearch();" />
+                <input type="text" id="research-topic-input" placeholder="e.g., 'Compare vLLM vs SGLang memory allocation', 'RAG cross-encoder reranking algorithms'..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-black/50 border theme-border text-sm placeholder-slate-500 font-sans focus:outline-none focus:border-cyan-400 transition" onkeydown="if(event.key==='Enter') executeDeepResearch();" />
               </div>
-              <button id="btn-start-research" onclick="executeDeepResearch()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20 cursor-pointer transition flex-shrink-0">
+              <button id="btn-start-research" onclick="executeDeepResearch()" class="px-6 py-3 rounded-xl btn-brand-primary font-bold text-xs flex items-center space-x-2 shadow-lg cursor-pointer transition flex-shrink-0">
                 <i data-lucide="sparkles" class="w-4 h-4"></i>
                 <span>Launch Research</span>
               </button>
@@ -2792,7 +2797,7 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 12: UNIVERSAL DOCUMENT INGESTION ════════ -->
-        <section id="view-documents" class="hidden space-y-6 max-w-7xl mx-auto">
+        <section id="view-documents" class="view-container hidden space-y-6">
           <!-- Ingestion Dropzone Banner -->
           <div class="p-6 rounded-2xl theme-card border space-y-4 shadow-xl">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
