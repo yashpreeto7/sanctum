@@ -43,7 +43,22 @@
   - Hybrid dense vector search + BM25 keyword matching + recency decay scoring.
   - Automatic indexing of all research dossiers and Obsidian notes.
 
-## 5. Persistence & Context Protocol
+## 6. Old Regime Tactile Physics, Shadows & Momentum Scrolling
+- **Lenis Inertial Scrolling**:
+  - Initialized on `#main-content-scroll` with `duration: 1.2`, cubic-bezier deceleration curve `(t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))`, `smoothWheel: true`, and `touchMultiplier: 2`.
+  - Automatic `scrollTo(0, { immediate: true })` on view tab transitions.
+- **Film Grain & Organic Texture**:
+  - `.noise-overlay` using SVG fractal noise filter (`feTurbulence`) fixed across viewport with `mix-blend-mode: overlay` (dark themes) and `multiply` (light themes) at `0.035` opacity.
+- **Dynamic Difference Follower Cursor**:
+  - `#blend-cursor` with `.cur-dot` and `.cur-circle` utilizing lerp physics (`cx += (mx - cx) * 0.18`) and `mix-blend-mode: difference`.
+  - Expands (`scale(1.65)`) over clickable elements (`button`, `a`, `.nav-item`, `.workspace-pill`, `.seamless-card`, `.theme-card`, `input`).
+- **Multi-Layer Ambient Shadows & Specular Bevels**:
+  - `--shadow-card`: 2-layer ambient occlusion + ground bounce shadow tailored to each theme's brand hue.
+  - `--bevel-highlight`: 1px specular top rim lighting (`inset 0 1px 0 0 rgba(255,255,255,0.08)` / theme color).
+  - Spring hover physics: `transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1)` with `transform: translateY(-2px)` on card hover and `scale(0.98)` on button click.
+
+## 7. Persistence & Context Protocol
 - Branch: `feature/research-ux-and-sidebar-toggle`.
 - Local Memory: `task_plan.md`, `findings.md`, `progress.md`, `CONTEXT.md`.
 - MCP Memory: `claude-mem` corpus `sovereign_os_context`.
+

@@ -48,12 +48,16 @@
 - **Status:** complete
 - [x] Applied **Old Regime design system** as foundational base: `Playfair Display` serif headers + `Space Grotesk` sans + `JetBrains Mono` code, 1px continuous precision grid borders, corner crosshair anchors (`+`), and monospace section stamps (`01 //`, `02 //`).
 - [x] Added **Sovereign Manifesto** theme preset (cream parchment `#f5f0e8`, deep charcoal ink `#0a0a0a`, Swiss vermilion accent `#d42b2b`, brutalist 2px offset shadows).
-- [x] Fixed Copilot and search text color glitch with universal dynamic input binding (`input, textarea, select { color: var(--text-main) !important; }`).
-- [x] Converted sidebar "New Session" button from static purple gradients to `.btn-brand-primary` dynamic theme styling.
-- [x] Removed all fixed-width `max-w-7xl mx-auto` containers across all 12 workspace views, replacing with `.view-container` (100% fluid edge-to-edge layout with zero left/right gutters on sidebar collapse).
+### Phase 7: Old Regime Tactile Physics, Shadows, Smooth Scrolling & Follower Cursor
+- **Status:** complete
+- [x] Integrated **Lenis Inertial Momentum Smooth Scrolling** (`https://unpkg.com/lenis@1.0.45/dist/lenis.min.js`) targeting `#main-content-scroll` with cubic bezier spring deceleration.
+- [x] Integrated **Organic SVG Film Grain Texture Overlay** (`.noise-overlay`) with `mix-blend-mode: overlay` (dark themes) and `multiply` (light themes) to eliminate digital banding.
+- [x] Implemented **Dynamic Blend-Mode Follower Cursor** (`#blend-cursor`) with lerp coordinate interpolation (`cx += (mx - cx) * 0.18`), hover expansion over interactive targets, and click scale physics.
+- [x] Engineered **Architectural Multi-Layer Ambient Shadows & Specular Bevel Highlights** (`--shadow-card`, `--shadow-card-hover`, `--bevel-highlight`, `--bevel-highlight-hover`) across all 14 theme presets and Custom Theme Studio.
+- [x] Added **Spring Physics & Micro-Interactions** (`cubic-bezier(0.16, 1, 0.3, 1)`): card hover lift (`translateY(-2px)`), button active depress (`scale(0.98)`), row glides (`translateX(2px)`), and view fade-in animations (`@keyframes viewFadeIn`).
 - [x] Verified full integration test suite (`tests/integration/test_spotlight_and_research_api.py`) with 100% pass rate.
-- [x] Committed and pushed changes to remote branch `origin/feature/research-ux-and-sidebar-toggle` (commit `b52687e`).
 
 ## Next Steps
-- User hands-on testing on branch `feature/research-ux-and-sidebar-toggle`.
-- On user approval, merge branch into `main`.
+- User hands-on testing of smooth scrolling, cursor, shadows, and tactile physics across all themes.
+- On user approval, merge branch `feature/research-ux-and-sidebar-toggle` into `main`.
+

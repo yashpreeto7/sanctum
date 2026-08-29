@@ -48,8 +48,16 @@
   - Fluid edge-to-edge `.view-container` layout across all 12 views (zero gaps on sidebar collapse).
   - Verified test suite and pushed commit `b52687e` to `origin/feature/research-ux-and-sidebar-toggle`.
 
+- **Phase 7: Old Regime Tactile Physics, Shadows, Smooth Scrolling & Follower Cursor**:
+  - Integrated Lenis inertial momentum smooth scrolling with cubic-bezier deceleration.
+  - Added organic SVG film grain texture overlay (`.noise-overlay`) with `overlay`/`multiply` blend modes across all themes.
+  - Implemented dynamic blend-mode follower cursor (`#blend-cursor`) with lerp interpolation and interactive hover physics.
+  - Added architectural multi-layer ambient shadows (`--shadow-card`, `--shadow-card-hover`) and specular bevel rim lighting (`--bevel-highlight`, `--bevel-highlight-hover`) across all 14 presets and Custom Theme Studio.
+  - Added spring physics (`cubic-bezier(0.16, 1, 0.3, 1)`) for card hover lifts (`translateY(-2px)`), button active clicks (`scale(0.98)`), row hover glides (`translateX(2px)`), and view crossfades (`@keyframes viewFadeIn`).
+  - Verified 100% pass rate in test suite.
+
 ## Current State
-- Branch: `feature/research-ux-and-sidebar-toggle` (Clean working tree, up to date with remote).
+- Branch: `feature/research-ux-and-sidebar-toggle`
 - Test Pass Rate: 100% (All scenarios passed).
-- Active Server: Running on `http://127.0.0.1:8000`.
+- UI/UX Feel: Old Regime tactile depth, inertial momentum, and layered ambient lighting active across all 14 themes.
 - Memory: Synced to on-disk persistent memory files and `claude-mem` MCP server corpus (`sovereign_os_context`).

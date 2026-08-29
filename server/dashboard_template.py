@@ -37,6 +37,9 @@ DASHBOARD_HTML = r"""
     }
   </script>
   
+  <!-- Lenis Momentum & Smooth Scrolling Engine -->
+  <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -99,6 +102,15 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
       --waybar-bg: rgba(18, 22, 31, 0.88);
+
+      /* Old Regime Tactile Shadows & Smooth Transition Tokens */
+      --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35), 0 12px 28px -4px rgba(0, 0, 0, 0.45);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
+      --shadow-raised: 0 8px 30px rgba(0, 0, 0, 0.5);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --card-transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* ── Sovereign Professional Themes ── */
@@ -128,6 +140,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
       --waybar-bg: rgba(18, 22, 31, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(0, 0, 0, 0.55);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     [data-theme="sovereign-onyx"] {
@@ -156,6 +172,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a1a1aa;
       --glow-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.25);
       --waybar-bg: rgba(14, 14, 17, 0.90);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(0, 0, 0, 0.7);
+      --shadow-card-hover: 0 6px 22px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(0, 0, 0, 0.85);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
     }
 
     [data-theme="sovereign-studio"] {
@@ -184,6 +204,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.25);
       --waybar-bg: rgba(16, 20, 22, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(0, 0, 0, 0.55);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     [data-theme="sovereign-obsidian"] {
@@ -212,6 +236,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a8a29e;
       --glow-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.25);
       --waybar-bg: rgba(20, 17, 14, 0.90);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.45), 0 14px 32px -4px rgba(0, 0, 0, 0.6);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.55), 0 24px 48px -6px rgba(0, 0, 0, 0.75);
+      --bevel-highlight: inset 0 1px 0 0 rgba(245, 158, 11, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(245, 158, 11, 0.25);
     }
 
     [data-theme="sovereign-light"] {
@@ -240,6 +268,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #64748b;
       --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15);
       --waybar-bg: rgba(255, 255, 255, 0.92);
+      --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 6px 18px -2px rgba(15, 23, 42, 0.07);
+      --shadow-card-hover: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 16px 32px -4px rgba(15, 23, 42, 0.14);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+      --bevel-highlight-hover: inset 0 1px 0 0 #ffffff;
     }
 
     /* ── Sovereign Manifesto (Old Regime Editorial Swiss/Parchment) ── */
@@ -269,6 +301,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #5c584e;
       --glow-shadow: 0 4px 16px -2px rgba(212, 43, 43, 0.25);
       --waybar-bg: #eae4d8;
+      --shadow-card: 2px 2px 0px #0a0a0a;
+      --shadow-card-hover: 4px 4px 0px #0a0a0a;
+      --bevel-highlight: inset 0 0 0 0 transparent;
+      --bevel-highlight-hover: inset 0 0 0 0 transparent;
     }
 
     /* ── Omarchy Cyberpunk & Aesthetic Themes ── */
@@ -298,6 +334,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.18);
       --waybar-bg: rgba(11, 13, 20, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(0, 240, 255, 0.12);
+      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(0, 240, 255, 0.25);
+      --bevel-highlight: inset 0 1px 0 0 rgba(0, 240, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 240, 255, 0.25);
     }
 
     [data-theme="omarchy-tokyonight"] {
@@ -326,6 +366,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #7aa2f7;
       --glow-shadow: 0 0 20px rgba(122, 162, 247, 0.18);
       --waybar-bg: rgba(26, 27, 38, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(122, 162, 247, 0.1);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(122, 162, 247, 0.22);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     [data-theme="omarchy-catppuccin"] {
@@ -354,6 +398,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a6adc8;
       --glow-shadow: 0 0 20px rgba(203, 166, 247, 0.18);
       --waybar-bg: rgba(24, 24, 37, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(203, 166, 247, 0.1);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(203, 166, 247, 0.2);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     [data-theme="omarchy-nord"] {
@@ -382,6 +430,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #d8dee9;
       --glow-shadow: 0 0 20px rgba(136, 192, 208, 0.2);
       --waybar-bg: rgba(46, 52, 64, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.35), 0 14px 32px -4px rgba(136, 192, 208, 0.1);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.45), 0 24px 48px -6px rgba(136, 192, 208, 0.2);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     [data-theme="omarchy-gruvbox"] {
@@ -410,6 +462,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a89984;
       --glow-shadow: 0 0 20px rgba(250, 189, 47, 0.18);
       --waybar-bg: rgba(40, 40, 40, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(250, 189, 47, 0.08);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(250, 189, 47, 0.18);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
     }
 
     [data-theme="omarchy-synthwave"] {
@@ -438,6 +494,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a79fc2;
       --glow-shadow: 0 0 25px rgba(255, 42, 133, 0.25);
       --waybar-bg: rgba(26, 16, 47, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(255, 42, 133, 0.18);
+      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(255, 42, 133, 0.32);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 42, 133, 0.15);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 42, 133, 0.3);
     }
 
     [data-theme="omarchy-matrix"] {
@@ -466,6 +526,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #4e9a4e;
       --glow-shadow: 0 0 25px rgba(0, 255, 65, 0.25);
       --waybar-bg: rgba(5, 15, 5, 0.9);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.6), 0 16px 36px -4px rgba(0, 255, 65, 0.15);
+      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.7), 0 28px 56px -6px rgba(0, 255, 65, 0.28);
+      --bevel-highlight: inset 0 1px 0 0 rgba(0, 255, 65, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 255, 65, 0.25);
     }
 
     [data-theme="omarchy-dracula"] {
@@ -494,6 +558,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #6272a4;
       --glow-shadow: 0 0 20px rgba(189, 147, 249, 0.2);
       --waybar-bg: rgba(33, 34, 44, 0.88);
+      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.45), 0 14px 32px -4px rgba(189, 147, 249, 0.12);
+      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.55), 0 24px 48px -6px rgba(189, 147, 249, 0.22);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -509,6 +577,71 @@ DASHBOARD_HTML = r"""
 
     .hidden {
       display: none !important;
+    }
+
+    /* ── Old Regime Organic Noise Texture Overlay ── */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 38;
+      opacity: 0.035;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+    [data-theme="sovereign-manifesto"] .noise-overlay {
+      opacity: 0.048;
+      mix-blend-mode: multiply;
+    }
+    [data-theme="sovereign-light"] .noise-overlay {
+      opacity: 0.03;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── Old Regime Blend-Mode Follower Cursor ── */
+    #blend-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 99999;
+      mix-blend-mode: difference;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cur-dot {
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      width: 6px;
+      height: 6px;
+      background: #ffffff;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .cur-circle {
+      position: absolute;
+      top: -18px;
+      left: -18px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease;
+    }
+    #blend-cursor.hovering .cur-circle {
+      transform: scale(1.65);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.95);
+    }
+    #blend-cursor.clicking .cur-circle {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.3);
+    }
+    @media (max-width: 768px) {
+      #blend-cursor { display: none !important; }
     }
 
     /* Glass Panels with Dynamic Theme & Transparency Variables */
@@ -530,33 +663,43 @@ DASHBOARD_HTML = r"""
       border: 1px solid var(--border-main);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow-card), var(--bevel-highlight);
       border-radius: 1rem;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+      transition: var(--card-transition);
     }
     .theme-card:hover {
       background-color: var(--bg-card-hover);
-      border-color: rgba(255, 255, 255, 0.16);
-      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
+      transform: translateY(-2px);
     }
     .theme-border { border-color: var(--border-main); }
     .theme-glow { box-shadow: var(--glow-shadow); }
 
     .nav-item {
-      color: #94a3b8;
+      color: var(--text-muted);
       border: 1px solid transparent;
-      transition: all 0.15s ease;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .nav-item:hover {
-      color: #ffffff;
+      color: var(--text-main);
       background-color: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.08);
+      transform: translateX(2px);
     }
     .nav-item.active {
+      background-color: var(--bg-surface);
       color: #ffffff;
-      background: linear-gradient(90deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.05));
-      border-color: rgba(99, 102, 241, 0.35);
-      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+      font-weight: 600;
+      border-left: 3px solid var(--color-brand);
+      box-shadow: var(--bevel-highlight);
+    }
+    .nav-item:not(.active) {
+      color: var(--text-muted);
+    }
+    .nav-item:not(.active):hover {
+      background-color: var(--bg-card);
+      color: var(--text-main);
     }
 
     /* CRT Scanlines Overlay */
@@ -590,17 +733,17 @@ DASHBOARD_HTML = r"""
       border-bottom: 1px solid var(--border-main);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 1px 12px rgba(0, 0, 0, 0.4), var(--bevel-highlight);
     }
     .workspace-pill {
       font-family: 'JetBrains Mono', monospace;
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
     }
     .workspace-pill.active {
       background: var(--color-brand);
       color: #ffffff;
-      box-shadow: 0 0 10px var(--color-brand);
+      box-shadow: 0 0 12px var(--color-brand);
       font-weight: 700;
     }
     .workspace-pill:not(.active) {
@@ -610,20 +753,7 @@ DASHBOARD_HTML = r"""
     .workspace-pill:not(.active):hover {
       background: rgba(255, 255, 255, 0.09);
       color: var(--text-main);
-    }
-
-    .nav-item.active {
-      background-color: var(--bg-surface);
-      color: #ffffff;
-      font-weight: 600;
-      border-left: 3px solid var(--color-brand);
-    }
-    .nav-item:not(.active) {
-      color: var(--text-muted);
-    }
-    .nav-item:not(.active):hover {
-      background-color: var(--bg-card);
-      color: var(--text-main);
+      transform: translateY(-1px);
     }
 
     /* Equalizer Bar Animation */
@@ -655,12 +785,16 @@ DASHBOARD_HTML = r"""
       background: var(--color-brand) !important;
       color: #ffffff !important;
       border: 1px solid var(--border-accent) !important;
-      box-shadow: var(--glow-shadow) !important;
-      transition: all 0.15s ease;
+      box-shadow: var(--glow-shadow), var(--bevel-highlight) !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-brand-primary:hover, .theme-btn-primary:hover {
       background: var(--color-brand-hover) !important;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover) !important;
+    }
+    .btn-brand-primary:active, .theme-btn-primary:active {
+      transform: scale(0.98);
     }
     .theme-avatar-bot {
       background: linear-gradient(135deg, var(--color-brand), var(--color-accent)) !important;
@@ -671,14 +805,38 @@ DASHBOARD_HTML = r"""
       background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover)) !important;
       color: #ffffff !important;
       border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: var(--shadow-card), var(--bevel-highlight);
     }
     .bubble-card {
       background-color: var(--bg-card) !important;
       border: 1px solid var(--border-main) !important;
       color: var(--text-main) !important;
+      box-shadow: var(--shadow-card), var(--bevel-highlight);
+      transition: var(--card-transition);
+    }
+    .bubble-card:hover {
+      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
     }
     .theme-text-brand { color: var(--color-brand) !important; }
     .theme-border-brand { border-color: var(--color-brand) !important; }
+
+    /* ── View Transitions & Row Hover Micro-Physics ── */
+    @keyframes viewFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .view-container:not(.hidden) {
+      animation: viewFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    [id^="inbox-item-row-"], [id^="trace-node-card-"], .hover-glide-row {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+    }
 
     /* ── Universal Input and Textarea Dynamic Theming ── */
     input, textarea, select, #chat-input-textarea, #chat-search-input, #spotlight-search-input {
@@ -975,11 +1133,15 @@ DASHBOARD_HTML = r"""
       border: 1px solid var(--border-main);
       background-color: var(--bg-card);
       backdrop-filter: blur(var(--card-blur));
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-backdrop-filter: blur(var(--card-blur));
+      box-shadow: var(--shadow-card), var(--bevel-highlight);
+      transition: var(--card-transition);
     }
     .seamless-card:hover {
       border-color: var(--border-accent);
       background-color: var(--bg-card-hover);
+      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
+      transform: translateY(-2px);
     }
     .eyebrow-stamp {
       font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
@@ -1064,6 +1226,15 @@ DASHBOARD_HTML = r"""
   </style>
 </head>
 <body class="flex flex-col h-screen w-screen relative overflow-hidden">
+
+  <!-- Old Regime Blend-Mode Magnetic Follower Cursor -->
+  <div id="blend-cursor" class="pointer-events-none fixed z-50 transition-opacity duration-300 opacity-0 hidden md:block">
+    <div class="cur-dot"></div>
+    <div class="cur-circle"></div>
+  </div>
+
+  <!-- Old Regime Film Grain / Noise Texture Overlay -->
+  <div class="noise-overlay" aria-hidden="true"></div>
 
   <!-- ─── 0. LIVE WALLPAPER, VIDEO & BACKGROUND LAYERS ──────────────── -->
   <!-- Live Canvas Engine (Matrix, Particles, Synthwave, Deep Space, Tokyo Rain, Aurora) -->
@@ -3840,6 +4011,72 @@ DASHBOARD_HTML = r"""
       }
     }
 
+    // ── Old Regime Lenis Inertial Momentum Smooth Scrolling ──
+    function initLenisSmoothScroll() {
+      try {
+        const scrollContainer = document.getElementById('main-content-scroll');
+        if (scrollContainer && typeof Lenis !== 'undefined') {
+          window.__lenis = new Lenis({
+            wrapper: scrollContainer,
+            content: scrollContainer.firstElementChild || scrollContainer,
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            touchMultiplier: 2,
+          });
+          function raf(time) {
+            if (window.__lenis) window.__lenis.raf(time);
+            requestAnimationFrame(raf);
+          }
+          requestAnimationFrame(raf);
+        }
+      } catch (err) {
+        console.warn('[Lenis] Init error:', err);
+      }
+    }
+
+    // ── Old Regime Blend-Mode Follower Cursor & Dynamic Physics ──
+    function initBlendCursor() {
+      const cursor = document.getElementById('blend-cursor');
+      if (!cursor) return;
+      let mx = -100, my = -100, cx = -100, cy = -100;
+
+      document.addEventListener('mousemove', (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.opacity = '1';
+      });
+
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+      });
+
+      document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+      document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
+
+      function tick() {
+        cx += (mx - cx) * 0.18;
+        cy += (my - cy) * 0.18;
+        cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      function updateHoverTargets() {
+        const targets = document.querySelectorAll('button, a, .nav-item, .workspace-pill, .seamless-card, .theme-card, input, select, textarea, .tab-btn, .hover-target, [id^="inbox-item-row-"], [id^="trace-node-card-"]');
+        targets.forEach(el => {
+          if (el._hasCursorBound) return;
+          el._hasCursorBound = true;
+          el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+          el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+      }
+      updateHoverTargets();
+      setInterval(updateHoverTargets, 1500);
+    }
+
     let currentSessionId = null;
     let currentSessionMessages = [];
     let allChatSessions = [];
@@ -4270,6 +4507,10 @@ DASHBOARD_HTML = r"""
       root.style.setProperty('--border-accent', themeObj.color_brand);
       root.style.setProperty('--glow-shadow', `0 4px 20px -2px ${themeObj.color_brand}40`);
       root.style.setProperty('--waybar-bg', themeObj.bg_sidebar);
+      root.style.setProperty('--shadow-card', `0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px ${themeObj.color_brand}18`);
+      root.style.setProperty('--shadow-card-hover', `0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px ${themeObj.color_brand}30`);
+      root.style.setProperty('--bevel-highlight', `inset 0 1px 0 0 rgba(255, 255, 255, 0.08)`);
+      root.style.setProperty('--bevel-highlight-hover', `inset 0 1px 0 0 rgba(255, 255, 255, 0.18)`);
     }
 
     function exportCustomThemeJson() {
@@ -4862,6 +5103,9 @@ DASHBOARD_HTML = r"""
         fetchIngestedDocuments();
       }
       refreshIcons();
+      if (window.__lenis) {
+        try { window.__lenis.scrollTo(0, { immediate: true }); } catch (e) {}
+      }
 
     }
 
@@ -9284,8 +9528,10 @@ DASHBOARD_HTML = r"""
 
     // ── Setup Window Drag & Drop Document Ingestion ──
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize Theme Engine
+      // 1. Initialize Theme Engine & Tactile Physics
       initThemeState();
+      initLenisSmoothScroll();
+      initBlendCursor();
 
       // 2. Restore Wallpaper & Custom URL
       const savedEngine = localStorage.getItem(STORAGE_WALLPAPER) || 'particles';
