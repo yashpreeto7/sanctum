@@ -39,9 +39,9 @@ deep_researcher = DeepResearcher(vector_store=vector_store, llm_provider=llm_pro
 folder_watcher = FolderWatcher(vector_store=vector_store)
 
 app = FastAPI(
-    title="Personal AI OS",
-    description="Local-first Personal AI Command Center and Automation Engine",
-    version="0.1.0",
+    title="SovereignOS",
+    description="Autonomous Executive Intelligence & Sovereign Workspace",
+    version="2.5.0",
 )
 
 app.add_middleware(
@@ -1712,12 +1712,12 @@ from server.dashboard_template import DASHBOARD_HTML
 async def get_manifest():
     """PWA Web App Manifest for Desktop App installation."""
     return {
-        "name": "Personal AI OS — Command Center",
-        "short_name": "Personal AI OS",
-        "description": "Local-first Personal AI Command Center and Automation Engine",
+        "name": "SovereignOS — Autonomous Executive Workspace",
+        "short_name": "SovereignOS",
+        "description": "Autonomous Executive Intelligence & Sovereign Workspace",
         "start_url": "/",
         "display": "standalone",
-        "background_color": "#07080d",
+        "background_color": "#0d1017",
         "theme_color": "#6366f1",
         "orientation": "any",
         "icons": [
@@ -1734,7 +1734,7 @@ async def get_manifest():
 # Web Command Center Dashboard UI
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard():
-    """Serves the rich, responsive Personal AI OS Web Command Center with Omarchy ricing themes and live wallpapers."""
+    """Serves the rich, responsive SovereignOS Web Command Center."""
     return HTMLResponse(content=DASHBOARD_HTML)
 
 

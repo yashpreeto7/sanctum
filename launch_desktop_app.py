@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 PORT = 8000
 APP_URL = f"http://127.0.0.1:{PORT}"
-APP_TITLE = "Personal AI OS — Operations Dashboard"
+APP_TITLE = "SovereignOS — Autonomous Executive Intelligence"
 
 
 def is_server_running(port: int = PORT) -> bool:

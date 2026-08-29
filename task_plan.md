@@ -34,5 +34,15 @@
 - [x] Added `/api/research/dossier` endpoint to load past research notes directly into the rich dossier reader.
 - [x] Verified test suite and pushed branch to `origin/feature/research-ux-and-sidebar-toggle`.
 
+### Phase 5: SovereignOS UI/UX Overhaul, Professional Themes, Backdrops & Rebranding
+- **Status:** complete
+- [x] Rename app to **SovereignOS** across all branding, titles, Waybar status bar, and desktop launcher (`SovereignOS — Autonomous Executive Intelligence`).
+- [x] Simplify naming structure to clean, professional titles (`Overview`, `Copilot`, `Traces`, `Inbox`, `Approvals`, `Topology`, `Memory`, `Vault`, `Schedule`, `Research`, `Documents`, `Settings`).
+- [x] De-vibe-code card design: Linear / Apple Pro subtle borders (`border-white/[0.08]` / `border-slate-800`), inner top bevel highlights, cohesive typography.
+- [x] Add 5 Sovereign Professional Themes: `Sovereign Slate`, `Titanium Onyx`, `Minimal Studio`, `Obsidian Gold`, and `Light Studio` while retaining the 8 Omarchy cyber presets.
+- [x] Add 4 Professional Workstation Backgrounds: `Solid Minimal (0% CPU)`, `Technical Grid`, `Slate Ambient`, and `Titanium Studio`.
+- [x] Modernize the Multi-Agent Pipeline Topology DAG map (`#view-topology`) with interactive SVG flow connectors, latency badges, and live simulation execution runner.
+- [x] Verify non-mail / non-calendar test suites.
+
 ## Next Step
 User test and review the interactive app on `feature/research-ux-and-sidebar-toggle`. If approved, merge into `main`.

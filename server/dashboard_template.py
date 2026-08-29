@@ -12,11 +12,11 @@ Features:
 
 DASHBOARD_HTML = r"""
 <!DOCTYPE html>
-<html lang="en" class="dark" data-theme="omarchy-cyberpunk">
+<html lang="en" class="dark" data-theme="sovereign-slate">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal AI OS — Operations Dashboard (Omarchy Edition)</title>
+  <title>SovereignOS — Autonomous Executive Intelligence & Sovereign Workspace</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#090a0f">
   
@@ -27,7 +27,7 @@ DASHBOARD_HTML = r"""
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Mermaid.js for Architecture & Flowchart Diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -70,13 +70,183 @@ DASHBOARD_HTML = r"""
       --surface-opacity: 0.70;
       --card-blur: 14px;
 
-      /* Omarchy Cyberpunk (Default) */
+      /* Sovereign Slate (Default Professional - Linear/Raycast Style) */
+      --rgb-base: 13, 16, 23;
+      --rgb-sidebar: 18, 22, 31;
+      --rgb-surface: 22, 27, 38;
+      --rgb-card: 24, 30, 42;
+      --rgb-card-hover: 32, 40, 56;
+      
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #242d3e;
+      --border-accent: #6366f1;
+      --color-brand: #6366f1;
+      --color-brand-hover: #4f46e5;
+      --color-accent: #38bdf8;
+      --color-highlight: #a855f7;
+      --color-cyan: #38bdf8;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
+      --waybar-bg: rgba(18, 22, 31, 0.88);
+    }
+
+    /* ── Sovereign Professional Themes ── */
+    [data-theme="sovereign-slate"] {
+      --rgb-base: 13, 16, 23;
+      --rgb-sidebar: 18, 22, 31;
+      --rgb-surface: 22, 27, 38;
+      --rgb-card: 24, 30, 42;
+      --rgb-card-hover: 32, 40, 56;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #242d3e;
+      --border-accent: #6366f1;
+      --color-brand: #6366f1;
+      --color-brand-hover: #4f46e5;
+      --color-accent: #38bdf8;
+      --color-highlight: #a855f7;
+      --color-cyan: #38bdf8;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
+      --waybar-bg: rgba(18, 22, 31, 0.88);
+    }
+
+    [data-theme="sovereign-onyx"] {
+      --rgb-base: 9, 9, 11;
+      --rgb-sidebar: 14, 14, 17;
+      --rgb-surface: 20, 20, 24;
+      --rgb-card: 24, 24, 29;
+      --rgb-card-hover: 32, 32, 39;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #27272a;
+      --border-accent: #3b82f6;
+      --color-brand: #3b82f6;
+      --color-brand-hover: #2563eb;
+      --color-accent: #60a5fa;
+      --color-highlight: #818cf8;
+      --color-cyan: #67e8f9;
+      --color-emerald: #34d399;
+      --color-amber: #fbbf24;
+      --color-rose: #fb7185;
+      --color-purple: #a78bfa;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --glow-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.25);
+      --waybar-bg: rgba(14, 14, 17, 0.90);
+    }
+
+    [data-theme="sovereign-studio"] {
+      --rgb-base: 11, 14, 15;
+      --rgb-sidebar: 16, 20, 22;
+      --rgb-surface: 21, 27, 30;
+      --rgb-card: 25, 33, 37;
+      --rgb-card-hover: 34, 44, 49;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #233138;
+      --border-accent: #10b981;
+      --color-brand: #10b981;
+      --color-brand-hover: #059669;
+      --color-accent: #2dd4bf;
+      --color-highlight: #06b6d4;
+      --color-cyan: #22d3ee;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-purple: #8b5cf6;
+      --text-main: #f0fdf4;
+      --text-muted: #94a3b8;
+      --glow-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.25);
+      --waybar-bg: rgba(16, 20, 22, 0.88);
+    }
+
+    [data-theme="sovereign-obsidian"] {
+      --rgb-base: 14, 12, 10;
+      --rgb-sidebar: 20, 17, 14;
+      --rgb-surface: 28, 24, 20;
+      --rgb-card: 34, 29, 24;
+      --rgb-card-hover: 44, 38, 32;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #3d342a;
+      --border-accent: #f59e0b;
+      --color-brand: #f59e0b;
+      --color-brand-hover: #d97706;
+      --color-accent: #fbbf24;
+      --color-highlight: #f97316;
+      --color-cyan: #38bdf8;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #ef4444;
+      --color-purple: #c084fc;
+      --text-main: #fef3c7;
+      --text-muted: #a8a29e;
+      --glow-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.25);
+      --waybar-bg: rgba(20, 17, 14, 0.90);
+    }
+
+    [data-theme="sovereign-light"] {
+      --rgb-base: 248, 250, 252;
+      --rgb-sidebar: 255, 255, 255;
+      --rgb-surface: 241, 245, 249;
+      --rgb-card: 255, 255, 255;
+      --rgb-card-hover: 241, 245, 249;
+      --bg-base: #f8fafc;
+      --bg-sidebar: rgba(255, 255, 255, 0.95);
+      --bg-surface: rgba(241, 245, 249, 0.95);
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: #f1f5f9;
+      --border-main: #e2e8f0;
+      --border-accent: #4f46e5;
+      --color-brand: #4f46e5;
+      --color-brand-hover: #4338ca;
+      --color-accent: #0284c7;
+      --color-highlight: #7c3aed;
+      --color-cyan: #0284c7;
+      --color-emerald: #059669;
+      --color-amber: #d97706;
+      --color-rose: #e11d48;
+      --color-purple: #7c3aed;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15);
+      --waybar-bg: rgba(255, 255, 255, 0.92);
+    }
+
+    /* ── Omarchy Cyberpunk & Aesthetic Themes ── */
+    [data-theme="omarchy-cyberpunk"] {
       --rgb-base: 7, 8, 13;
       --rgb-sidebar: 11, 13, 20;
       --rgb-surface: 15, 18, 29;
       --rgb-card: 18, 22, 34;
       --rgb-card-hover: 28, 34, 52;
-      
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
@@ -316,23 +486,47 @@ DASHBOARD_HTML = r"""
       background-color: var(--bg-sidebar);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
+      border-color: var(--border-main);
     }
     .theme-bg-surface {
       background-color: var(--bg-surface);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
+      border-color: var(--border-main);
     }
     .theme-card {
       background-color: var(--bg-card);
-      border-color: var(--border-main);
+      border: 1px solid var(--border-main);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
     }
     .theme-card:hover {
       background-color: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
     }
     .theme-border { border-color: var(--border-main); }
     .theme-glow { box-shadow: var(--glow-shadow); }
+
+    .nav-item {
+      color: #94a3b8;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .nav-item.active {
+      color: #ffffff;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.05));
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    }
 
     /* CRT Scanlines Overlay */
     #omarchy-crt-overlay {
@@ -497,46 +691,46 @@ DASHBOARD_HTML = r"""
   <!-- CRT Scanlines Overlay -->
   <div id="omarchy-crt-overlay" class="fixed inset-0 hidden"></div>
 
-  <!-- ─── 1. OMARCHY TOP WAYBAR / STATUS BAR ───────────────────────── -->
-  <header class="waybar-hud h-10 px-3 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none w-full border-b theme-border bg-black/50 backdrop-blur-xl">
+  <!-- ─── 1. SOVEREIGN TOP STATUS BAR / WAYBAR ─────────────────────── -->
+  <header class="waybar-hud h-10 px-3 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none w-full border-b theme-border bg-black/60 backdrop-blur-xl">
     
     <!-- Left: Distro Logo, Sidebar Toggle & Workspaces -->
     <div class="flex items-center space-x-2 min-w-0 flex-shrink">
       <!-- Distro Pill -->
-      <div class="flex items-center space-x-1 px-2 py-0.5 rounded-lg bg-black/40 border border-white/10 text-white shadow-sm flex-shrink-0">
-        <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 300 300" fill="currentColor">
-          <path d="M141.3 8.7c-2.4 5.9-9.5 24.3-15.8 40.8-6.3 16.5-18.7 48.7-27.5 71.5s-20.9 54.4-26.9 70.3c-6 15.8-13.8 36.3-17.4 45.5-5.9 15-6.4 17.2-4.1 17.2 1.4 0 5.4-3.5 8.9-7.7 7.7-9.4 15.6-21.7 20.3-31.5 2.1-4.4 2.8-5.3 4-5.3 1 0 2.8 1.9 4 4.3 3.8 7.3 12.1 17.6 19.3 23.9 8.2 7.1 13.9 9.8 23 10.8 12.7 1.4 27-2.6 37.9-10.6 4.9-3.6 13.4-12.7 16.5-17.7 1.4-2.3 2.8-3.9 3.1-3.6.3.3 2.1 4.5 4 9.3 4.8 12.2 13 25.1 21.2 33.3 3.2 3.2 4.1 3.4 8.7 1.9 4.3-1.4 5.3-3 2.8-4.7-2.4-1.6-11.8-24.3-25.1-60.6-20.6-56.3-46.6-127.3-51.1-139.7-1.7-4.8-3.4-9.3-3.8-9.9-.7-.9-1.4-.2-2.1 2z"/>
-        </svg>
-        <span class="font-bold tracking-wider text-[10px] text-white">OMARCHY</span>
-        <span class="text-[8px] px-1 py-0.1 rounded bg-indigo-500/30 text-indigo-300 font-mono hidden sm:inline">v2.4</span>
+      <div class="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-lg bg-black/50 border border-white/10 text-white shadow-sm flex-shrink-0">
+        <div class="w-3.5 h-3.5 rounded-md bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[9px] font-bold">
+          S
+        </div>
+        <span class="font-bold tracking-wider text-[11px] text-white font-display">SOVEREIGN<span class="text-indigo-400">OS</span></span>
+        <span class="text-[8px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono hidden sm:inline border border-indigo-500/30">PRO</span>
       </div>
 
       <!-- Sidebar Hide/Show Toggle Button -->
-      <button onclick="toggleAppSidebar()" id="btn-toggle-sidebar" title="Toggle Left Dashboard / Sidebar (Ctrl+B / ⌘B)" class="p-1 rounded-lg bg-black/40 hover:bg-cyan-500/20 text-cyan-400 hover:text-white border border-white/10 text-xs flex items-center justify-center transition cursor-pointer flex-shrink-0">
+      <button onclick="toggleAppSidebar()" id="btn-toggle-sidebar" title="Toggle Left Dashboard / Sidebar (Ctrl+B / ⌘B)" class="p-1.5 rounded-lg bg-black/40 hover:bg-indigo-500/20 text-slate-300 hover:text-white border border-white/10 text-xs flex items-center justify-center transition cursor-pointer flex-shrink-0">
         <i data-lucide="panel-left-close" class="w-3.5 h-3.5" id="icon-sidebar-toggle"></i>
       </button>
 
-      <!-- Hyprland Workspace Switcher -->
+      <!-- Workspace Switcher -->
       <div class="flex items-center space-x-1 bg-black/30 p-0.5 rounded-lg border border-white/5 overflow-x-auto no-scrollbar max-w-[44vw] flex-shrink">
-        <button onclick="switchTab('home'); playCyberClick();" id="ws-home" class="workspace-pill active px-1.5 py-0.5 rounded text-[10px] cursor-pointer">1:SYS</button>
-        <button onclick="switchTab('chat'); playCyberClick();" id="ws-chat" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">2:CHAT</button>
-        <button onclick="switchTab('traces'); playCyberClick();" id="ws-traces" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">3:TRC</button>
-        <button onclick="switchTab('inbox'); playCyberClick();" id="ws-inbox" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">4:INBOX</button>
-        <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">5:HITL</button>
-        <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">6:DAG</button>
-        <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">7:RAG</button>
-        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">8:VAULT</button>
-        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer">9:CAL</button>
-        <button onclick="switchTab('research'); playCyberClick();" id="ws-research" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer text-cyan-400">10:RES</button>
-        <button onclick="switchTab('documents'); playCyberClick();" id="ws-documents" class="workspace-pill px-1.5 py-0.5 rounded text-[10px] cursor-pointer text-emerald-400">11:DOCS</button>
+        <button onclick="switchTab('home'); playCyberClick();" id="ws-home" class="workspace-pill active px-2 py-0.5 rounded text-[10px] cursor-pointer">Overview</button>
+        <button onclick="switchTab('chat'); playCyberClick();" id="ws-chat" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Copilot</button>
+        <button onclick="switchTab('traces'); playCyberClick();" id="ws-traces" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Traces</button>
+        <button onclick="switchTab('inbox'); playCyberClick();" id="ws-inbox" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Inbox</button>
+        <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Approvals</button>
+        <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Topology</button>
+        <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Memory</button>
+        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Vault</button>
+        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Schedule</button>
+        <button onclick="switchTab('research'); playCyberClick();" id="ws-research" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer text-cyan-300">Research</button>
+        <button onclick="switchTab('documents'); playCyberClick();" id="ws-documents" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer text-emerald-300">Documents</button>
       </div>
     </div>
 
-    <!-- Center: Audio Spectrum Visualizer (CAVA-style Equalizer Bar for Spotify/Music) -->
-    <div onclick="toggleAudioVisualizerSync()" title="Music Visualizer: Click to Sync Live Spotify/Browser Audio" class="hidden md:flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-2 py-0.5 rounded-full border border-white/10 cursor-pointer transition flex-shrink-0">
+    <!-- Center: Audio Spectrum Visualizer (Equalizer Bar for Spotify/Music) -->
+    <div onclick="toggleAudioVisualizerSync()" title="Audio Spectrum: Click to Sync Live Audio Visualizer" class="hidden md:flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-2.5 py-0.5 rounded-full border border-white/10 cursor-pointer transition flex-shrink-0">
       <div class="flex items-center space-x-1">
-        <i data-lucide="music" class="w-3 h-3 text-cyan-400" id="icon-music-sync"></i>
-        <span id="label-music-status" class="text-[9px] text-slate-300 font-mono hidden xl:inline">CAVA</span>
+        <i data-lucide="activity" class="w-3 h-3 text-indigo-400" id="icon-music-sync"></i>
+        <span id="label-music-status" class="text-[9px] text-slate-300 font-mono hidden xl:inline">SYNC</span>
       </div>
 
       <!-- 12 Animated Frequency Equalizer Bars -->
@@ -556,60 +750,60 @@ DASHBOARD_HTML = r"""
       </div>
 
       <span class="text-slate-600">|</span>
-      <span id="waybar-clock" class="text-cyan-300 font-bold text-[10px]">12:00:00</span>
+      <span id="waybar-clock" class="text-indigo-300 font-bold text-[10px]">12:00:00</span>
     </div>
 
     <!-- Right: Telemetry, Theme/Wallpaper Pickers & Desktop Mode Controls -->
     <div class="flex items-center space-x-1.5 flex-shrink-0">
       <!-- Simulated CPU/RAM Telemetry -->
-      <div class="hidden 2xl:flex items-center space-x-1.5 bg-black/30 px-2 py-0.5 rounded-lg border border-white/5 text-[9px]">
-        <div class="flex items-center space-x-1 text-cyan-300">
-          <i data-lucide="cpu" class="w-2.5 h-2.5"></i>
+      <div class="hidden 2xl:flex items-center space-x-1.5 bg-black/30 px-2.5 py-0.5 rounded-lg border border-white/5 text-[9px]">
+        <div class="flex items-center space-x-1 text-slate-300">
+          <i data-lucide="cpu" class="w-2.5 h-2.5 text-cyan-400"></i>
           <span id="waybar-cpu">14%</span>
         </div>
         <span class="text-slate-600">/</span>
-        <div class="flex items-center space-x-1 text-purple-300">
-          <i data-lucide="hard-drive" class="w-2.5 h-2.5"></i>
+        <div class="flex items-center space-x-1 text-slate-300">
+          <i data-lucide="hard-drive" class="w-2.5 h-2.5 text-purple-400"></i>
           <span id="waybar-ram">1.4GB</span>
         </div>
       </div>
 
       <!-- Audio SFX Toggle -->
-      <button onclick="toggleAudioSFX()" id="btn-audio-sfx" title="Toggle Synthesized Audio SFX" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
+      <button onclick="toggleAudioSFX()" id="btn-audio-sfx" title="Toggle Synthesized Audio SFX" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
         <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="icon-audio-sfx"></i>
       </button>
 
       <!-- TTS Speech Output Toggle (JARVIS Mode) -->
-      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle JARVIS Speech Synthesis (TTS Voice Output)" class="px-1.5 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
+      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle Sovereign Speech Synthesis (Voice Engine)" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
         <i data-lucide="volume-x" class="w-3 h-3 text-slate-400" id="icon-tts-state"></i>
         <span id="label-tts-state" class="text-[9px] font-mono text-slate-400 hidden sm:inline">Voice</span>
       </button>
 
       <!-- Global Spotlight Trigger -->
-      <button onclick="openSpotlightModal()" title="Quick Spotlight HUD (Ctrl+K / Cmd+K)" class="px-2 py-0.5 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-500/40 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
-        <i data-lucide="command" class="w-3 h-3 text-cyan-400"></i>
+      <button onclick="openSpotlightModal()" title="Quick Command Palette (Ctrl+K / Cmd+K)" class="px-2.5 py-0.5 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
+        <i data-lucide="command" class="w-3 h-3 text-indigo-400"></i>
         <span class="font-mono font-bold">⌘K</span>
       </button>
 
       <!-- Wallpaper & Glass Customizer Trigger -->
-      <button onclick="openWallpaperModal()" title="Backgrounds & Glass Transparency" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="sliders" class="w-3 h-3 text-purple-400"></i>
-        <span class="hidden lg:inline">Glass</span>
+      <button onclick="openWallpaperModal()" title="Background & Canvas Customizer" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
+        <i data-lucide="image" class="w-3 h-3 text-purple-400"></i>
+        <span class="hidden lg:inline">Backdrop</span>
       </button>
 
       <!-- Themes Picker Trigger -->
-      <button onclick="openThemeModal()" title="Theme Selector" class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-indigo-500/40 to-purple-500/40 hover:from-indigo-500/60 hover:to-purple-500/60 text-white border border-indigo-400/30 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
-        <i data-lucide="palette" class="w-3 h-3 text-cyan-300"></i>
-        <span id="current-theme-label" class="hidden sm:inline">Cyberpunk</span>
+      <button onclick="openThemeModal()" title="Theme Selector" class="px-2.5 py-0.5 rounded-lg bg-gradient-to-r from-indigo-600/40 to-purple-600/40 hover:from-indigo-600/60 hover:to-purple-600/60 text-white border border-indigo-400/30 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
+        <i data-lucide="palette" class="w-3 h-3 text-indigo-300"></i>
+        <span id="current-theme-label" class="hidden sm:inline">Sovereign Slate</span>
       </button>
 
       <!-- Desktop Mode / Standalone Window Helper -->
-      <button onclick="openDesktopLauncherModal()" title="Desktop App Mode & Launcher" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 transition cursor-pointer flex-shrink-0">
+      <button onclick="openDesktopLauncherModal()" title="Desktop Standalone Mode" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 transition cursor-pointer flex-shrink-0">
         <i data-lucide="app-window" class="w-3.5 h-3.5 text-amber-400"></i>
       </button>
 
       <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullScreen()" title="Fullscreen F11" class="p-1 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
+      <button onclick="toggleFullScreen()" title="Fullscreen F11" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
         <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
       </button>
     </div>
@@ -623,14 +817,14 @@ DASHBOARD_HTML = r"""
       
       <!-- Top Brand & New Chat -->
       <div class="p-4 space-y-4">
-        <div class="flex items-center justify-between px-2">
+        <div class="flex items-center justify-between px-1">
           <div class="flex items-center space-x-2.5">
-            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-              <i data-lucide="cpu" class="w-4 h-4"></i>
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 font-bold text-sm">
+              S
             </div>
             <div>
-              <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Personal AI OS</span>
-              <span class="text-[9px] font-mono text-cyan-400 leading-none">Arch / Omarchy Edition</span>
+              <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Sovereign<span class="text-indigo-400">OS</span></span>
+              <span class="text-[9px] font-mono text-slate-400 leading-none">Autonomous Intelligence</span>
             </div>
           </div>
           <!-- Quick Collapse Sidebar Button -->
@@ -640,105 +834,105 @@ DASHBOARD_HTML = r"""
         </div>
 
         <!-- New Chat Button -->
-        <button onclick="switchTab('chat'); createNewChatSession(); playCyberClick();" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm flex items-center justify-between shadow-lg shadow-indigo-500/25 transition cursor-pointer active:scale-[0.98]">
+        <button onclick="switchTab('chat'); createNewChatSession(); playCyberClick();" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs flex items-center justify-between shadow-lg shadow-indigo-500/20 transition cursor-pointer active:scale-[0.98]">
           <div class="flex items-center space-x-2">
             <i data-lucide="plus" class="w-4 h-4"></i>
-            <span>New Chat</span>
+            <span class="font-semibold">New Session</span>
           </div>
-          <span class="text-xs opacity-70 font-mono">⌘N</span>
+          <span class="text-[10px] opacity-70 font-mono">⌘N</span>
         </button>
 
         <!-- Main Navigation Menu -->
         <div class="space-y-1 pt-1">
-          <div class="text-[10px] font-mono uppercase tracking-wider text-slate-500 px-3 py-1 font-bold">WORKSPACES</div>
+          <div class="text-[10px] font-mono uppercase tracking-wider text-slate-500 px-3 py-1 font-bold">WORKSPACE</div>
           
-          <a onclick="switchTab('home'); playCyberClick();" id="nav-home" class="nav-item active flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
-            <i data-lucide="home" class="w-4 h-4"></i>
-            <span>1. Overview & Health</span>
+          <a onclick="switchTab('home'); playCyberClick();" id="nav-home" class="nav-item active flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-400"></i>
+            <span>Overview & Health</span>
           </a>
 
-          <a onclick="switchTab('chat'); playCyberClick();" id="nav-chat" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('chat'); playCyberClick();" id="nav-chat" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
-              <i data-lucide="message-square" class="w-4 h-4"></i>
-              <span>2. Chat & Copilot</span>
+              <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
+              <span>Copilot & Execution</span>
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
           </a>
 
-          <a onclick="switchTab('traces'); playCyberClick();" id="nav-traces" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('traces'); playCyberClick();" id="nav-traces" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
               <i data-lucide="git-branch" class="w-4 h-4 text-cyan-400"></i>
-              <span>3. Traces (LangSmith)</span>
+              <span>Traces & Trajectories</span>
             </div>
             <span id="nav-traces-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('inbox'); playCyberClick();" id="nav-inbox" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('inbox'); playCyberClick();" id="nav-inbox" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
-              <i data-lucide="inbox" class="w-4 h-4"></i>
-              <span>4. Inbox & Triage</span>
+              <i data-lucide="mail" class="w-4 h-4 text-blue-400"></i>
+              <span>Inbox & Triage</span>
             </div>
             <span id="inbox-badge-count" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('approvals'); playCyberClick();" id="nav-approvals" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('approvals'); playCyberClick();" id="nav-approvals" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
-              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
-              <span>5. HITL Approvals</span>
+              <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+              <span>Security Approvals</span>
             </div>
             <span id="nav-approval-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('topology'); playCyberClick();" id="nav-topology" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
-            <i data-lucide="git-merge" class="w-4 h-4 text-purple-400"></i>
-            <span>6. Topology DAG</span>
+          <a onclick="switchTab('topology'); playCyberClick();" id="nav-topology" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+            <i data-lucide="network" class="w-4 h-4 text-purple-400"></i>
+            <span>Pipeline Topology</span>
           </a>
 
-          <a onclick="switchTab('rag'); playCyberClick();" id="nav-rag" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('rag'); playCyberClick();" id="nav-rag" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
-            <span>7. Knowledge (RAG)</span>
+            <span>Memory & Vector RAG</span>
           </a>
 
-          <a onclick="switchTab('obsidian'); playCyberClick();" id="nav-obsidian" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('obsidian'); playCyberClick();" id="nav-obsidian" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
               <i data-lucide="book-open" class="w-4 h-4 text-purple-400"></i>
-              <span>8. Obsidian Notes</span>
+              <span>Obsidian Vault</span>
             </div>
             <span id="nav-obsidian-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('calendar'); playCyberClick();" id="nav-calendar" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('calendar'); playCyberClick();" id="nav-calendar" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
               <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
-              <span>9. Calendar & Schedule</span>
+              <span>Schedule & Briefings</span>
             </div>
             <span id="nav-calendar-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('research'); playCyberClick();" id="nav-research" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('research'); playCyberClick();" id="nav-research" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
-              <i data-lucide="microscope" class="w-4 h-4 text-cyan-400"></i>
-              <span>10. Deep Research</span>
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+              <span>Deep Research</span>
             </div>
-            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">AI</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">R1</span>
           </a>
 
-          <a onclick="switchTab('documents'); playCyberClick();" id="nav-documents" class="nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs cursor-pointer transition">
+          <a onclick="switchTab('documents'); playCyberClick();" id="nav-documents" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <div class="flex items-center space-x-3">
               <i data-lucide="folder-down" class="w-4 h-4 text-emerald-400"></i>
-              <span>11. Drop Ingestion</span>
+              <span>Document Ingest</span>
             </div>
             <span id="nav-documents-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">0</span>
           </a>
 
-          <a onclick="switchTab('activity'); playCyberClick();" id="nav-activity" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
-            <i data-lucide="activity" class="w-4 h-4"></i>
+          <a onclick="switchTab('activity'); playCyberClick();" id="nav-activity" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+            <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
             <span>Activity Logs</span>
           </a>
 
-          <a onclick="switchTab('system'); playCyberClick();" id="nav-system" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-xs cursor-pointer transition">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            <span>System Telemetry</span>
+          <a onclick="switchTab('system'); playCyberClick();" id="nav-system" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+            <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+            <span>Preferences & Settings</span>
           </a>
         </div>
       </div>
@@ -821,7 +1015,7 @@ DASHBOARD_HTML = r"""
                 <h2 class="text-lg font-display font-bold text-white tracking-tight">Operations Command Center</h2>
               </div>
               <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
-                Personal AI OS is active in full Omarchy distro rice. Specialized in multi-agent orchestration, Dual-LLM quarantine defense, hybrid RAG knowledge search, and HITL safety authorization.
+                SovereignOS is active. Specialized in multi-agent orchestration, Dual-LLM quarantine defense, hybrid RAG knowledge search, and HITL safety authorization.
               </p>
             </div>
 
@@ -1047,7 +1241,7 @@ DASHBOARD_HTML = r"""
               <div class="space-y-3">
                 <div class="flex items-center space-x-2">
                   <i data-lucide="info" class="w-4 h-4 text-cyan-400"></i>
-                  <h3 class="text-sm font-display font-bold text-white">Why 3 Agents in Personal AI OS?</h3>
+                  <h3 class="text-sm font-display font-bold text-white">Why 3 Agents in SovereignOS?</h3>
                 </div>
 
                 <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed font-sans">
@@ -1113,9 +1307,9 @@ DASHBOARD_HTML = r"""
               </div>
 
               <div id="activity-log-feed" class="h-44 overflow-y-auto bg-black/40 rounded-xl border theme-border p-3 space-y-2 font-mono text-[11px] text-slate-300">
-                <div class="text-slate-400">[System] Personal AI OS initialized. Hybrid RAG vector store loaded.</div>
+                <div class="text-slate-400">[System] SovereignOS initialized. Hybrid RAG vector store loaded.</div>
                 <div class="text-slate-400">[System] LangGraph orchestrator ready with SQLite thread checkpoints.</div>
-                <div class="text-cyan-400">[Theme] Omarchy Distro rice engine active.</div>
+                <div class="text-cyan-400">[Theme] SovereignOS Theme & Style engine active.</div>
               </div>
             </div>
 
@@ -1192,9 +1386,9 @@ DASHBOARD_HTML = r"""
                   <i data-lucide="bot" class="w-4 h-4"></i>
                 </div>
                 <div class="p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2">
-                  <div class="text-xs font-semibold text-cyan-300">Personal AI</div>
+                  <div class="text-xs font-semibold text-indigo-300">Sovereign Copilot</div>
                   <p class="text-xs text-slate-200 leading-relaxed font-sans">
-                    Greetings, Yashpreet. Personal AI OS is online with Omarchy distro ricing. How can I assist with email triaging, calendar scheduling, or knowledge vault search today?
+                    Greetings, Yashpreet. SovereignOS is online. How can I assist with executive email triaging, calendar scheduling, autonomous deep research, or knowledge vault search today?
                   </p>
                 </div>
               </div>
@@ -1588,21 +1782,21 @@ DASHBOARD_HTML = r"""
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
             <div class="space-y-1">
               <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-300 flex items-center justify-center">
-                  <i data-lucide="git-fork" class="w-4 h-4 text-purple-400"></i>
+                <div class="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center font-bold">
+                  <i data-lucide="network" class="w-4 h-4 text-indigo-400"></i>
                 </div>
-                <h2 class="text-base font-display font-bold text-white">LangGraph Multi-Agent Architecture & Topology DAG</h2>
+                <h2 class="text-base font-display font-bold text-white">LangGraph Multi-Agent Architecture & Pipeline DAG</h2>
               </div>
-              <p class="text-xs text-slate-400 font-mono">Interactive State Machine Graph with security boundaries, conditional routing, and real-time step execution runner.</p>
+              <p class="text-xs text-slate-400 font-mono">Interactive deterministic state machine with security isolation boundaries, calibrated SGD gating, and tool sandboxes.</p>
             </div>
             <div class="flex items-center space-x-2">
-              <button onclick="openDAGSimulateModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
+              <button onclick="openDAGSimulateModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold flex items-center space-x-2 transition cursor-pointer shadow-lg shadow-indigo-500/20">
                 <i data-lucide="play" class="w-3.5 h-3.5"></i>
-                <span>Run Live DAG Simulation</span>
+                <span>Simulate Execution Flow</span>
               </button>
-              <button onclick="fetchTopologyGraph(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-purple-400 transition cursor-pointer">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-purple-400"></i>
-                <span>Refresh Architecture</span>
+              <button onclick="fetchTopologyGraph(); playCyberClick();" class="px-3.5 py-2 rounded-xl theme-card border text-slate-200 text-xs flex items-center space-x-1.5 hover:border-indigo-400 transition cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span>Refresh DAG</span>
               </button>
             </div>
           </div>
@@ -1612,175 +1806,213 @@ DASHBOARD_HTML = r"""
             <!-- Left 2 Columns: Graphical Pipeline Topology DAG Canvas -->
             <div class="lg:col-span-2 p-6 rounded-2xl theme-card border space-y-6 relative overflow-hidden">
               <div class="flex items-center justify-between text-xs font-mono text-slate-400 border-b theme-border pb-3">
-                <span class="flex items-center space-x-2"><i data-lucide="share-2" class="w-3.5 h-3.5 text-cyan-400"></i><span>STATE MACHINE PIPELINE GRAPH</span></span>
-                <span class="text-cyan-300">Click any node to inspect architecture</span>
+                <span class="flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="text-white font-semibold">STATE MACHINE EXECUTION TOPOLOGY</span>
+                </span>
+                <span class="text-indigo-300 text-[11px]">Click any node to inspect runtime state</span>
               </div>
 
-              <!-- Visual Interactive DAG Flow Chart -->
-              <div class="space-y-4 font-mono text-xs select-none">
+              <!-- Visual Interactive Node Editor Graph Flow -->
+              <div class="space-y-4 font-mono text-xs select-none relative">
                 <!-- Row 1: Entry -> Quarantine -->
                 <div class="flex items-center justify-center space-x-3">
-                  <div class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px]">
-                    ● ENTRY POINT (Raw Inbound / User Command)
+                  <div class="px-4 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold flex items-center space-x-2 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span>ENTRY POINT (Inbound Email / User Command / File Drop)</span>
                   </div>
                 </div>
 
-                <div class="flex justify-center text-cyan-500">
-                  <i data-lucide="arrow-down" class="w-4 h-4 animate-bounce"></i>
+                <div class="flex justify-center text-cyan-500/70">
+                  <svg class="w-4 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                  </svg>
                 </div>
 
                 <!-- Node 1: Quarantine Sandbox -->
-                <div onclick="inspectTopologyNode('quarantine_node'); playCyberClick();" id="dag-node-quarantine_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-cyan-500/60 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] transition cursor-pointer space-y-1.5">
+                <div onclick="inspectTopologyNode('quarantine_node'); playCyberClick();" id="dag-node-quarantine_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-cyan-500/40 hover:border-cyan-400 hover:shadow-[0_4px_20px_-2px_rgba(6,182,212,0.25)] transition cursor-pointer space-y-2 relative group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2 text-cyan-400 font-bold">
-                      <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <div class="flex items-center space-x-2 text-cyan-300 font-bold text-xs font-display">
+                      <div class="w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                      </div>
                       <span>1. Quarantine & Sanitization Node</span>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">TOOL-ISOLATED</span>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-[9px] font-mono text-slate-400">~35ms</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">TOOL-ISOLATED</span>
+                    </div>
                   </div>
-                  <p class="text-[11px] text-slate-300 font-sans">Neutralizes prompt injection attacks and outputs structured clean facts without tool access.</p>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">Neutralizes prompt injection attacks and outputs structured clean facts without tool access.</p>
                 </div>
 
-                <div class="flex justify-center text-indigo-400">
-                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                <div class="flex justify-center text-indigo-400/70">
+                  <svg class="w-4 h-6 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                  </svg>
                 </div>
 
                 <!-- Node 2: Triaging Node & Conditional Branch -->
-                <div onclick="inspectTopologyNode('triaging_node'); playCyberClick();" id="dag-node-triaging_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-indigo-500/60 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] transition cursor-pointer space-y-1.5">
+                <div onclick="inspectTopologyNode('triaging_node'); playCyberClick();" id="dag-node-triaging_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-indigo-500/40 hover:border-indigo-400 hover:shadow-[0_4px_20px_-2px_rgba(99,102,241,0.25)] transition cursor-pointer space-y-2 relative group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2 text-indigo-400 font-bold">
-                      <i data-lucide="layers" class="w-4 h-4"></i>
-                      <span>2. ML Triaging & Gatekeeper Node</span>
+                    <div class="flex items-center space-x-2 text-indigo-300 font-bold text-xs font-display">
+                      <div class="w-6 h-6 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                      </div>
+                      <span>2. ML Triaging & Importance Gating Node</span>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">CALIBRATED SGD</span>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-[9px] font-mono text-slate-400">~4ms</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">CALIBRATED SGD</span>
+                    </div>
                   </div>
-                  <p class="text-[11px] text-slate-300 font-sans">Calculates importance probability (0.0 to 1.0) and assigns category. Routes low-priority noise directly to bypass archive.</p>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">Computes calibrated probability (0.0 to 1.0) and assigns category. Routes low-priority noise directly to bypass archive.</p>
                 </div>
 
-                <!-- Branching Visual -->
-                <div class="grid grid-cols-2 gap-4 text-center">
+                <!-- Conditional Branching Header -->
+                <div class="grid grid-cols-2 gap-4 text-center pt-1">
                   <div class="flex flex-col items-center">
-                    <span class="text-[10px] text-emerald-400 pb-1">Score ≥ 0.50 (Trigger Agent)</span>
-                    <i data-lucide="arrow-down" class="w-4 h-4 text-emerald-400"></i>
+                    <span class="text-[10px] font-mono text-emerald-400 pb-1 font-bold">Score ≥ 0.50 (Trigger Agent Workflow)</span>
+                    <svg class="w-4 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                   </div>
                   <div class="flex flex-col items-center">
-                    <span class="text-[10px] text-slate-500 pb-1">Score < 0.50 (Low Priority)</span>
-                    <i data-lucide="arrow-down" class="w-4 h-4 text-slate-500"></i>
+                    <span class="text-[10px] font-mono text-slate-400 pb-1">Score < 0.50 (Low Priority Archive)</span>
+                    <svg class="w-4 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                   </div>
                 </div>
 
                 <!-- Row: RAG Node (Left) vs Low Priority Store (Right) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Node 3: Hybrid RAG -->
-                  <div onclick="inspectTopologyNode('retrieval_node'); playCyberClick();" id="dag-node-retrieval_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-emerald-500/60 hover:border-emerald-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition cursor-pointer space-y-1.5">
+                  <div onclick="inspectTopologyNode('retrieval_node'); playCyberClick();" id="dag-node-retrieval_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-emerald-500/40 hover:border-emerald-400 hover:shadow-[0_4px_20px_-2px_rgba(16,185,129,0.25)] transition cursor-pointer space-y-2">
                     <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-2 text-emerald-400 font-bold">
-                        <i data-lucide="database" class="w-4 h-4"></i>
+                      <div class="flex items-center space-x-2 text-emerald-300 font-bold text-xs font-display">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                        </div>
                         <span>3. Hybrid RAG Retrieval</span>
                       </div>
+                      <span class="text-[9px] font-mono text-slate-400">~22ms</span>
                     </div>
                     <p class="text-[11px] text-slate-300 font-sans">Dense MiniLM embeddings + BM25 keyword matching + CrossEncoder reranker.</p>
                   </div>
 
                   <!-- Node 2b: Low Priority Store -->
-                  <div onclick="inspectTopologyNode('low_priority_store_node'); playCyberClick();" id="dag-node-low_priority_store_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/60 border border-slate-700 hover:border-slate-500 transition cursor-pointer space-y-1.5">
+                  <div onclick="inspectTopologyNode('low_priority_store_node'); playCyberClick();" id="dag-node-low_priority_store_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/50 border border-slate-700/60 hover:border-slate-500 transition cursor-pointer space-y-2">
                     <div class="flex items-center justify-between text-slate-400 font-bold">
-                      <div class="flex items-center space-x-2">
-                        <i data-lucide="archive" class="w-4 h-4"></i>
-                        <span>2b. Low-Priority Store</span>
+                      <div class="flex items-center space-x-2 text-xs font-display">
+                        <div class="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400">
+                          <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <span>2b. Bypass Archive</span>
                       </div>
-                      <span class="text-[10px] text-slate-500">BYPASS LLM</span>
+                      <span class="text-[10px] text-slate-500 font-mono">0 LLM Tokens</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-sans">Direct database storage without consuming LLM reasoning tokens.</p>
+                    <p class="text-[11px] text-slate-400 font-sans">Direct database storage without consuming LLM reasoning budget.</p>
                   </div>
                 </div>
 
-                <div class="flex justify-center text-purple-400">
-                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                <div class="flex justify-center text-purple-400/70">
+                  <svg class="w-4 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                  </svg>
                 </div>
 
                 <!-- Node 4: ReAct Reasoning Node -->
-                <div onclick="inspectTopologyNode('reasoning_node'); playCyberClick();" id="dag-node-reasoning_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-purple-500/60 hover:border-purple-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition cursor-pointer space-y-1.5">
+                <div onclick="inspectTopologyNode('reasoning_node'); playCyberClick();" id="dag-node-reasoning_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-purple-500/40 hover:border-purple-400 hover:shadow-[0_4px_20px_-2px_rgba(168,85,247,0.25)] transition cursor-pointer space-y-2 relative group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2 text-purple-400 font-bold">
-                      <i data-lucide="brain" class="w-4 h-4"></i>
-                      <span>4. ReAct Reasoning & Planner Node</span>
+                    <div class="flex items-center space-x-2 text-purple-300 font-bold text-xs font-display">
+                      <div class="w-6 h-6 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                        <i data-lucide="brain" class="w-3.5 h-3.5"></i>
+                      </div>
+                      <span>4. ReAct Reasoning & Execution Planner</span>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">STRUCTURED OUTPUT</span>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-[9px] font-mono text-slate-400">~420ms</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">STRUCTURED</span>
+                    </div>
                   </div>
-                  <p class="text-[11px] text-slate-300 font-sans">Synthesizes context, formulates execution plan, and selects tool with schema-validated args.</p>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">Synthesizes context, formulates execution plan, and selects tool with schema-validated args.</p>
                 </div>
 
-                <div class="flex justify-center text-amber-400">
-                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                <div class="flex justify-center text-amber-400/70">
+                  <svg class="w-4 h-6 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                  </svg>
                 </div>
 
                 <!-- Node 5: HITL Safety Gate Node -->
-                <div onclick="inspectTopologyNode('approval_gate_node'); playCyberClick();" id="dag-node-approval_gate_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-amber-500/60 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition cursor-pointer space-y-1.5">
+                <div onclick="inspectTopologyNode('approval_gate_node'); playCyberClick();" id="dag-node-approval_gate_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_4px_20px_-2px_rgba(245,158,11,0.25)] transition cursor-pointer space-y-2 relative group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2 text-amber-400 font-bold">
-                      <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                    <div class="flex items-center space-x-2 text-amber-300 font-bold text-xs font-display">
+                      <div class="w-6 h-6 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                      </div>
                       <span>5. 3-Tier HITL Safety Gatekeeper</span>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">RISK INTERCEPTOR</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 font-mono">RISK INTERCEPTOR</span>
                   </div>
-                  <p class="text-[11px] text-slate-300 font-sans">Halts Tier 3 destructive tools (email.send, workspace.write_file) until operator authorizes.</p>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">Halts Tier 3 destructive tools (email.send, workspace.write_file) until operator authorizes.</p>
                 </div>
 
-                <div class="flex justify-center text-blue-400">
-                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                <div class="flex justify-center text-blue-400/70">
+                  <svg class="w-4 h-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                  </svg>
                 </div>
 
                 <!-- Node 6: Tool Execution Node -->
-                <div onclick="inspectTopologyNode('tool_execution_node'); playCyberClick();" id="dag-node-tool_execution_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/90 border-2 border-blue-500/60 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition cursor-pointer space-y-1.5">
+                <div onclick="inspectTopologyNode('tool_execution_node'); playCyberClick();" id="dag-node-tool_execution_node" class="dag-visual-node p-4 rounded-xl bg-slate-900/80 border border-blue-500/40 hover:border-blue-400 hover:shadow-[0_4px_20px_-2px_rgba(59,130,246,0.25)] transition cursor-pointer space-y-2 relative group">
                   <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2 text-blue-400 font-bold">
-                      <i data-lucide="cpu" class="w-4 h-4"></i>
+                    <div class="flex items-center space-x-2 text-blue-300 font-bold text-xs font-display">
+                      <div class="w-6 h-6 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                      </div>
                       <span>6. Sandboxed Tool Execution Node</span>
                     </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">CONNECTORS</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono">DETERMINISTIC</span>
                   </div>
-                  <p class="text-[11px] text-slate-300 font-sans">Executes Gmail, Calendar, Obsidian, Workspace, and Web Search connectors safely.</p>
+                  <p class="text-xs text-slate-300 font-sans leading-relaxed">Executes Gmail, Calendar, Obsidian, Workspace, and Web Search connectors in deterministic sub-runtimes.</p>
                 </div>
               </div>
             </div>
 
             <!-- Right 1 Column: Node Deep Dive Architecture Inspector -->
-            <div class="p-5 rounded-2xl theme-card border space-y-4 h-[680px] flex flex-col overflow-y-auto">
+            <div class="p-5 rounded-2xl theme-card border space-y-4 h-[720px] flex flex-col overflow-y-auto">
               <div class="border-b theme-border pb-3">
                 <h3 id="topology-node-title" class="font-display font-bold text-sm text-white">Quarantine Node</h3>
-                <span id="topology-node-role" class="text-[11px] font-mono text-cyan-400">Tier 1: Security Isolation Sandbox</span>
+                <span id="topology-node-role" class="text-[11px] font-mono text-cyan-300">Tier 1: Security Isolation Sandbox</span>
               </div>
 
               <div class="space-y-3 text-xs flex-1">
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">MODEL & RUNTIME</span>
-                  <div id="topology-node-model" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px]">Gemini 2.5 Flash / Fast LLM</div>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">MODEL & RUNTIME</span>
+                  <div id="topology-node-model" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px] border theme-border">Gemini 2.5 Flash / Fast LLM</div>
                 </div>
 
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">ISOLATION BOUNDARY</span>
-                  <div id="topology-node-isolation" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px]">Tool-Isolated (No file/network/state access)</div>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">ISOLATION BOUNDARY</span>
+                  <div id="topology-node-isolation" class="p-2.5 rounded-xl bg-black/40 text-slate-200 font-mono text-[11px] border theme-border">Tool-Isolated (No file/network/state access)</div>
                 </div>
 
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">PURPOSE & LOGIC</span>
-                  <p id="topology-node-desc" class="text-slate-300 text-xs leading-relaxed">Sanitizes raw untrusted user/email inputs, neutralizing prompt injection attacks and extracting structured clean facts.</p>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">PURPOSE & LOGIC</span>
+                  <p id="topology-node-desc" class="text-slate-300 text-xs leading-relaxed font-sans p-2.5 rounded-xl bg-black/30 border theme-border">Sanitizes raw untrusted user/email inputs, neutralizing prompt injection attacks and extracting structured clean facts.</p>
                 </div>
 
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">INPUT STATE SCHEMA</span>
-                  <div id="topology-node-inputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-cyan-300">["raw_subject", "raw_body", "sender", "is_known_contact"]</div>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">INPUT STATE SCHEMA</span>
+                  <div id="topology-node-inputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-cyan-300 border theme-border">["raw_subject", "raw_body", "sender", "is_known_contact"]</div>
                 </div>
 
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">OUTPUT STATE MUTATIONS</span>
-                  <div id="topology-node-outputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-emerald-300">["clean_facts", "is_interactive_command"]</div>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">OUTPUT STATE MUTATIONS</span>
+                  <div id="topology-node-outputs" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-emerald-300 border theme-border">["clean_facts", "is_interactive_command"]</div>
                 </div>
 
                 <div class="space-y-1">
-                  <span class="font-mono text-[10px] text-slate-400">TYPICAL LATENCY</span>
-                  <div id="topology-node-latency" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-purple-300">~35ms</div>
+                  <span class="font-mono text-[10px] text-slate-400 font-bold uppercase">TYPICAL LATENCY</span>
+                  <div id="topology-node-latency" class="p-2.5 rounded-xl bg-black/40 font-mono text-[11px] text-purple-300 border theme-border">~35ms</div>
                 </div>
               </div>
             </div>
@@ -2243,19 +2475,17 @@ DASHBOARD_HTML = r"""
 
       </div>
     </main>
-  </div>
-
-  <!-- ─── 3. OMARCHY THEMES SELECTOR MODAL ──────────────────────────── -->
+  <!-- ─── 3. SOVEREIGN THEMES SELECTOR MODAL ──────────────────────────── -->
   <div id="theme-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
-    <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl">
+    <div class="w-full max-w-3xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b theme-border pb-4">
         <div class="flex items-center space-x-2.5">
-          <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+          <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
             <i data-lucide="palette" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-display font-bold text-base text-white">Omarchy Distro Theme Engine</h3>
-            <p class="text-xs text-slate-400 font-mono">Select curated ricing presets for Personal AI OS</p>
+            <h3 class="font-display font-bold text-base text-white">SovereignOS Theme & Style Engine</h3>
+            <p class="text-xs text-slate-400 font-mono">Select curated professional workstation & cyberpunk aesthetic profiles</p>
           </div>
         </div>
         <button onclick="closeThemeModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
@@ -2263,85 +2493,135 @@ DASHBOARD_HTML = r"""
         </button>
       </div>
 
-      <!-- Theme Cards Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <!-- 1. Cyberpunk -->
-        <button onclick="setThemePreset('omarchy-cyberpunk'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#07080d] border-[#00f0ff]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#00f0ff] via-[#9d4edd] to-[#ff007f] mb-2"></div>
-          <div class="font-bold text-xs">Cyberpunk</div>
-          <div class="text-[10px] text-cyan-300 font-mono">Neon Cyan & Pink</div>
-        </button>
+      <!-- Section 1: Sovereign Professional Workstation Themes -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-indigo-300">
+          <i data-lucide="briefcase" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>👑 Sovereign Professional Workstation Themes</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <!-- 1. Sovereign Slate -->
+          <button onclick="setThemePreset('sovereign-slate'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#0d1017] border-[#242d3e] hover:border-indigo-500/80 text-white shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#6366f1] via-[#38bdf8] to-[#1e293b] mb-2 border border-white/5"></div>
+            <div class="font-bold text-xs">Sovereign Slate</div>
+            <div class="text-[10px] text-indigo-300 font-mono">Linear / Raycast</div>
+          </button>
 
-        <!-- 2. Tokyo Night -->
-        <button onclick="setThemePreset('omarchy-tokyonight'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1a1b26] border-[#7aa2f7]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#7aa2f7] via-[#bb9af7] to-[#7dcfff] mb-2"></div>
-          <div class="font-bold text-xs">Tokyo Night</div>
-          <div class="text-[10px] text-blue-300 font-mono">Storm & Lavender</div>
-        </button>
+          <!-- 2. Sovereign Onyx -->
+          <button onclick="setThemePreset('sovereign-onyx'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#09090b] border-[#27272a] hover:border-blue-500/80 text-white shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#3b82f6] via-[#60a5fa] to-[#18181b] mb-2 border border-white/5"></div>
+            <div class="font-bold text-xs">Titanium Onyx</div>
+            <div class="text-[10px] text-blue-300 font-mono">Apple Pro / Vercel</div>
+          </button>
 
-        <!-- 3. Catppuccin Mocha -->
-        <button onclick="setThemePreset('omarchy-catppuccin'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1e1e2e] border-[#cba6f7]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#cba6f7] via-[#f5c2e7] to-[#94e2d5] mb-2"></div>
-          <div class="font-bold text-xs">Catppuccin</div>
-          <div class="text-[10px] text-purple-300 font-mono">Mocha & Mauve</div>
-        </button>
+          <!-- 3. Sovereign Studio -->
+          <button onclick="setThemePreset('sovereign-studio'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#0b0e0f] border-[#233138] hover:border-emerald-500/80 text-white shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#10b981] via-[#2dd4bf] to-[#151c1e] mb-2 border border-white/5"></div>
+            <div class="font-bold text-xs">Minimal Studio</div>
+            <div class="text-[10px] text-emerald-300 font-mono">Graphite & Sage</div>
+          </button>
 
-        <!-- 4. Nord Frost -->
-        <button onclick="setThemePreset('omarchy-nord'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#2e3440] border-[#88c0d0]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#88c0d0] via-[#81a1c1] to-[#a3be8c] mb-2"></div>
-          <div class="font-bold text-xs">Nord Frost</div>
-          <div class="text-[10px] text-teal-300 font-mono">Arctic Night</div>
-        </button>
+          <!-- 4. Sovereign Obsidian -->
+          <button onclick="setThemePreset('sovereign-obsidian'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#0e0c0a] border-[#3d342a] hover:border-amber-500/80 text-white shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#f59e0b] via-[#fbbf24] to-[#1c1713] mb-2 border border-white/5"></div>
+            <div class="font-bold text-xs">Obsidian Gold</div>
+            <div class="text-[10px] text-amber-300 font-mono">Warm Amber Glass</div>
+          </button>
 
-        <!-- 5. Gruvbox Retro -->
-        <button onclick="setThemePreset('omarchy-gruvbox'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#282828] border-[#fabd2f]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#fabd2f] via-[#fe8019] to-[#8ec07c] mb-2"></div>
-          <div class="font-bold text-xs">Gruvbox</div>
-          <div class="text-[10px] text-amber-300 font-mono">Warm Gold & Aqua</div>
-        </button>
+          <!-- 5. Sovereign Light -->
+          <button onclick="setThemePreset('sovereign-light'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#f8fafc] border-[#e2e8f0] hover:border-indigo-500/80 text-slate-900 shadow-md">
+            <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#4f46e5] via-[#0284c7] to-[#e2e8f0] mb-2 border border-black/5"></div>
+            <div class="font-bold text-xs text-slate-900">Light Studio</div>
+            <div class="text-[10px] text-indigo-600 font-mono">High Contrast Clean</div>
+          </button>
+        </div>
+      </div>
 
-        <!-- 6. Synthwave 84 -->
-        <button onclick="setThemePreset('omarchy-synthwave'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1a102f] border-[#ff2a85]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#ff2a85] via-[#ff7b00] to-[#05d9e8] mb-2"></div>
-          <div class="font-bold text-xs">Synthwave 84</div>
-          <div class="text-[10px] text-pink-300 font-mono">Outrun Horizon</div>
-        </button>
+      <!-- Section 2: Omarchy Cyber & Aesthetic Profiles -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>⚡ Omarchy Cyberpunk & Rice Profiles</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- Cyberpunk -->
+          <button onclick="setThemePreset('omarchy-cyberpunk'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#07080d] border-[#00f0ff]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#00f0ff] via-[#9d4edd] to-[#ff007f] mb-1.5"></div>
+            <div class="font-bold text-xs">Cyberpunk</div>
+            <div class="text-[10px] text-cyan-300 font-mono">Neon Cyan & Pink</div>
+          </button>
 
-        <!-- 7. Matrix Terminal -->
-        <button onclick="setThemePreset('omarchy-matrix'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#020702] border-[#00ff41]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#00ff41] via-[#39ff14] to-[#003b00] mb-2"></div>
-          <div class="font-bold text-xs">Matrix Terminal</div>
-          <div class="text-[10px] text-emerald-300 font-mono">Phosphor CRT</div>
-        </button>
+          <!-- Tokyo Night -->
+          <button onclick="setThemePreset('omarchy-tokyonight'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1a1b26] border-[#7aa2f7]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#7aa2f7] via-[#bb9af7] to-[#7dcfff] mb-1.5"></div>
+            <div class="font-bold text-xs">Tokyo Night</div>
+            <div class="text-[10px] text-blue-300 font-mono">Storm & Lavender</div>
+          </button>
 
-        <!-- 8. Dracula Abyss -->
-        <button onclick="setThemePreset('omarchy-dracula'); playCyberClick();" class="p-3.5 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#21222c] border-[#bd93f9]/40 text-white">
-          <div class="w-full h-8 rounded-lg bg-gradient-to-r from-[#bd93f9] via-[#ff79c6] to-[#50fa7b] mb-2"></div>
-          <div class="font-bold text-xs">Dracula Abyss</div>
-          <div class="text-[10px] text-purple-300 font-mono">Vampire Dusk</div>
-        </button>
+          <!-- Catppuccin Mocha -->
+          <button onclick="setThemePreset('omarchy-catppuccin'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1e1e2e] border-[#cba6f7]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#cba6f7] via-[#f5c2e7] to-[#94e2d5] mb-1.5"></div>
+            <div class="font-bold text-xs">Catppuccin</div>
+            <div class="text-[10px] text-purple-300 font-mono">Mocha & Mauve</div>
+          </button>
+
+          <!-- Nord Frost -->
+          <button onclick="setThemePreset('omarchy-nord'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#2e3440] border-[#88c0d0]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#88c0d0] via-[#81a1c1] to-[#a3be8c] mb-1.5"></div>
+            <div class="font-bold text-xs">Nord Frost</div>
+            <div class="text-[10px] text-teal-300 font-mono">Arctic Night</div>
+          </button>
+
+          <!-- Gruvbox Retro -->
+          <button onclick="setThemePreset('omarchy-gruvbox'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#282828] border-[#fabd2f]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#fabd2f] via-[#fe8019] to-[#8ec07c] mb-1.5"></div>
+            <div class="font-bold text-xs">Gruvbox</div>
+            <div class="text-[10px] text-amber-300 font-mono">Warm Gold & Aqua</div>
+          </button>
+
+          <!-- Synthwave 84 -->
+          <button onclick="setThemePreset('omarchy-synthwave'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#1a102f] border-[#ff2a85]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#ff2a85] via-[#ff7b00] to-[#05d9e8] mb-1.5"></div>
+            <div class="font-bold text-xs">Synthwave 84</div>
+            <div class="text-[10px] text-pink-300 font-mono">Outrun Horizon</div>
+          </button>
+
+          <!-- Matrix Terminal -->
+          <button onclick="setThemePreset('omarchy-matrix'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#020702] border-[#00ff41]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#00ff41] via-[#39ff14] to-[#003b00] mb-1.5"></div>
+            <div class="font-bold text-xs">Matrix Terminal</div>
+            <div class="text-[10px] text-emerald-300 font-mono">Phosphor CRT</div>
+          </button>
+
+          <!-- Dracula Abyss -->
+          <button onclick="setThemePreset('omarchy-dracula'); playCyberClick();" class="p-3 rounded-xl border text-left transition cursor-pointer hover:scale-[1.02] bg-[#21222c] border-[#bd93f9]/40 text-white">
+            <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#bd93f9] via-[#ff79c6] to-[#50fa7b] mb-1.5"></div>
+            <div class="font-bold text-xs">Dracula Abyss</div>
+            <div class="text-[10px] text-purple-300 font-mono">Vampire Dusk</div>
+          </button>
+        </div>
       </div>
 
       <div class="flex items-center justify-between text-xs text-slate-400 border-t theme-border pt-4">
-        <span>Settings auto-saved to local state</span>
-        <button onclick="closeThemeModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer">Done</button>
+        <span>Themes auto-saved to local state</span>
+        <button onclick="closeThemeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer">Done</button>
       </div>
     </div>
   </div>
 
-  <!-- ─── 4. OMARCHY WALLPAPERS & GLASS CUSTOMIZER MODAL ────────────── -->
+  <!-- ─── 4. SOVEREIGN WALLPAPERS & PROFESSIONAL BACKGROUNDS ─────────── -->
   <div id="wallpaper-picker-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
     <div class="w-full max-w-3xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b theme-border pb-4">
         <div class="flex items-center space-x-2.5">
-          <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-white">
+          <div class="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
             <i data-lucide="image" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-display font-bold text-base text-white">Background Wallpapers & Glass Customizer</h3>
-            <p class="text-xs text-slate-400 font-mono">Choose dynamic live canvases, upload local video/photo, or customize card transparency</p>
+            <h3 class="font-display font-bold text-base text-white">Background & Environment Customizer</h3>
+            <p class="text-xs text-slate-400 font-mono">Choose distraction-free professional backdrops, dynamic live canvases, or upload local media</p>
           </div>
         </div>
         <button onclick="closeWallpaperModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
@@ -2349,29 +2629,74 @@ DASHBOARD_HTML = r"""
         </button>
       </div>
 
+      <!-- Professional Workstation Backdrops -->
+      <div class="space-y-2">
+        <label class="text-xs font-mono text-indigo-300 font-bold uppercase tracking-wider flex items-center space-x-2">
+          <i data-lucide="monitor" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>💼 Professional Workstation Backdrops (Clean & Fast)</span>
+        </label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- 1. Minimal Solid Onyx -->
+          <button onclick="setWallpaperEngine('minimal-solid'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-[#0d1017] border border-white/10 flex items-center justify-center text-slate-300 mb-2">
+              <i data-lucide="square" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Solid Minimal</div>
+            <div class="text-[10px] text-slate-400">Zero Distraction (0% CPU)</div>
+          </button>
+
+          <!-- 2. Blueprint Grid -->
+          <button onclick="setWallpaperEngine('subtle-grid'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-[#090b10] border border-indigo-500/30 flex items-center justify-center text-indigo-300 mb-2">
+              <i data-lucide="grid" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Technical Grid</div>
+            <div class="text-[10px] text-slate-400">Blueprint Grid Lines</div>
+          </button>
+
+          <!-- 3. Slate Gradient Studio -->
+          <button onclick="setWallpaperEngine('slate-gradient'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-gradient-to-br from-[#1e1b4b]/40 to-[#020617] border border-indigo-500/20 flex items-center justify-center text-indigo-300 mb-2">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Slate Ambient</div>
+            <div class="text-[10px] text-slate-400">Studio Radial Glow</div>
+          </button>
+
+          <!-- 4. Titanium Studio -->
+          <button onclick="setWallpaperEngine('titanium-studio'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-indigo-400 theme-card">
+            <div class="w-full h-10 rounded-lg bg-gradient-to-tr from-[#18181b] to-[#09090b] border border-zinc-700 flex items-center justify-center text-zinc-300 mb-2">
+              <i data-lucide="shield" class="w-4 h-4"></i>
+            </div>
+            <div class="font-bold text-xs text-white">Titanium Studio</div>
+            <div class="text-[10px] text-slate-400">Deep Graphite Mesh</div>
+          </button>
+        </div>
+      </div>
+
       <!-- Upload Local Photo/Video Banner -->
       <div class="p-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/40 to-black/40 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="space-y-1 text-left">
           <div class="flex items-center space-x-2">
-            <i data-lucide="upload-cloud" class="w-4 h-4 text-cyan-400"></i>
+            <i data-lucide="upload-cloud" class="w-4 h-4 text-indigo-400"></i>
             <span class="font-bold text-sm text-white">Upload Custom Video or Photo Background</span>
           </div>
           <p class="text-xs text-slate-300">
-            Select any local video (<code class="text-cyan-300">.mp4</code>, <code class="text-cyan-300">.webm</code>) or image (<code class="text-cyan-300">.png</code>, <code class="text-cyan-300">.jpg</code>, <code class="text-cyan-300">.gif</code>). Automatically stored in local IndexedDB.
+            Select any local video (<code class="text-indigo-300">.mp4</code>, <code class="text-indigo-300">.webm</code>) or image (<code class="text-indigo-300">.png</code>, <code class="text-indigo-300">.jpg</code>). Stored locally in browser state.
           </p>
         </div>
 
         <input type="file" id="wallpaper-file-input" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" onchange="handleWallpaperFileUpload(event)" class="hidden">
         
-        <button onclick="document.getElementById('wallpaper-file-input').click(); playCyberClick();" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-medium text-xs flex items-center space-x-2 shadow-lg cursor-pointer flex-shrink-0">
+        <button onclick="document.getElementById('wallpaper-file-input').click(); playCyberClick();" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs flex items-center space-x-2 shadow-lg cursor-pointer flex-shrink-0">
           <i data-lucide="folder-plus" class="w-4 h-4"></i>
           <span>Choose File</span>
         </button>
       </div>
 
-      <!-- Live Wallpaper Presets Grid -->
-      <div class="space-y-2">
-        <label class="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">Dynamic Canvases & Presets</label>
+      <!-- Dynamic Live Canvases Grid -->
+      <div class="space-y-2 pt-2 border-t theme-border">
+        <label class="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">Dynamic Canvases & Rice Presets</label>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <!-- Canvas: Particles -->
           <button onclick="setWallpaperEngine('particles'); playCyberClick();" class="p-3 rounded-xl border theme-border text-left transition cursor-pointer hover:border-cyan-400 theme-card">
@@ -3196,6 +3521,11 @@ DASHBOARD_HTML = r"""
       localStorage.setItem(STORAGE_THEME, themeName);
       
       const themeLabels = {
+        'sovereign-slate': 'Sovereign Slate',
+        'sovereign-onyx': 'Titanium Onyx',
+        'sovereign-studio': 'Minimal Studio',
+        'sovereign-obsidian': 'Obsidian Gold',
+        'sovereign-light': 'Light Studio',
         'omarchy-cyberpunk': 'Cyberpunk',
         'omarchy-tokyonight': 'Tokyo Night',
         'omarchy-catppuccin': 'Catppuccin',
@@ -3440,7 +3770,29 @@ DASHBOARD_HTML = r"""
         video.classList.add('hidden');
       }
 
-      // Handle preset backgrounds
+      // Handle professional and preset backgrounds
+      if (currentWallpaperEngine === 'minimal-solid') {
+        bg.style.backgroundImage = 'none';
+        bg.style.backgroundColor = 'transparent';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      if (currentWallpaperEngine === 'subtle-grid') {
+        bg.style.backgroundImage = "radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 80%), linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px)";
+        bg.style.backgroundSize = "100% 100%, 32px 32px, 32px 32px";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      if (currentWallpaperEngine === 'slate-gradient') {
+        bg.style.backgroundImage = "radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.14) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.09) 0%, transparent 60%), linear-gradient(180deg, #0d1017 0%, #06080c 100%)";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      if (currentWallpaperEngine === 'titanium-studio') {
+        bg.style.backgroundImage = "radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 75%), linear-gradient(180deg, #09090b 0%, #000000 100%)";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
       if (currentWallpaperEngine === 'arch') {
         bg.style.backgroundImage = "radial-gradient(circle at 50% 50%, #171f2d 0%, #090c12 100%)";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
