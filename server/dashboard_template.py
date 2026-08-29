@@ -104,12 +104,12 @@ DASHBOARD_HTML = r"""
       --waybar-bg: rgba(18, 22, 31, 0.88);
 
       /* Old Regime Tactile Shadows & Smooth Transition Tokens */
-      --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35), 0 12px 28px -4px rgba(0, 0, 0, 0.45);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
-      --shadow-raised: 0 8px 30px rgba(0, 0, 0, 0.5);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
-      --card-transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.6);
+      --shadow-raised: 0 14px 40px -4px rgba(0, 0, 0, 0.85);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
+      --card-transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
       --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -140,10 +140,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
       --waybar-bg: rgba(18, 22, 31, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(0, 0, 0, 0.55);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="sovereign-onyx"] {
@@ -172,10 +172,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a1a1aa;
       --glow-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.25);
       --waybar-bg: rgba(14, 14, 17, 0.90);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(0, 0, 0, 0.7);
-      --shadow-card-hover: 0 6px 22px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(0, 0, 0, 0.85);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+      --shadow-card: 0 8px 26px -4px rgba(0, 0, 0, 0.88), 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.98), 0 8px 20px -3px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
     }
 
     [data-theme="sovereign-studio"] {
@@ -204,10 +204,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.25);
       --waybar-bg: rgba(16, 20, 22, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(0, 0, 0, 0.55);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(0, 0, 0, 0.7);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.78), 0 2px 8px -2px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(16, 185, 129, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(16, 185, 129, 0.15);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(16, 185, 129, 0.3);
     }
 
     [data-theme="sovereign-obsidian"] {
@@ -236,10 +236,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a8a29e;
       --glow-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.25);
       --waybar-bg: rgba(20, 17, 14, 0.90);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.45), 0 14px 32px -4px rgba(0, 0, 0, 0.6);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.55), 0 24px 48px -6px rgba(0, 0, 0, 0.75);
-      --bevel-highlight: inset 0 1px 0 0 rgba(245, 158, 11, 0.12);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(245, 158, 11, 0.25);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(245, 158, 11, 0.08);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(245, 158, 11, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.7);
+      --bevel-highlight: inset 0 1px 0 0 rgba(245, 158, 11, 0.18);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(245, 158, 11, 0.35);
     }
 
     [data-theme="sovereign-light"] {
@@ -268,9 +268,9 @@ DASHBOARD_HTML = r"""
       --text-muted: #64748b;
       --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15);
       --waybar-bg: rgba(255, 255, 255, 0.92);
-      --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 6px 18px -2px rgba(15, 23, 42, 0.07);
-      --shadow-card-hover: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 16px 32px -4px rgba(15, 23, 42, 0.14);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+      --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 1px 4px -1px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(15, 23, 42, 0.06);
+      --shadow-card-hover: 0 16px 36px -4px rgba(15, 23, 42, 0.15), 0 6px 14px -2px rgba(79, 70, 229, 0.18), 0 0 0 1px rgba(79, 70, 229, 0.5);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
       --bevel-highlight-hover: inset 0 1px 0 0 #ffffff;
     }
 
@@ -301,8 +301,8 @@ DASHBOARD_HTML = r"""
       --text-muted: #5c584e;
       --glow-shadow: 0 4px 16px -2px rgba(212, 43, 43, 0.25);
       --waybar-bg: #eae4d8;
-      --shadow-card: 2px 2px 0px #0a0a0a;
-      --shadow-card-hover: 4px 4px 0px #0a0a0a;
+      --shadow-card: 3px 3px 0px #0a0a0a;
+      --shadow-card-hover: 5px 5px 0px #d42b2b, 0 0 0 1px #0a0a0a;
       --bevel-highlight: inset 0 0 0 0 transparent;
       --bevel-highlight-hover: inset 0 0 0 0 transparent;
     }
@@ -334,10 +334,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #94a3b8;
       --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.18);
       --waybar-bg: rgba(11, 13, 20, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(0, 240, 255, 0.12);
-      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(0, 240, 255, 0.25);
-      --bevel-highlight: inset 0 1px 0 0 rgba(0, 240, 255, 0.12);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 240, 255, 0.25);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 240, 255, 0.12);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(0, 240, 255, 0.35), 0 0 0 1px rgba(0, 240, 255, 0.7);
+      --bevel-highlight: inset 0 1px 0 0 rgba(0, 240, 255, 0.18);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 240, 255, 0.35);
     }
 
     [data-theme="omarchy-tokyonight"] {
@@ -366,10 +366,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #7aa2f7;
       --glow-shadow: 0 0 20px rgba(122, 162, 247, 0.18);
       --waybar-bg: rgba(26, 27, 38, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(122, 162, 247, 0.1);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(122, 162, 247, 0.22);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(122, 162, 247, 0.1);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(122, 162, 247, 0.32), 0 0 0 1px rgba(122, 162, 247, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-catppuccin"] {
@@ -398,10 +398,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a6adc8;
       --glow-shadow: 0 0 20px rgba(203, 166, 247, 0.18);
       --waybar-bg: rgba(24, 24, 37, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(203, 166, 247, 0.1);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(203, 166, 247, 0.2);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(203, 166, 247, 0.1);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(203, 166, 247, 0.3), 0 0 0 1px rgba(203, 166, 247, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-nord"] {
@@ -430,10 +430,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #d8dee9;
       --glow-shadow: 0 0 20px rgba(136, 192, 208, 0.2);
       --waybar-bg: rgba(46, 52, 64, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.35), 0 14px 32px -4px rgba(136, 192, 208, 0.1);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.45), 0 24px 48px -6px rgba(136, 192, 208, 0.2);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.7), 0 2px 8px -2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(136, 192, 208, 0.1);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.9), 0 8px 20px -3px rgba(136, 192, 208, 0.3), 0 0 0 1px rgba(136, 192, 208, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-gruvbox"] {
@@ -462,10 +462,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a89984;
       --glow-shadow: 0 0 20px rgba(250, 189, 47, 0.18);
       --waybar-bg: rgba(40, 40, 40, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px rgba(250, 189, 47, 0.08);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px rgba(250, 189, 47, 0.18);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(250, 189, 47, 0.08);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(250, 189, 47, 0.3), 0 0 0 1px rgba(250, 189, 47, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
     }
 
     [data-theme="omarchy-synthwave"] {
@@ -494,10 +494,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #a79fc2;
       --glow-shadow: 0 0 25px rgba(255, 42, 133, 0.25);
       --waybar-bg: rgba(26, 16, 47, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.5), 0 16px 36px -4px rgba(255, 42, 133, 0.18);
-      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.6), 0 28px 56px -6px rgba(255, 42, 133, 0.32);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 42, 133, 0.15);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 42, 133, 0.3);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 42, 133, 0.18);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(255, 42, 133, 0.4), 0 0 0 1px rgba(255, 42, 133, 0.75);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 42, 133, 0.2);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 42, 133, 0.4);
     }
 
     [data-theme="omarchy-matrix"] {
@@ -526,10 +526,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #4e9a4e;
       --glow-shadow: 0 0 25px rgba(0, 255, 65, 0.25);
       --waybar-bg: rgba(5, 15, 5, 0.9);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.6), 0 16px 36px -4px rgba(0, 255, 65, 0.15);
-      --shadow-card-hover: 0 6px 24px -2px rgba(0, 0, 0, 0.7), 0 28px 56px -6px rgba(0, 255, 65, 0.28);
-      --bevel-highlight: inset 0 1px 0 0 rgba(0, 255, 65, 0.12);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 255, 65, 0.25);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.88), 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 255, 65, 0.15);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.98), 0 8px 20px -3px rgba(0, 255, 65, 0.35), 0 0 0 1px rgba(0, 255, 65, 0.7);
+      --bevel-highlight: inset 0 1px 0 0 rgba(0, 255, 65, 0.18);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 255, 65, 0.35);
     }
 
     [data-theme="omarchy-dracula"] {
@@ -558,10 +558,10 @@ DASHBOARD_HTML = r"""
       --text-muted: #6272a4;
       --glow-shadow: 0 0 20px rgba(189, 147, 249, 0.2);
       --waybar-bg: rgba(33, 34, 44, 0.88);
-      --shadow-card: 0 2px 10px -2px rgba(0, 0, 0, 0.45), 0 14px 32px -4px rgba(189, 147, 249, 0.12);
-      --shadow-card-hover: 0 6px 20px -2px rgba(0, 0, 0, 0.55), 0 24px 48px -6px rgba(189, 147, 249, 0.22);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(189, 147, 249, 0.12);
+      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(189, 147, 249, 0.32), 0 0 0 1px rgba(189, 147, 249, 0.6);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     * { box-sizing: border-box; }
@@ -688,15 +688,15 @@ DASHBOARD_HTML = r"""
       border: 1px solid var(--border-main);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
-      box-shadow: var(--shadow-card), var(--bevel-highlight);
+      box-shadow: var(--shadow-card), var(--bevel-highlight) !important;
       border-radius: 0px !important;
-      transition: var(--card-transition);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease !important;
     }
     .theme-card:hover {
       background-color: var(--bg-card-hover);
-      border-color: var(--border-accent);
-      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
-      transform: translateY(-2px);
+      border-color: var(--border-accent) !important;
+      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover) !important;
+      transform: translateY(-3px) !important;
     }
     .theme-border { border-color: var(--border-main); }
     .theme-glow { box-shadow: var(--glow-shadow); }
@@ -1160,14 +1160,15 @@ DASHBOARD_HTML = r"""
       background-color: var(--bg-card);
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
-      box-shadow: var(--shadow-card), var(--bevel-highlight);
-      transition: var(--card-transition);
+      box-shadow: var(--shadow-card), var(--bevel-highlight) !important;
+      border-radius: 0px !important;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease !important;
     }
     .seamless-card:hover {
-      border-color: var(--border-accent);
+      border-color: var(--border-accent) !important;
       background-color: var(--bg-card-hover);
-      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
-      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover) !important;
+      transform: translateY(-3px) !important;
     }
     .eyebrow-stamp {
       font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
