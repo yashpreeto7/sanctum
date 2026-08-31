@@ -1,6 +1,7 @@
 import asyncio
 import io
 import json
+import logging
 import time
 import uuid
 from pathlib import Path
@@ -9,6 +10,9 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger("SovereignOS")
+logging.basicConfig(level=logging.INFO)
 
 from execution.core.config import settings
 from execution.core.llm_provider import llm_provider
@@ -233,6 +237,7 @@ class SendReplyPayload(BaseModel):
 
 
 class CreateCalendarEventPayload(BaseModel):
+    id: Optional[str] = None
     summary: str
     start_time: str
     end_time: str
@@ -850,6 +855,7 @@ async def create_calendar_event(payload: CreateCalendarEventPayload):
     """Creates a new event in Google Calendar with offline persistent fallback."""
     try:
         ev = CalendarEvent(
+            id=payload.id,
             summary=payload.summary,
             start_time=payload.start_time,
             end_time=payload.end_time,
@@ -861,6 +867,25 @@ async def create_calendar_event(payload: CreateCalendarEventPayload):
         return {"status": "success", "result": res}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create event: {str(e)}")
+
+
+@app.put("/api/calendar/event")
+async def update_calendar_event(payload: CreateCalendarEventPayload):
+    """Updates an existing event in Google Calendar or local persistent schedule."""
+    try:
+        ev = CalendarEvent(
+            id=payload.id,
+            summary=payload.summary,
+            start_time=payload.start_time,
+            end_time=payload.end_time,
+            description=payload.description,
+            location=payload.location,
+            attendees=payload.attendees,
+        )
+        res = await asyncio.to_thread(calendar_connector.create_event, ev)
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update event: {str(e)}")
 
 
 @app.delete("/api/calendar/event")
@@ -1789,7 +1814,15 @@ async def simulate_graph_execution(payload: SimulateGraphPayload):
 
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
-    """WebSocket endpoint for real-time streaming chat with token-by-token LLM output."""
+    """WebSocket endpoint for real-time streaming chat.
+    
+    Emits progressive events during execution:
+    - node_progress: as each LangGraph node starts/completes
+    - tool_start: when the agent selects a tool to execute
+    - token: character chunks of the assistant response (streamed word-by-word)
+    - done: final complete response with all metadata
+    - error: on failure
+    """
     await ws_manager.connect(websocket)
     try:
         while True:
@@ -1804,9 +1837,6 @@ async def websocket_chat(websocket: WebSocket):
             if not command:
                 await websocket.send_json({"type": "error", "content": "Empty command."})
                 continue
-
-            # Signal thinking start
-            await websocket.send_json({"type": "thinking", "content": "⚙️ Executing LangGraph DAG..."})
 
             session_id = payload.get("session_id") or f"session-{uuid.uuid4().hex[:8]}"
             thread_id = payload.get("thread_id") or session_id
@@ -1831,13 +1861,102 @@ async def websocket_chat(websocket: WebSocket):
                 "chat_history": history_tuples,
             }
 
+            # ── Signal pipeline start with node progress ────────────────────
+            await websocket.send_json({
+                "type": "node_progress",
+                "node": "quarantine_node",
+                "status": "running",
+                "label": "🛡️ Security gate...",
+                "session_id": session_id,
+            })
+
+            pipeline_output = ""
+            planned_tool = None
+            tool_args = None
+            approval_required = False
+            approval_request_id = None
+
             try:
-                result = await agent_engine.app.ainvoke(initial_state, config=config)
-                pipeline_output = result.get("final_output", "Done.")
-                planned_tool = result.get("planned_tool")
-                tool_args = result.get("tool_args")
-                approval_required = result.get("approval_required", False)
-                approval_request_id = result.get("approval_request_id")
+                # ── Use astream_events for live node progress ───────────────
+                async for event in agent_engine.app.astream_events(initial_state, config=config, version="v1"):
+                    kind = event.get("event", "")
+                    name = event.get("name", "")
+
+                    # Node started
+                    if kind == "on_chain_start" and name in (
+                        "quarantine_node", "triaging_node", "retrieval_node",
+                        "reasoning_node", "approval_gate_node", "tool_execution_node"
+                    ):
+                        node_labels = {
+                            "quarantine_node": "🛡️ Security gate...",
+                            "triaging_node": "⚡ Triaging intent...",
+                            "retrieval_node": "🔍 Searching knowledge base...",
+                            "reasoning_node": "🧠 Reasoning...",
+                            "approval_gate_node": "🔐 Checking approval gate...",
+                            "tool_execution_node": "⚙️ Executing action...",
+                        }
+                        await websocket.send_json({
+                            "type": "node_progress",
+                            "node": name,
+                            "status": "running",
+                            "label": node_labels.get(name, f"Running {name}..."),
+                            "session_id": session_id,
+                        })
+
+                    # Node completed — capture state updates
+                    elif kind == "on_chain_end" and name == "reasoning_node":
+                        output = event.get("data", {}).get("output", {})
+                        if isinstance(output, dict):
+                            pipeline_output = output.get("final_output", pipeline_output)
+                            planned_tool = output.get("planned_tool", planned_tool)
+                            tool_args = output.get("tool_args", tool_args)
+                            # Signal tool selection to UI
+                            if planned_tool and planned_tool != "no_action":
+                                await websocket.send_json({
+                                    "type": "tool_start",
+                                    "tool": planned_tool,
+                                    "args": tool_args or {},
+                                    "session_id": session_id,
+                                })
+
+                    elif kind == "on_chain_end" and name == "tool_execution_node":
+                        output = event.get("data", {}).get("output", {})
+                        if isinstance(output, dict):
+                            pipeline_output = output.get("final_output", pipeline_output)
+                            approval_required = output.get("approval_required", False)
+                            approval_request_id = output.get("approval_request_id")
+
+                    elif kind == "on_chain_end" and name == "approval_gate_node":
+                        output = event.get("data", {}).get("output", {})
+                        if isinstance(output, dict):
+                            approval_required = output.get("approval_required", False)
+                            approval_request_id = output.get("approval_request_id")
+                            if approval_required:
+                                pipeline_output = output.get("final_output", pipeline_output)
+
+                # Fallback: if astream_events didn't capture final_output, run ainvoke
+                if not pipeline_output:
+                    result = await agent_engine.app.ainvoke(initial_state, config={"configurable": {"thread_id": f"{thread_id}-fb"}})
+                    pipeline_output = result.get("final_output", "Done.")
+                    planned_tool = result.get("planned_tool", planned_tool)
+                    tool_args = result.get("tool_args", tool_args)
+                    approval_required = result.get("approval_required", False)
+                    approval_request_id = result.get("approval_request_id")
+
+                # ── Stream response tokens word-by-word ────────────────────
+                if pipeline_output:
+                    words = pipeline_output.split(" ")
+                    chunk_size = max(1, len(words) // 40)  # ~40 chunks regardless of length
+                    for i in range(0, len(words), chunk_size):
+                        chunk = " ".join(words[i:i + chunk_size])
+                        if i > 0:
+                            chunk = " " + chunk
+                        await websocket.send_json({
+                            "type": "token",
+                            "content": chunk,
+                            "session_id": session_id,
+                        })
+                        await asyncio.sleep(0.018)  # ~55 chunks/sec — feels natural
 
                 trace_store.complete_trace(
                     run_id=trace.run_id,
@@ -1861,7 +1980,7 @@ async def websocket_chat(websocket: WebSocket):
                     approval_request_id=approval_request_id,
                 )
 
-                # Continuously ingest conversation Q&A into hybrid vector RAG store
+                # Ingest Q&A into hybrid vector RAG store
                 try:
                     qa_summary = f"User Query: {command}\nPersonal AI Response: {pipeline_output}"
                     if planned_tool and planned_tool != "no_action":
@@ -1880,13 +1999,15 @@ async def websocket_chat(websocket: WebSocket):
                     ])
                 except Exception:
                     pass
+
             except Exception as exc:
+                logger.error(f"WebSocket chat error: {exc}")
                 trace_store.complete_trace(run_id=trace.run_id, status="ERROR", error=str(exc))
                 chat_history_store.add_message(session_id=session_id, role="assistant", content=f"⚠️ Error: {str(exc)}")
                 await websocket.send_json({"type": "error", "content": str(exc), "session_id": session_id})
                 continue
 
-            # Send final pipeline result
+            # ── Final done event with full metadata ───────────────────────
             await websocket.send_json({
                 "type": "done",
                 "content": pipeline_output,
@@ -1900,7 +2021,7 @@ async def websocket_chat(websocket: WebSocket):
             })
 
     except WebSocketDisconnect:
-        pass
+        ws_manager.disconnect(websocket)
 
 
 from server.dashboard_template import DASHBOARD_HTML

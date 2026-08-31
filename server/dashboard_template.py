@@ -2790,10 +2790,18 @@ DASHBOARD_HTML = r"""
             </div>
           </div>
 
-          <!-- Email Messages Feed Stream -->
-          <div class="space-y-3" id="inbox-messages-stream">
-            <div class="p-12 text-center text-xs text-slate-500 font-mono">
-              Loading inbox stream...
+          <!-- Dual-Column Responsive Split Layout: Left Email List, Right Reading Pane -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[640px] items-start">
+            <!-- Left Stream Column (5 cols on large screens) -->
+            <div class="lg:col-span-5 space-y-2.5 max-h-[760px] overflow-y-auto pr-1" id="inbox-messages-stream">
+              <div class="p-12 text-center text-xs text-slate-500 font-mono">
+                Loading inbox stream...
+              </div>
+            </div>
+
+            <!-- Right Reading Pane & Quick Reply (7 cols on large screens) -->
+            <div class="lg:col-span-7 theme-card border rounded-2xl p-5 sticky top-4 max-h-[760px] overflow-y-auto flex flex-col space-y-4 shadow-xl" id="inbox-reading-pane">
+              <!-- Dynamically populated by selectEmailForReading() or renderEmptyReadingPane() -->
             </div>
           </div>
         </section>
@@ -3389,13 +3397,21 @@ DASHBOARD_HTML = r"""
             </div>
 
             <!-- Calendar Navigation & Action Buttons -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 flex-wrap gap-2">
+              <!-- View Switcher Tabs: Month / Week / Agenda -->
+              <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border theme-border font-mono text-xs select-none">
+                <button onclick="setCalendarViewMode('month')" id="cal-view-btn-month" class="px-2.5 py-1 rounded-lg bg-amber-500 text-black font-bold cursor-pointer transition">📅 Month</button>
+                <button onclick="setCalendarViewMode('week')" id="cal-view-btn-week" class="px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition">📆 Week</button>
+                <button onclick="setCalendarViewMode('agenda')" id="cal-view-btn-agenda" class="px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition">📋 Agenda</button>
+              </div>
+
+              <!-- Navigation: Prev / Today / Next -->
               <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border theme-border">
-                <button onclick="changeCalendarMonth(-1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+                <button onclick="navigateCalendar(-1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer" title="Previous">
                   <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 </button>
                 <button onclick="jumpToCalendarToday()" class="px-3 py-1 rounded-lg text-xs font-mono font-bold text-cyan-300 hover:bg-white/10 transition cursor-pointer">Today</button>
-                <button onclick="changeCalendarMonth(1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+                <button onclick="navigateCalendar(1)" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer" title="Next">
                   <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
               </div>
@@ -3405,15 +3421,14 @@ DASHBOARD_HTML = r"""
                 <span>+ Schedule Event</span>
               </button>
 
-              <button onclick="fetchCalendarEvents(); playCyberClick();" class="p-2 rounded-xl theme-card border hover:border-amber-400 text-slate-300 hover:text-white transition cursor-pointer" title="Sync Calendar">
+              <button onclick="fetchCalendarEvents(true); playCyberClick();" id="btn-sync-calendar" class="p-2 rounded-xl theme-card border hover:border-amber-400 text-slate-300 hover:text-white transition cursor-pointer" title="Sync Calendar">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
               </button>
             </div>
           </div>
 
-          <!-- 2-Column Calendar Layout: Left Month Grid, Right Upcoming Agenda -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0">
-            
+          <!-- View 1: 2-Column Month Grid Layout -->
+          <div id="calendar-container-month" class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0">
             <!-- Left 7x5 Interactive Grid -->
             <div class="lg:col-span-8 theme-card border rounded-2xl p-5 space-y-3">
               <!-- Weekday Header (Mon - Sun) -->
@@ -3455,6 +3470,31 @@ DASHBOARD_HTML = r"""
               <div class="flex-1 overflow-y-auto space-y-2.5 max-h-[500px] pr-1 min-h-0" id="calendar-agenda-stream">
                 <div class="p-8 text-center text-xs text-slate-500 font-mono">Loading schedule & festivals...</div>
               </div>
+            </div>
+          </div>
+
+          <!-- View 2: 7-Day Week Columns Layout (Initially Hidden) -->
+          <div id="calendar-container-week" class="theme-card border rounded-2xl p-5 space-y-4 hidden">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+              <span class="text-xs font-mono font-bold text-amber-300 uppercase" id="calendar-week-range-label">Week Schedule</span>
+              <span class="text-[11px] font-mono text-slate-400">Click any time slot to schedule an event</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-3 min-h-[480px]" id="calendar-week-columns-grid">
+              <!-- Populated dynamically via renderCalendarWeek() -->
+            </div>
+          </div>
+
+          <!-- View 3: Full-Width Chronological Agenda View (Initially Hidden) -->
+          <div id="calendar-container-agenda" class="theme-card border rounded-2xl p-5 space-y-4 hidden">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="text-xs font-mono font-bold text-white uppercase">Complete Chronological Schedule & Festivals</span>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400" id="calendar-full-agenda-counter">All Events</span>
+            </div>
+            <div class="space-y-3 max-h-[640px] overflow-y-auto pr-1" id="calendar-full-agenda-feed">
+              <!-- Populated via renderCalendarFullAgenda() -->
             </div>
           </div>
         </section>
@@ -4623,17 +4663,19 @@ DASHBOARD_HTML = r"""
     </div>
   </div>
 
-  <!-- ─── 5.8 GOOGLE CALENDAR EVENT CREATOR MODAL ──────────────────── -->
+  <!-- ─── 5.8 GOOGLE CALENDAR EVENT CREATOR & EDITOR MODAL ───────── -->
   <div id="calendar-event-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
     <div class="w-full max-w-xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative">
+      <input type="hidden" id="calendar-input-id" value="" />
+      
       <div class="flex items-center justify-between border-b theme-border pb-3">
         <div class="flex items-center space-x-2.5">
           <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center">
             <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div>
-            <h3 class="text-sm font-bold text-white font-display">Schedule Google Calendar Event</h3>
-            <p class="text-[10px] font-mono text-slate-400">Creates event with conflict detection & notifications</p>
+            <h3 class="text-sm font-bold text-white font-display" id="calendar-modal-title">Schedule Google Calendar Event</h3>
+            <p class="text-[10px] font-mono text-slate-400">Live sync with Google Calendar API & local schedule persistence</p>
           </div>
         </div>
         <button onclick="closeCalendarEventModal()" class="text-slate-400 hover:text-white transition cursor-pointer">
@@ -4643,7 +4685,7 @@ DASHBOARD_HTML = r"""
 
       <div class="space-y-1 text-xs font-mono">
         <label class="text-[10px] text-slate-400 uppercase">Event Title / Summary:</label>
-        <input type="text" id="calendar-input-summary" placeholder="DocDispatch Quarterly Review Meeting" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white font-semibold focus:outline-none focus:border-amber-500" />
+        <input type="text" id="calendar-input-summary" placeholder="e.g. DocDispatch Quarterly Review Meeting" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white font-semibold focus:outline-none focus:border-amber-500" />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
@@ -4664,20 +4706,30 @@ DASHBOARD_HTML = r"""
         </div>
         <div class="space-y-1">
           <label class="text-[10px] text-slate-400 uppercase">Attendees (comma-separated):</label>
-          <input type="text" id="calendar-input-attendees" placeholder="rahul@techcorp.io" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-amber-500" />
+          <input type="text" id="calendar-input-attendees" placeholder="rahul@techcorp.io, sarah@techcorp.io" class="w-full px-3 py-2 rounded-xl bg-black/40 border theme-border text-white focus:outline-none focus:border-amber-500" />
         </div>
       </div>
 
       <div class="space-y-1">
         <label class="text-[10px] font-mono text-slate-400 uppercase">Description / Agenda Notes:</label>
-        <textarea id="calendar-input-description" rows="3" placeholder="Quarterly architecture and deployment sync." class="w-full p-3 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans leading-relaxed resize-none"></textarea>
+        <textarea id="calendar-input-description" rows="3" placeholder="Meeting objectives, topics, and action items." class="w-full p-3 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans leading-relaxed resize-none"></textarea>
       </div>
 
-      <div class="flex items-center justify-between pt-2 border-t theme-border">
-        <button onclick="closeCalendarEventModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+      <div class="flex items-center justify-between pt-3 border-t theme-border flex-wrap gap-2">
+        <div class="flex items-center space-x-2">
+          <button onclick="closeCalendarEventModal()" class="px-3.5 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Cancel</button>
+          <button id="btn-delete-calendar-modal-event" onclick="deleteCalendarEventFromModal()" style="display: none;" class="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs flex items-center space-x-1.5 cursor-pointer transition">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Delete Event</span>
+          </button>
+          <button id="btn-obsidian-calendar-modal-event" onclick="prepCurrentEventInObsidian()" style="display: none;" class="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-xs flex items-center space-x-1.5 cursor-pointer transition">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>Prep in Obsidian</span>
+          </button>
+        </div>
         <button id="btn-save-calendar-event" onclick="saveCalendarEventFromModal()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
           <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
-          <span>Save Event</span>
+          <span id="calendar-modal-save-label">Confirm & Save</span>
         </button>
       </div>
     </div>
@@ -6520,6 +6572,11 @@ DASHBOARD_HTML = r"""
 
       if (tabId === 'chat') {
         focusChatInput();
+        if (!allChatSessions || allChatSessions.length === 0) {
+          fetchChatSessions(true);
+        } else if (currentSessionId && (!currentSessionMessages || currentSessionMessages.length === 0)) {
+          selectChatSession(currentSessionId);
+        }
       }
       if (tabId === 'inbox') {
         fetchInbox();
@@ -6648,9 +6705,11 @@ DASHBOARD_HTML = r"""
         const savedSessionId = localStorage.getItem('personal_ai_os_active_session');
         const sessionExists = allChatSessions.some(s => s.id === savedSessionId);
 
-        if (sessionExists && !currentSessionId) {
+        if (sessionExists) {
+          // Restore previously active session saved in localStorage
           selectChatSession(savedSessionId);
-        } else if (autoSelectFirst && allChatSessions.length > 0 && !currentSessionId) {
+        } else if ((autoSelectFirst || !currentSessionId) && allChatSessions.length > 0) {
+          // Auto-select the most recent session
           selectChatSession(allChatSessions[0].id);
         } else if (allChatSessions.length === 0 && !currentSessionId) {
           await createNewChatSession();
@@ -6788,19 +6847,22 @@ DASHBOARD_HTML = r"""
       return wrapper;
     }
 
-    function createAssistantMessageBubble(text = '', tool = null, runId = null) {
+    function createAssistantMessageBubble(text = '', tool = null, runId = null, streaming = false) {
       const wrapper = document.createElement('div');
       wrapper.className = 'flex items-start space-x-3.5 my-4 group max-w-4xl w-full';
+      const streamId = 'stream-' + Math.random().toString(36).slice(2, 9);
       wrapper.innerHTML = `
         <div class="w-7 h-7 rounded-lg theme-avatar-bot flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
           <i data-lucide="bot" class="w-3.5 h-3.5"></i>
         </div>
         <div class="bubble-card flex-1 min-w-0 space-y-2">
-          <div class="msg-content select-text prose-chat">
-            ${text ? formatMarkdownText(text) : ''}
+          <div class="node-status-area text-[10px] font-mono theme-text-muted space-y-0.5" id="node-status-${streamId}"></div>
+          <div class="msg-content select-text prose-chat" id="msg-content-${streamId}">
+            ${streaming ? '<span class="streaming-cursor inline-block w-0.5 h-4 bg-current animate-pulse align-middle ml-0.5"></span>' : (text ? formatMarkdownText(text) : '')}
           </div>
-          
-          <!-- Streamlined ChatGPT-style bottom toolbar -->
+          <!-- Tool call card placeholder -->
+          <div class="tool-card-slot" id="tool-slot-${streamId}"></div>
+          <!-- Toolbar -->
           <div class="flex items-center space-x-2 pt-1 opacity-60 group-hover:opacity-100 transition text-[11px] font-mono theme-text-muted">
             <button onclick="copyMessageText(this)" title="Copy response" class="copy-btn px-2 py-1 rounded hover:bg-white/10 hover:text-white transition cursor-pointer flex items-center space-x-1">
               <i data-lucide="copy" class="w-3 h-3"></i>
@@ -6819,7 +6881,44 @@ DASHBOARD_HTML = r"""
           </div>
         </div>
       `;
+      wrapper.dataset.streamId = streamId;
       return wrapper;
+    }
+
+    // ── Render tool call card inside a message bubble ──
+    function renderToolCallCard(bubbleEl, toolName, toolArgs, status = 'running') {
+      if (!bubbleEl) return;
+      const streamId = bubbleEl.dataset.streamId;
+      const slot = bubbleEl.querySelector(`#tool-slot-${streamId}`);
+      if (!slot) return;
+
+      const toolIcons = {
+        'email.send': '📧', 'email.search': '🔍', 'email.list_unread': '📬',
+        'calendar.create_event': '📅', 'calendar.list_events': '📆',
+        'obsidian.create_note': '📝', 'obsidian.search_notes': '🔎',
+        'web.search': '🌐', 'workspace.list_files': '📁', 'workspace.read_file': '📄',
+        'workspace.write_file': '💾',
+      };
+      const icon = toolIcons[toolName] || '⚙️';
+      const argsStr = toolArgs ? JSON.stringify(toolArgs, null, 2) : '{}';
+      const statusColor = status === 'done' ? 'text-emerald-400' : status === 'error' ? 'text-rose-400' : 'text-amber-400';
+      const statusLabel = status === 'done' ? '✓ Done' : status === 'error' ? '✗ Error' : '⋯ Running';
+
+      slot.innerHTML = `
+        <details class="tool-call-card border border-amber-500/20 bg-amber-500/5 rounded-lg text-[11px] font-mono" ${status === 'done' ? '' : 'open'}>
+          <summary class="flex items-center justify-between p-2.5 cursor-pointer select-none hover:bg-white/5 rounded-lg transition">
+            <div class="flex items-center space-x-2">
+              <span class="text-base">${icon}</span>
+              <span class="font-semibold text-amber-300">${toolName}</span>
+              <span class="${statusColor} text-[10px]">${statusLabel}</span>
+            </div>
+            <span class="text-slate-500 text-[10px]">▼ details</span>
+          </summary>
+          <div class="px-3 pb-3 pt-1">
+            <pre class="text-[10px] text-slate-300 bg-black/30 rounded p-2 overflow-x-auto max-h-32 whitespace-pre-wrap">${escapeHtml(argsStr)}</pre>
+          </div>
+        </details>
+      `;
     }
 
     // ── Send Message ──
@@ -6893,31 +6992,93 @@ DASHBOARD_HTML = r"""
       const box = document.getElementById('chat-messages-box');
       if (!box) return;
 
-      if (data.type === 'thinking') {
-        currentAssistantMsgEl = createAssistantMessageBubble();
-        const p = currentAssistantMsgEl.querySelector('.msg-content');
-        if (p) p.innerHTML = '<span class="text-cyan-400 font-mono animate-pulse">⚙️ Executing LangGraph Multi-Agent DAG...</span>';
-        box.appendChild(currentAssistantMsgEl);
+      // ── node_progress: pipeline step label shown inside the streaming bubble ──
+      if (data.type === 'node_progress') {
+        if (!currentAssistantMsgEl) {
+          currentAssistantMsgEl = createAssistantMessageBubble('', null, null, true);
+          box.appendChild(currentAssistantMsgEl);
+          box.scrollTop = box.scrollHeight;
+        }
+        const streamId = currentAssistantMsgEl.dataset.streamId;
+        const statusArea = currentAssistantMsgEl.querySelector(`#node-status-${streamId}`);
+        if (statusArea) {
+          const stepEl = document.createElement('div');
+          stepEl.className = 'flex items-center space-x-1.5 text-cyan-400/70 animate-pulse';
+          stepEl.innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 flex-shrink-0"></span><span>${escapeHtml(data.label || data.node)}</span>`;
+          // Replace previous step (only show current)
+          statusArea.innerHTML = '';
+          statusArea.appendChild(stepEl);
+        }
         box.scrollTop = box.scrollHeight;
       }
+
+      // ── tool_start: agent selected a tool — render tool call card ──
+      else if (data.type === 'tool_start') {
+        if (currentAssistantMsgEl) {
+          renderToolCallCard(currentAssistantMsgEl, data.tool, data.args, 'running');
+          box.scrollTop = box.scrollHeight;
+        }
+      }
+
+      // ── token: stream text chunks word-by-word into the bubble ──
+      else if (data.type === 'token') {
+        if (!currentAssistantMsgEl) {
+          currentAssistantMsgEl = createAssistantMessageBubble('', null, null, true);
+          box.appendChild(currentAssistantMsgEl);
+        }
+        const streamId = currentAssistantMsgEl.dataset.streamId;
+        const contentEl = currentAssistantMsgEl.querySelector(`#msg-content-${streamId}`);
+        if (contentEl) {
+          // Remove cursor before appending
+          const cursor = contentEl.querySelector('.streaming-cursor');
+          if (cursor) cursor.remove();
+          // Append raw text node
+          contentEl.appendChild(document.createTextNode(data.content));
+          // Re-append cursor at end
+          const newCursor = document.createElement('span');
+          newCursor.className = 'streaming-cursor inline-block w-0.5 h-4 bg-current animate-pulse align-middle ml-0.5';
+          contentEl.appendChild(newCursor);
+        }
+        // Clear node status area once text starts
+        const streamId2 = currentAssistantMsgEl.dataset.streamId;
+        const statusArea = currentAssistantMsgEl.querySelector(`#node-status-${streamId2}`);
+        if (statusArea) statusArea.innerHTML = '';
+        box.scrollTop = box.scrollHeight;
+      }
+
+      // ── done: finalize the streaming bubble with formatted markdown ──
       else if (data.type === 'done') {
         if (!currentAssistantMsgEl) {
           currentAssistantMsgEl = createAssistantMessageBubble();
           box.appendChild(currentAssistantMsgEl);
         }
-        const p = currentAssistantMsgEl.querySelector('.msg-content');
-        if (p) p.innerHTML = formatMarkdownText(data.content);
+        const streamId = currentAssistantMsgEl.dataset.streamId;
+        const contentEl = currentAssistantMsgEl.querySelector(`#msg-content-${streamId}`);
+        const statusArea = currentAssistantMsgEl.querySelector(`#node-status-${streamId}`);
 
+        // Clear status and render final formatted markdown
+        if (statusArea) statusArea.innerHTML = '';
+        if (contentEl) contentEl.innerHTML = formatMarkdownText(data.content);
+
+        // Update tool card status to done
+        if (data.planned_tool && data.planned_tool !== 'no_action') {
+          renderToolCallCard(currentAssistantMsgEl, data.planned_tool, data.tool_args, 'done');
+        }
+
+        // Add run trace button
         if (data.run_id) {
-          const badgeContainer = document.createElement('div');
-          badgeContainer.className = 'pt-2 flex items-center space-x-2 border-t border-white/5';
-          badgeContainer.innerHTML = `
-            <button onclick="inspectSpecificTrace('${data.run_id}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
-              <i data-lucide="git-branch" class="w-3 h-3"></i>
-              <span>Inspect Run Trace (${data.run_id})</span>
-            </button>
-          `;
-          currentAssistantMsgEl.querySelector('.bubble-card').appendChild(badgeContainer);
+          const bubbleCard = currentAssistantMsgEl.querySelector('.bubble-card');
+          if (bubbleCard) {
+            const badgeContainer = document.createElement('div');
+            badgeContainer.className = 'pt-2 flex items-center space-x-2 border-t border-white/5';
+            badgeContainer.innerHTML = `
+              <button onclick="inspectSpecificTrace('${data.run_id}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
+                <i data-lucide="git-branch" class="w-3 h-3"></i>
+                <span>Inspect Run Trace (${data.run_id})</span>
+              </button>
+            `;
+            bubbleCard.appendChild(badgeContainer);
+          }
         }
 
         if (data.approval_required) {
@@ -6931,29 +7092,80 @@ DASHBOARD_HTML = r"""
         fetchChatSessions(false);
         playHudBeep(1200);
         refreshIcons();
-        // Inject follow-up suggestions after AI reply
         injectFollowUpSuggestions(data.content || '', box);
-
-        // Speak aloud assistant response if JARVIS voice mode is enabled
         speakAssistantResponse(data.content);
       }
       else if (data.type === 'trace_event') {
         handleRealtimeTraceEvent(data.event, data.data);
       }
       else if (data.type === 'proactive_alert') {
-        showProactiveToast(
-          data.title || '📬 Proactive Inbox Alert',
-          data.message || 'New inbound message received.',
-          'Open in Inbox',
-          () => {
-            switchTab('inbox');
-          }
-        );
+        // Subtle notification — update inbox badge instead of full toast
+        const inboxBadge = document.getElementById('nav-inbox-badge');
+        if (inboxBadge) {
+          inboxBadge.textContent = (parseInt(inboxBadge.textContent || '0') + 1).toString();
+          inboxBadge.classList.add('animate-pulse');
+          setTimeout(() => inboxBadge.classList.remove('animate-pulse'), 3000);
+        }
+        // Subtle slide-in notification (not full-screen toast)
+        showSubtleNotification(data.title || '📬 New Email', data.message || '', () => switchTab('inbox'));
         fetchInbox(false);
       }
       else if (data.type === 'inbox_update') {
         fetchInbox(false);
       }
+      else if (data.type === 'error') {
+        if (!currentAssistantMsgEl) {
+          currentAssistantMsgEl = createAssistantMessageBubble();
+          box.appendChild(currentAssistantMsgEl);
+        }
+        const streamId = currentAssistantMsgEl.dataset.streamId;
+        const contentEl = currentAssistantMsgEl.querySelector(`#msg-content-${streamId}`);
+        const statusArea = currentAssistantMsgEl.querySelector(`#node-status-${streamId}`);
+        if (statusArea) statusArea.innerHTML = '';
+        if (contentEl) contentEl.innerHTML = `<span class="text-rose-400">⚠️ ${escapeHtml(data.content)}</span>`;
+        currentAssistantMsgEl = null;
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    // ── Subtle slide-in notification (replaces aggressive toast for inbox alerts) ──
+    function showSubtleNotification(title, message, onClick) {
+      const existing = document.getElementById('subtle-notification');
+      if (existing) existing.remove();
+
+      const notif = document.createElement('div');
+      notif.id = 'subtle-notification';
+      notif.className = 'fixed bottom-6 right-6 z-[8000] max-w-xs w-full';
+      notif.style.cssText = 'animation: slideInRight 0.3s ease-out forwards;';
+      notif.innerHTML = `
+        <style>
+          @keyframes slideInRight { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+          @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
+        </style>
+        <div class="bg-[#0d1117] border border-slate-700/60 rounded-xl shadow-2xl p-3.5 flex items-start space-x-3 cursor-pointer hover:border-slate-500 transition" onclick="this.closest('#subtle-notification').remove(); (arguments[0] || function(){})()" data-click="1">
+          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-base">📬</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-semibold text-white truncate">${escapeHtml(title)}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 line-clamp-2">${escapeHtml((message || '').substring(0, 100))}</div>
+          </div>
+          <button onclick="event.stopPropagation(); document.getElementById('subtle-notification').remove()" class="text-slate-500 hover:text-white text-xs flex-shrink-0">✕</button>
+        </div>
+      `;
+      // Wire click action
+      const clickArea = notif.querySelector('[data-click]');
+      if (clickArea && onClick) {
+        clickArea.addEventListener('click', () => { onClick(); notif.remove(); });
+      }
+      document.body.appendChild(notif);
+      // Auto-dismiss after 6 seconds
+      setTimeout(() => {
+        if (notif.parentNode) {
+          notif.style.animation = 'slideOutRight 0.3s ease-in forwards';
+          setTimeout(() => notif.remove(), 300);
+        }
+      }, 6000);
     }
 
     function handleRealtimeTraceEvent(eventType, eventData) {
@@ -7882,29 +8094,39 @@ DASHBOARD_HTML = r"""
       overlay.id = 'shortcut-overlay';
       overlay.className = 'fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4';
       overlay.innerHTML = `
-        <div class="bg-[#0d0d14] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-5">
+        <div class="bg-[#0d0d14] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-bold font-display text-white flex items-center space-x-2">
-              <span>⌨️</span><span>Keyboard Shortcuts</span>
+              <span class="text-lg">⌨️</span><span>SovereignOS Keyboard Shortcuts</span>
             </h2>
-            <button onclick="document.getElementById('shortcut-overlay').remove()" class="text-slate-400 hover:text-white text-lg cursor-pointer">✕</button>
+            <button onclick="document.getElementById('shortcut-overlay').remove()" class="text-slate-400 hover:text-white text-lg cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition">✕</button>
           </div>
-          <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-[11px]">
-            ${[
-              ['Ctrl + K', 'Open Command Palette'],
-              ['Ctrl + B', 'Toggle Sidebar'],
-              ['Ctrl + Enter', 'Send Chat (in input)'],
-              ['?', 'Show this shortcut guide'],
-              ['Escape', 'Close modal / Cancel edit'],
-              ['Tab 1–9', 'Switch between nav tabs'],
-            ].map(([key, desc]) => `
-              <div class="flex items-center justify-between py-1.5 border-b border-slate-800/60">
-                <span class="text-slate-400">${desc}</span>
-                <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300 font-mono text-[10px]">${key}</kbd>
+
+          <div class="space-y-3">
+            <div>
+              <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2 border-b border-slate-800 pb-1">Navigation</div>
+              <div class="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11px]">
+                ${[['Ctrl + K', 'Open Command Palette'], ['Ctrl + B', 'Toggle Sidebar'], ['Alt + 1–9', 'Switch view tab'], ['?', 'Show this guide']]
+                  .map(([k,d]) => `<div class="flex items-center justify-between py-1"><span class="text-slate-300">${d}</span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300 font-mono text-[10px] whitespace-nowrap">${k}</kbd></div>`).join('')}
               </div>
-            `).join('')}
+            </div>
+            <div>
+              <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2 border-b border-slate-800 pb-1">Chat</div>
+              <div class="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11px]">
+                ${[['Enter', 'Send message'], ['Shift + Enter', 'New line in input'], ['Escape', 'Close modal / cancel'], ['↑', 'Recall last message (coming)']]
+                  .map(([k,d]) => `<div class="flex items-center justify-between py-1"><span class="text-slate-300">${d}</span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300 font-mono text-[10px] whitespace-nowrap">${k}</kbd></div>`).join('')}
+              </div>
+            </div>
+            <div>
+              <div class="text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-2 border-b border-slate-800 pb-1">Overlays & Search</div>
+              <div class="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11px]">
+                ${[['Ctrl + T', 'Open Theme Studio'], ['Ctrl + F', 'Chat message search (coming)'], ['Escape', 'Dismiss any overlay'], ['Click outside', 'Close modal']]
+                  .map(([k,d]) => `<div class="flex items-center justify-between py-1"><span class="text-slate-300">${d}</span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300 font-mono text-[10px] whitespace-nowrap">${k}</kbd></div>`).join('')}
+              </div>
+            </div>
           </div>
-          <p class="text-[10px] text-slate-500 text-center">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Esc</kbd> to dismiss</p>
+
+          <p class="text-[10px] text-slate-500 text-center border-t border-slate-800 pt-3">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Esc</kbd> or click outside to dismiss</p>
         </div>
       `;
       overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
@@ -8614,9 +8836,298 @@ DASHBOARD_HTML = r"""
       }
     }
 
+    let activeEmailId = null;
+
+    function renderEmptyReadingPane() {
+      const pane = document.getElementById('inbox-reading-pane');
+      if (!pane) return;
+      pane.innerHTML = `
+        <div class="h-full flex flex-col items-center justify-center text-center p-8 space-y-3 min-h-[460px] my-auto">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shadow-lg">
+            <i data-lucide="mail" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white font-display">Select an Email to Inspect</h3>
+          <p class="text-xs text-slate-400 max-w-sm leading-relaxed font-mono">
+            Click any email on the left to read sanitized contents, trigger AI draft replies, archive, or dispatch actions.
+          </p>
+          <button onclick="openAiComposeModal(); playCyberClick();" class="mt-2 px-3.5 py-1.5 rounded-xl btn-brand-primary text-xs font-bold flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>Compose New Message</span>
+          </button>
+        </div>
+      `;
+      refreshIcons();
+    }
+
+    async function selectEmailForReading(emailId) {
+      activeEmailId = emailId;
+      playCyberClick(800);
+
+      // Highlight active row in stream
+      const allRows = document.querySelectorAll('[id^="inbox-item-row-"], [id^="sent-item-row-"]');
+      allRows.forEach(r => {
+        if (r.id === `inbox-item-row-${emailId}` || r.id === `sent-item-row-${emailId}`) {
+          r.classList.add('border-indigo-500', 'bg-indigo-500/10');
+          r.classList.remove('border-white/5');
+        } else {
+          r.classList.remove('border-indigo-500', 'bg-indigo-500/10');
+          r.classList.add('border-white/5');
+        }
+      });
+
+      const pool = currentInboxCategory === 'sent' ? cachedSentItems : cachedInboxItems;
+      const em = pool.find(i => i.id === emailId) || cachedInboxItems.find(i => i.id === emailId) || cachedSentItems.find(i => i.id === emailId);
+      if (!em) {
+        renderEmptyReadingPane();
+        return;
+      }
+
+      // Mark as read in background if unread
+      if (!em.is_read && currentInboxCategory !== 'sent') {
+        em.is_read = true;
+        fetch('/api/inbox/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: emailId, action: 'mark_read' })
+        }).catch(() => {});
+      }
+
+      const pane = document.getElementById('inbox-reading-pane');
+      if (!pane) return;
+
+      const isSent = currentInboxCategory === 'sent' || !!em.to;
+      const senderDisplay = em.sender || (isSent ? `To: ${em.to}` : 'Unknown');
+      const cat = em.category || (em.triage ? em.triage.predicted_category : 'normal');
+      const badgeMarkup = isSent ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 SENT</span>' : getCategoryBadgeMarkup(cat);
+      const dateFormatted = formatEmailDate(em.created_at || em.sent_at_timestamp);
+      const safeBody = em.body || em.final_output || em.snippet || 'No message body available.';
+
+      pane.innerHTML = `
+        <!-- Header Section -->
+        <div class="space-y-3 border-b border-white/5 pb-4">
+          <div class="flex items-start justify-between gap-3">
+            <h2 class="text-base font-bold font-display text-white leading-snug select-text flex-1">
+              ${escapeHtml(em.subject || 'No Subject')}
+            </h2>
+            <div class="flex items-center space-x-1.5 flex-shrink-0">
+              ${badgeMarkup}
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">🛡️ Dual-LLM Sanitized</span>
+            </div>
+          </div>
+
+          <!-- Sender & Meta Info -->
+          <div class="flex items-center justify-between flex-wrap gap-2 text-xs">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold flex items-center justify-center font-mono text-xs shadow-sm">
+                ${escapeHtml((senderDisplay[0] || 'M').toUpperCase())}
+              </div>
+              <div>
+                <div class="font-bold text-white select-text">${escapeHtml(senderDisplay)}</div>
+                <div class="text-[11px] text-slate-400 font-mono select-text">${escapeHtml(em.sender || em.to || '')}</div>
+              </div>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 flex items-center space-x-2">
+              <span>📅 ${dateFormatted}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Toolbar -->
+        <div class="flex items-center justify-between flex-wrap gap-2 py-1 border-b border-white/5 text-xs font-mono">
+          <div class="flex items-center space-x-1.5 flex-wrap gap-1">
+            <button onclick="openAiReplyModal('${em.id}')" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold flex items-center space-x-1.5 cursor-pointer shadow-sm transition">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-300"></i>
+              <span>✨ AI Modal</span>
+            </button>
+            <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive" class="px-2.5 py-1 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-white flex items-center space-x-1 cursor-pointer transition">
+              <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>Archive</span>
+            </button>
+            <button onclick="performEmailAction('${em.id}', '${em.is_read ? 'mark_unread' : 'mark_read'}')" title="Toggle Read" class="px-2.5 py-1 rounded-lg theme-card border hover:border-amber-400 text-slate-300 hover:text-white flex items-center space-x-1 cursor-pointer transition">
+              <i data-lucide="${em.is_read ? 'mail-open' : 'mail'}" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>${em.is_read ? 'Mark Unread' : 'Mark Read'}</span>
+            </button>
+            <button onclick="performEmailAction('${em.id}', 'trash')" title="Trash" class="px-2.5 py-1 rounded-lg theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 flex items-center space-x-1 cursor-pointer transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Trash</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-1.5">
+            <button onclick="openEmailInChat('${em.id}')" title="Ask Sovereign Copilot about this email" class="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1.5 cursor-pointer transition">
+              <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+              <span>Ask Copilot</span>
+            </button>
+            <button onclick="saveEmailToObsidian('${em.id}')" title="Save to Obsidian Vault" class="px-2.5 py-1 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 flex items-center space-x-1.5 cursor-pointer transition">
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+              <span>Obsidian</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Full Email Body -->
+        <div class="p-4 rounded-xl bg-black/40 border theme-border text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-[300px] overflow-y-auto font-normal">
+          ${escapeHtml(safeBody)}
+        </div>
+
+        <!-- Quick Inline AI Reply Box -->
+        <div class="p-3.5 rounded-xl bg-black/30 border border-white/5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono font-bold text-slate-300 flex items-center space-x-1.5">
+              <i data-lucide="corner-down-right" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>Quick Reply Composer</span>
+            </span>
+            <button onclick="generateAiQuickReply('${em.id}')" id="btn-quick-ai-reply" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 transition cursor-pointer flex items-center space-x-1">
+              <i data-lucide="sparkles" class="w-3 h-3"></i>
+              <span>Generate AI Draft</span>
+            </button>
+          </div>
+
+          <textarea id="inbox-quick-reply-text" rows="3" placeholder="Draft your reply here or click 'Generate AI Draft' to let Copilot write it..." class="w-full p-2.5 rounded-xl bg-black/50 border theme-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-sans resize-none"></textarea>
+
+          <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
+            <div class="flex items-center space-x-1 text-[10px] font-mono text-slate-400">
+              <span>Tone:</span>
+              <select id="inbox-quick-reply-tone" class="bg-black/50 border theme-border rounded-lg px-2 py-0.5 text-slate-300 focus:outline-none">
+                <option value="professional">Professional</option>
+                <option value="concise">Concise</option>
+                <option value="friendly">Friendly</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <button onclick="sendQuickReplyFromReadingPane('${em.id}')" id="btn-send-quick-reply" class="px-4 py-1.5 rounded-xl btn-brand-primary text-xs font-bold flex items-center space-x-1.5 cursor-pointer shadow-md transition">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>Send Outbound Reply</span>
+            </button>
+          </div>
+        </div>
+      `;
+      refreshIcons();
+    }
+
+    async function saveEmailToObsidian(emailId) {
+      const pool = currentInboxCategory === 'sent' ? cachedSentItems : cachedInboxItems;
+      const em = pool.find(i => i.id === emailId) || cachedInboxItems.find(i => i.id === emailId);
+      if (!em) return;
+      try {
+        const res = await fetch('/api/obsidian/note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: `Email - ${em.subject || 'Note'}`,
+            folder: 'Inbox',
+            tags: ['email', 'triage', em.category || 'general'],
+            content: `# ${em.subject || 'Email Note'}\n\n**Sender:** ${em.sender || ''}\n**Date:** ${new Date().toISOString()}\n\n---\n\n${em.body || em.final_output || em.snippet || ''}`
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          showSubtleNotification('Saved to Obsidian', `Created note: "Email - ${em.subject}"`);
+          playHudBeep(1400);
+        } else {
+          alert('Failed to save to Obsidian: ' + (data.detail || 'Error'));
+        }
+      } catch(e) {
+        alert('Error saving to Obsidian: ' + e.message);
+      }
+    }
+
+    async function generateAiQuickReply(emailId) {
+      const pool = currentInboxCategory === 'sent' ? cachedSentItems : cachedInboxItems;
+      const em = pool.find(i => i.id === emailId) || cachedInboxItems.find(i => i.id === emailId);
+      if (!em) return;
+      const textarea = document.getElementById('inbox-quick-reply-text');
+      const tone = document.getElementById('inbox-quick-reply-tone')?.value || 'professional';
+      const btn = document.getElementById('btn-quick-ai-reply');
+      if (!textarea) return;
+
+      textarea.value = "⏳ Generating AI draft reply...";
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/inbox/draft-reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: emailId,
+            sender: em.sender || '',
+            subject: em.subject || '',
+            body: em.body || em.final_output || '',
+            tone: tone
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          textarea.value = data.draft_reply || '';
+          playHudBeep(1300);
+        } else {
+          textarea.value = `Hi ${em.sender?.split('<')[0]?.trim() || 'there'},\n\nThank you for reaching out. I have reviewed your message regarding "${em.subject}" and will follow up shortly.\n\nBest regards,\nYashpreet`;
+        }
+      } catch(e) {
+        textarea.value = `Hi ${em.sender?.split('<')[0]?.trim() || 'there'},\n\nThank you for your note. Received and acknowledged.\n\nBest regards,\nYashpreet`;
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function sendQuickReplyFromReadingPane(emailId) {
+      const pool = currentInboxCategory === 'sent' ? cachedSentItems : cachedInboxItems;
+      const em = pool.find(i => i.id === emailId) || cachedInboxItems.find(i => i.id === emailId);
+      if (!em) return;
+      const textarea = document.getElementById('inbox-quick-reply-text');
+      const body = textarea?.value?.trim();
+      if (!body) {
+        alert('Please write or generate reply text before sending.');
+        return;
+      }
+      const btn = document.getElementById('btn-send-quick-reply');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Sending...</span>`;
+        refreshIcons();
+      }
+
+      try {
+        const res = await fetch('/api/inbox/send-reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: em.sender || em.to || '',
+            subject: (em.subject || '').startsWith('Re:') ? em.subject : `Re: ${em.subject || 'Update'}`,
+            body: body,
+            msg_id: em.id
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          playHudBeep(1600);
+          showSubtleNotification('Reply Dispatched', `Sent reply to ${em.sender || em.to}`);
+          textarea.value = '';
+          fetchInbox(false);
+        } else {
+          alert('Failed to send reply: ' + (data.detail || 'Error'));
+        }
+      } catch(e) {
+        alert('Error sending reply: ' + e.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i><span>Send Outbound Reply</span>`;
+          refreshIcons();
+        }
+      }
+    }
+
     async function fetchInbox(forceSync = false, reset = false) {
       try {
         const container = document.getElementById('inbox-messages-stream') || document.getElementById('inbox-cards-stream');
+        const syncBtn = document.querySelector('button[title*="sync live emails" i]');
+
+        if (syncBtn && forceSync) {
+          syncBtn.disabled = true;
+          syncBtn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 text-indigo-400 animate-spin"></i><span>Syncing Gmail...</span>`;
+          refreshIcons();
+        }
 
         if (reset) {
           cachedInboxItems = [];
@@ -8626,26 +9137,17 @@ DASHBOARD_HTML = r"""
             refreshIcons();
           }
         } else if (cachedInboxItems && cachedInboxItems.length > 0) {
-          // Immediately render cached items if available for 0ms visual latency
           if (currentInboxCategory === 'sent') renderSentRows();
           else renderInboxRows();
         }
 
-        if (forceSync && container) {
-          const syncBanner = document.createElement('div');
-          syncBanner.id = 'inbox-sync-progress-banner';
-          syncBanner.className = 'p-3 mb-3 text-center text-xs text-cyan-400 bg-cyan-950/40 border border-cyan-500/30 rounded-lg animate-pulse font-mono flex items-center justify-center space-x-2';
-          syncBanner.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-1.5 animate-spin"></i> Syncing live messages directly from Gmail API...`;
-          container.prepend(syncBanner);
-          refreshIcons();
+        if (forceSync) {
           try {
             await fetch(`/api/inbox/sync?reset=${reset ? 'true' : 'false'}`, { method: 'POST' });
           } catch(e) {}
-          const existingBanner = document.getElementById('inbox-sync-progress-banner');
-          if (existingBanner) existingBanner.remove();
         }
 
-        // 2. Fetch fresh inbox state
+        // Fetch fresh inbox state
         const res = await fetch('/api/inbox');
         const data = await res.json();
         cachedInboxItems = data.inbox || [];
@@ -8657,14 +9159,13 @@ DASHBOARD_HTML = r"""
         if (navCounter) navCounter.textContent = cachedInboxItems.length;
         if (cardBadge) cardBadge.textContent = cachedInboxItems.length;
 
-        // 3. Render inbox view immediately without waiting for sent emails
         if (currentInboxCategory === 'sent') {
           renderSentRows();
         } else {
           renderInboxRows();
         }
 
-        // 4. Fetch sent items asynchronously in background without blocking the UI
+        // Fetch sent items asynchronously
         fetch('/api/inbox/sent')
           .then(r => r.json())
           .then(sentData => {
@@ -8678,6 +9179,13 @@ DASHBOARD_HTML = r"""
             }
           })
           .catch(() => {});
+
+        if (syncBtn && forceSync) {
+          syncBtn.disabled = false;
+          syncBtn.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-400"></i><span>Sync Live Gmail</span>`;
+          refreshIcons();
+          showSubtleNotification('Gmail Synced', `Updated inbox stream (${cachedInboxItems.length} messages)`);
+        }
 
       } catch (err) {
         console.error("Failed to fetch inbox:", err);
@@ -8772,122 +9280,80 @@ DASHBOARD_HTML = r"""
             <p class="text-[11px] text-slate-400">All caught up! Click "Sync Live Gmail" to fetch newly received emails.</p>
           </div>
         `;
+        renderEmptyReadingPane();
         refreshIcons();
         return;
+      }
+
+      // Auto-select first email if none currently selected
+      if (!activeEmailId || !filtered.some(e => e.id === activeEmailId)) {
+        activeEmailId = filtered[0].id;
+        selectEmailForReading(activeEmailId);
       }
 
       filtered.forEach((em, idx) => {
         const cat = em.category || (em.triage ? em.triage.predicted_category : 'normal');
         const badgeMarkup = getCategoryBadgeMarkup(cat);
         const dateFormatted = formatEmailDate(em.created_at);
-        const snippetText = em.snippet || (em.clean_facts ? em.clean_facts.factual_summary : (em.body ? em.body.slice(0, 110) : 'No preview available'));
+        const snippetText = em.snippet || (em.clean_facts ? em.clean_facts.factual_summary : (em.body ? em.body.slice(0, 95) : 'No preview available'));
         
-        // Clean sender display
         let senderDisplay = em.sender || 'Unknown';
         if (senderDisplay.includes('<')) {
           senderDisplay = senderDisplay.split('<')[0].trim().replace(/['"]/g, '');
         }
 
         const isRead = !!em.is_read;
+        const isSelected = em.id === activeEmailId;
 
         const row = document.createElement('div');
         row.id = `inbox-item-row-${em.id}`;
-        row.className = `group rounded-xl theme-card border transition ${isRead ? 'opacity-85' : 'border-indigo-500/30 shadow-sm'}`;
+        row.className = `group rounded-xl theme-card border transition cursor-pointer p-3 space-y-1.5 ${
+          isSelected 
+            ? 'border-indigo-500 bg-indigo-500/10 shadow-md' 
+            : isRead 
+              ? 'border-white/5 opacity-80 hover:opacity-100 hover:border-indigo-500/40 hover:bg-white/[0.03]' 
+              : 'border-indigo-500/40 bg-indigo-950/10 hover:border-indigo-400 hover:bg-white/[0.04]'
+        }`;
+        row.onclick = () => selectEmailForReading(em.id);
         row.innerHTML = `
-          <!-- Concise Header Row (Gmail Style) -->
-          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition rounded-xl">
-            <!-- Left: Sender -->
-            <div class="flex items-center space-x-3 w-56 flex-shrink-0">
-              <div class="w-6 h-6 rounded-lg ${isRead ? 'bg-slate-700/30 text-slate-400 border border-slate-700/40' : 'bg-indigo-600/30 text-cyan-300 border border-indigo-500/50'} font-mono text-[10px] flex items-center justify-center font-bold">
+          <div class="flex items-center justify-between space-x-2">
+            <div class="flex items-center space-x-2 min-w-0">
+              <div class="w-5 h-5 rounded-md ${isRead ? 'bg-slate-800 text-slate-400' : 'bg-indigo-600 text-white font-bold'} font-mono text-[9px] flex items-center justify-center flex-shrink-0">
                 ${escapeHtml((senderDisplay[0] || 'M').toUpperCase())}
               </div>
-              <span class="text-xs ${isRead ? 'text-slate-300' : 'font-bold text-white'} truncate max-w-[170px]" title="${escapeHtml(em.sender)}">
+              <span class="text-xs ${isRead ? 'text-slate-300 font-normal' : 'font-bold text-white'} truncate" title="${escapeHtml(em.sender)}">
                 ${escapeHtml(senderDisplay)}
               </span>
             </div>
-
-            <!-- Middle: Subject & 1-line Snippet (Crisp Layout) -->
-            <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
-              <span class="${isRead ? 'text-slate-200' : 'font-bold text-white'} flex-shrink-0 truncate max-w-[280px]">${escapeHtml(em.subject || 'No Subject')}</span>
-              <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${escapeHtml(snippetText)}</span>
-            </div>
-
-            <!-- Right: Category Badge + Floating Hover Quick Actions + Timestamp + Expand -->
-            <div class="flex items-center space-x-2 flex-shrink-0">
-              <!-- Floating Hover Quick Actions (Gmail-style) -->
-              <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-1" onclick="event.stopPropagation()">
-                <button onclick="openAiReplyModal('${em.id}')" title="AI Smart Reply" class="p-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 transition cursor-pointer shadow-sm">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive Email" class="p-1.5 rounded-lg theme-card border hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition cursor-pointer">
-                  <i data-lucide="archive" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="performEmailAction('${em.id}', '${isRead ? 'mark_unread' : 'mark_read'}')" title="${isRead ? 'Mark as Unread' : 'Mark as Read'}" class="p-1.5 rounded-lg theme-card border hover:border-amber-400 text-slate-300 hover:text-amber-300 transition cursor-pointer">
-                  <i data-lucide="${isRead ? 'mail-open' : 'mail'}" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="performEmailAction('${em.id}', 'trash')" title="Move to Trash" class="p-1.5 rounded-lg theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 transition cursor-pointer">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              ${badgeMarkup}
-              <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
-              <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
-            </div>
+            <span class="text-[10px] font-mono text-slate-400 flex-shrink-0">${dateFormatted}</span>
           </div>
 
-          <!-- Expandable Detail Drawer -->
-          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3 rounded-b-xl">
-            <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
-              <div class="space-y-0.5">
-                <div class="text-slate-300 font-mono text-[11px]">From: <span class="text-white">${escapeHtml(em.sender)}</span></div>
-                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-cyan-300 font-bold">${escapeHtml(em.subject)}</span></div>
-              </div>
-              <div class="flex items-center space-x-2">
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">🛡️ Dual-LLM Sanitized</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded ${isRead ? 'bg-slate-700/40 text-slate-300' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${isRead ? 'READ' : 'UNREAD'}</span>
-              </div>
+          <div class="text-xs ${isRead ? 'text-slate-200' : 'font-bold text-white'} truncate">
+            ${escapeHtml(em.subject || 'No Subject')}
+          </div>
+
+          <div class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+            ${escapeHtml(snippetText)}
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center space-x-1">
+              ${badgeMarkup}
+              ${!isRead ? '<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block ml-1"></span>' : ''}
             </div>
-
-            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
-              ${escapeHtml(em.body || em.final_output || '')}
-            </div>
-
-            <!-- Triage Quick Action Buttons Toolbar -->
-            <div class="flex items-center justify-between pt-1 text-xs font-mono flex-wrap gap-2">
-              <span class="text-[10px] text-slate-500">ID: ${em.id}</span>
-              
-              <div class="flex items-center space-x-2">
-                <!-- 1. AI Smart Reply Button -->
-                <button onclick="openAiReplyModal('${em.id}')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-300"></i>
-                  <span>✨ AI Reply</span>
-                </button>
-
-                <!-- 2. Archive Button -->
-                <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive Email" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-cyan-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
-                  <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
-                  <span>Archive</span>
-                </button>
-
-                <!-- 3. Mark Read / Unread Toggle -->
-                <button onclick="performEmailAction('${em.id}', '${isRead ? 'mark_unread' : 'mark_read'}')" title="Toggle Read Status" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-slate-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1 cursor-pointer transition">
-                  <i data-lucide="${isRead ? 'mail' : 'mail-open'}" class="w-3.5 h-3.5 text-amber-400"></i>
-                  <span>${isRead ? 'Mark Unread' : 'Mark Read'}</span>
-                </button>
-
-                <!-- 4. Trash Button -->
-                <button onclick="performEmailAction('${em.id}', 'trash')" title="Move to Trash" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-rose-500 text-slate-400 hover:text-rose-400 text-xs flex items-center space-x-1 cursor-pointer transition">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                  <span>Trash</span>
-                </button>
-
-                <!-- 5. Process in Chat -->
-                <button onclick="openEmailInChat('${em.id}')" class="px-2.5 py-1.5 rounded-xl bg-black/40 hover:bg-white/10 text-cyan-300 border theme-border text-xs flex items-center space-x-1.5 cursor-pointer transition">
-                  <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                  <span>Chat</span>
-                </button>
-              </div>
+            <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" onclick="event.stopPropagation()">
+              <button onclick="openAiReplyModal('${em.id}')" title="AI Smart Reply" class="p-1 rounded bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white transition cursor-pointer">
+                <i data-lucide="sparkles" class="w-3 h-3"></i>
+              </button>
+              <button onclick="performEmailAction('${em.id}', 'archive')" title="Archive" class="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-cyan-300 transition cursor-pointer">
+                <i data-lucide="archive" class="w-3 h-3"></i>
+              </button>
+              <button onclick="performEmailAction('${em.id}', '${isRead ? 'mark_unread' : 'mark_read'}')" title="Toggle Read" class="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-amber-300 transition cursor-pointer">
+                <i data-lucide="${isRead ? 'mail-open' : 'mail'}" class="w-3 h-3"></i>
+              </button>
+              <button onclick="performEmailAction('${em.id}', 'trash')" title="Trash" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer">
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+              </button>
             </div>
           </div>
         `;
@@ -8926,8 +9392,14 @@ DASHBOARD_HTML = r"""
             </button>
           </div>
         `;
+        renderEmptyReadingPane();
         refreshIcons();
         return;
+      }
+
+      if (!activeEmailId || !filtered.some(e => e.id === activeEmailId)) {
+        activeEmailId = filtered[0].id;
+        selectEmailForReading(activeEmailId);
       }
 
       filtered.forEach((em, idx) => {
@@ -8938,69 +9410,45 @@ DASHBOARD_HTML = r"""
         }
 
         const safeSubject = escapeHtml(em.subject || 'No Subject');
-        const safeTo = escapeHtml(em.to || '');
-        const safeSnippet = escapeHtml(em.snippet || (em.body ? em.body.slice(0, 110) : 'Sent message'));
-        const safeBody = escapeHtml(em.body || '');
+        const safeSnippet = escapeHtml(em.snippet || (em.body ? em.body.slice(0, 95) : 'Sent message'));
+        const isSelected = em.id === activeEmailId;
 
         const row = document.createElement('div');
         row.id = `sent-item-row-${em.id}`;
-        row.className = "group rounded-xl theme-card border transition border-emerald-500/20 shadow-sm";
+        row.className = `group rounded-xl theme-card border transition cursor-pointer p-3 space-y-1.5 ${
+          isSelected 
+            ? 'border-emerald-500 bg-emerald-500/10 shadow-md' 
+            : 'border-emerald-500/20 hover:border-emerald-400 hover:bg-white/[0.03]'
+        }`;
+        row.onclick = () => selectEmailForReading(em.id);
         row.innerHTML = `
-          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition rounded-xl">
-            <div class="flex items-center space-x-3 w-56 flex-shrink-0">
-              <div class="w-6 h-6 rounded-lg bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 font-mono text-[10px] flex items-center justify-center font-bold">
+          <div class="flex items-center justify-between space-x-2">
+            <div class="flex items-center space-x-2 min-w-0">
+              <div class="w-5 h-5 rounded-md bg-emerald-600/30 text-emerald-300 font-mono text-[9px] flex items-center justify-center flex-shrink-0 font-bold">
                 TO
               </div>
-              <span class="text-xs text-slate-300 truncate max-w-[170px]" title="${safeTo}">
+              <span class="text-xs text-slate-300 truncate" title="${escapeHtml(em.to || '')}">
                 ${escapeHtml(recipientDisplay)}
               </span>
             </div>
-
-            <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
-              <span class="font-bold text-white flex-shrink-0 truncate max-w-[280px]">${safeSubject}</span>
-              <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${safeSnippet}</span>
-            </div>
-
-            <div class="flex items-center space-x-2 flex-shrink-0">
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 SENT</span>
-              <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
-              <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
-            </div>
+            <span class="text-[10px] font-mono text-slate-400 flex-shrink-0">${dateFormatted}</span>
           </div>
 
-          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3 rounded-b-xl">
-            <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
-              <div class="space-y-0.5">
-                <div class="text-slate-300 font-mono text-[11px]">To: <span class="text-white">${safeTo}</span></div>
-                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-emerald-300 font-bold">${safeSubject}</span></div>
-              </div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">DISPATCHED</span>
-            </div>
+          <div class="text-xs font-bold text-white truncate">
+            ${safeSubject}
+          </div>
 
-            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
-              ${safeBody}
-            </div>
+          <div class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+            ${safeSnippet}
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 SENT</span>
           </div>
         `;
         container.appendChild(row);
       });
       refreshIcons();
-    }
-
-    function toggleInboxRowDetails(emailId) {
-      const drawer = document.getElementById(`drawer-${emailId}`);
-      const chevron = document.getElementById(`chevron-${emailId}`);
-      if (!drawer) return;
-      
-      const isHidden = drawer.classList.contains('hidden');
-      if (isHidden) {
-        drawer.classList.remove('hidden');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-        playCyberClick(800);
-      } else {
-        drawer.classList.add('hidden');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      }
     }
 
     function openEmailInChat(emailId) {
@@ -10402,7 +10850,7 @@ DASHBOARD_HTML = r"""
         });
         if (res.ok) {
           playHudBeep(700);
-          showProactiveToast('Note Deleted', `Deleted "${activeObsidianNote.title}.md"`);
+          showSubtleNotification('Note Deleted', `Deleted "${activeObsidianNote.title}.md"`);
           activeObsidianNote = null;
           document.getElementById('obsidian-active-view')?.classList.add('hidden');
           document.getElementById('obsidian-empty-view')?.classList.remove('hidden');
@@ -10446,7 +10894,7 @@ DASHBOARD_HTML = r"""
         });
         if (res.ok) {
           playHudBeep(1500);
-          showProactiveToast('Daily Note Appended', `Added entry under ## ${section}`);
+          showSubtleNotification('Daily Note Appended', `Added entry under ## ${section}`);
           appendSystemLog(`[Obsidian Daily] Appended entry to today's daily log`);
           closeObsidianDailyModal();
           await fetchObsidianNotes();
@@ -10467,9 +10915,17 @@ DASHBOARD_HTML = r"""
     let allCalendarEvents = [];
     let calendarCurrentDate = new Date();
     let currentCalendarFilter = 'all';
+    let currentCalendarViewMode = 'month';
 
-    async function fetchCalendarEvents() {
+    async function fetchCalendarEvents(forceSync = false) {
       try {
+        const syncBtn = document.getElementById('btn-sync-calendar');
+        if (syncBtn && forceSync) {
+          syncBtn.disabled = true;
+          syncBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-amber-400"></i>`;
+          refreshIcons();
+        }
+
         const res = await fetch('/api/calendar/events?days_back=120&days_ahead=365&include_festivals=true');
         const data = await res.json();
         allCalendarEvents = data.events || [];
@@ -10480,11 +10936,70 @@ DASHBOARD_HTML = r"""
         }).length;
         if (navBadge) navBadge.textContent = totalUpcoming;
 
-        renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
+        renderCurrentCalendarView();
         applyCalendarFilter();
+
+        if (syncBtn && forceSync) {
+          syncBtn.disabled = false;
+          syncBtn.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4"></i>`;
+          refreshIcons();
+          showSubtleNotification('Calendar Synced', `Updated calendar schedule (${allCalendarEvents.length} events)`);
+        }
       } catch (e) {
         console.error('Failed to fetch calendar events:', e);
       }
+    }
+
+    function setCalendarViewMode(mode) {
+      currentCalendarViewMode = mode;
+      playCyberClick(900);
+
+      const modes = ['month', 'week', 'agenda'];
+      modes.forEach(m => {
+        const btn = document.getElementById(`cal-view-btn-${m}`);
+        const container = document.getElementById(`calendar-container-${m}`);
+        if (!btn || !container) return;
+
+        if (m === mode) {
+          btn.className = "px-2.5 py-1 rounded-lg bg-amber-500 text-black font-bold cursor-pointer transition shadow-sm";
+          container.classList.remove('hidden');
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition";
+          container.classList.add('hidden');
+        }
+      });
+
+      renderCurrentCalendarView();
+    }
+
+    function renderCurrentCalendarView() {
+      if (currentCalendarViewMode === 'month') {
+        renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
+      } else if (currentCalendarViewMode === 'week') {
+        renderCalendarWeek(calendarCurrentDate);
+      } else if (currentCalendarViewMode === 'agenda') {
+        renderCalendarFullAgenda();
+      }
+    }
+
+    function navigateCalendar(delta) {
+      if (currentCalendarViewMode === 'week') {
+        calendarCurrentDate.setDate(calendarCurrentDate.getDate() + (delta * 7));
+      } else {
+        calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
+      }
+      playCyberClick(800);
+      renderCurrentCalendarView();
+    }
+
+    function changeCalendarMonth(delta) {
+      navigateCalendar(delta);
+    }
+
+    function jumpToCalendarToday() {
+      calendarCurrentDate = new Date();
+      playCyberClick(1100);
+      renderCurrentCalendarView();
     }
 
     function setCalendarFilter(filterName) {
@@ -10532,18 +11047,6 @@ DASHBOARD_HTML = r"""
       renderCalendarAgenda(filtered);
     }
 
-    function changeCalendarMonth(delta) {
-      calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
-      playCyberClick(800);
-      renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
-    }
-
-    function jumpToCalendarToday() {
-      calendarCurrentDate = new Date();
-      playCyberClick(1100);
-      renderCalendarGrid(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth());
-    }
-
     function renderCalendarGrid(year, month) {
       const monthLabel = document.getElementById('calendar-month-year-label');
       const grid = document.getElementById('calendar-days-grid');
@@ -10585,12 +11088,16 @@ DASHBOARD_HTML = r"""
           isToday 
             ? 'bg-amber-500/10 border-amber-500/50 shadow-inner' 
             : isPastDay 
-              ? 'theme-card border-white/5 opacity-75 hover:opacity-100 hover:border-amber-400/30'
+              ? 'theme-card border-white/5 opacity-75 hover:opacity-100 hover:border-amber-400/30' 
               : 'theme-card border-white/5 hover:border-amber-400/40 hover:bg-white/[0.04]'
         }`;
         
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        cell.onclick = () => openNewCalendarEventModal(dateStr);
+        cell.onclick = (e) => {
+          if (e.target === cell || e.target.closest('.day-num-badge')) {
+            openNewCalendarEventModal(dateStr);
+          }
+        };
 
         const dayEvents = allCalendarEvents.filter(ev => {
           if (!ev.start_time) return false;
@@ -10615,13 +11122,13 @@ DASHBOARD_HTML = r"""
 
           if (isFestival) {
             eventPillsHtml += `
-              <div class="px-1.5 py-0.5 rounded bg-purple-500/25 text-purple-200 border border-purple-500/40 text-[9px] font-mono font-semibold truncate" title="${escapeHtml(ev.summary)}: ${escapeHtml(ev.description || '')}">
+              <div onclick="event.stopPropagation(); openNewCalendarEventModal(null, ${escapeHtml(JSON.stringify(ev))})" class="px-1.5 py-0.5 rounded bg-purple-500/25 text-purple-200 border border-purple-500/40 text-[9px] font-mono font-semibold truncate hover:border-purple-300 transition cursor-pointer" title="${escapeHtml(ev.summary)}: ${escapeHtml(ev.description || '')}">
                 ${escapeHtml(ev.summary)}
               </div>
             `;
           } else {
             eventPillsHtml += `
-              <div class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate" title="${escapeHtml(ev.summary)}">
+              <div onclick="event.stopPropagation(); openNewCalendarEventModal(null, ${escapeHtml(JSON.stringify(ev))})" class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono truncate hover:border-amber-300 transition cursor-pointer" title="${escapeHtml(ev.summary)}">
                 ${time ? `${time} ` : ''}${escapeHtml(ev.summary)}
               </div>
             `;
@@ -10645,7 +11152,7 @@ DASHBOARD_HTML = r"""
         }
 
         cell.innerHTML = `
-          <div class="flex items-center justify-between text-xs font-mono">
+          <div class="flex items-center justify-between text-xs font-mono day-num-badge">
             <span class="${isToday ? 'w-5 h-5 rounded-full bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]' : isPastDay ? 'text-slate-400' : 'text-slate-200 font-semibold'}">${d}</span>
             ${indicatorBadge}
           </div>
@@ -10662,6 +11169,162 @@ DASHBOARD_HTML = r"""
         cell.textContent = i;
         grid.appendChild(cell);
       }
+    }
+
+    function renderCalendarWeek(baseDate) {
+      const grid = document.getElementById('calendar-week-columns-grid');
+      const label = document.getElementById('calendar-week-range-label');
+      const monthLabel = document.getElementById('calendar-month-year-label');
+      if (!grid) return;
+
+      const d = new Date(baseDate);
+      const dayOfWeek = d.getDay();
+      const mondayOffset = (dayOfWeek + 6) % 7;
+      d.setDate(d.getDate() - mondayOffset);
+
+      const weekDays = [];
+      for (let i = 0; i < 7; i++) {
+        const cur = new Date(d);
+        cur.setDate(d.getDate() + i);
+        weekDays.push(cur);
+      }
+
+      const firstD = weekDays[0];
+      const lastD = weekDays[6];
+      const weekRangeStr = `${firstD.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${lastD.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      if (label) label.textContent = `Week: ${weekRangeStr}`;
+      if (monthLabel) monthLabel.textContent = `Week Schedule (${firstD.toLocaleDateString('en-US', { month: 'short' })} ${firstD.getFullYear()})`;
+
+      grid.innerHTML = '';
+      const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+      const today = new Date();
+
+      weekDays.forEach((day, idx) => {
+        const isToday = day.toDateString() === today.toDateString();
+        const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+
+        const dayEvents = allCalendarEvents.filter(ev => {
+          if (!ev.start_time) return false;
+          if (ev.start_time.startsWith(dateStr)) return true;
+          try {
+            const evD = new Date(ev.start_time);
+            return evD.toDateString() === day.toDateString();
+          } catch(e) {
+            return false;
+          }
+        });
+
+        const col = document.createElement('div');
+        col.className = `p-3 rounded-2xl border flex flex-col space-y-2.5 min-h-[380px] transition ${
+          isToday 
+            ? 'bg-amber-500/10 border-amber-500/50 shadow-md' 
+            : 'theme-card border-white/5 hover:border-amber-400/30'
+        }`;
+
+        let eventsHtml = '';
+        if (dayEvents.length === 0) {
+          eventsHtml = `<div class="text-[10px] text-slate-600 font-mono text-center py-8">No events</div>`;
+        } else {
+          dayEvents.forEach(ev => {
+            const isFestival = ev.event_type === 'festival';
+            let time = '';
+            try {
+              if (ev.start_time.includes('T') && !ev.is_all_day && !isFestival) {
+                time = new Date(ev.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              }
+            } catch(e) {}
+
+            eventsHtml += `
+              <div onclick="openNewCalendarEventModal(null, ${escapeHtml(JSON.stringify(ev))})" class="p-2 rounded-xl border text-xs font-mono transition cursor-pointer space-y-1 ${
+                isFestival 
+                  ? 'bg-purple-950/30 border-purple-500/40 text-purple-200 hover:border-purple-300' 
+                  : 'bg-black/50 border-amber-500/30 text-amber-200 hover:border-amber-400'
+              }">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="font-bold truncate">${isFestival ? '🎉 Festival' : (time || 'All Day')}</span>
+                </div>
+                <div class="text-xs font-semibold truncate text-white">${escapeHtml(ev.summary)}</div>
+                ${ev.location ? `<div class="text-[10px] text-slate-400 truncate">📍 ${escapeHtml(ev.location)}</div>` : ''}
+              </div>
+            `;
+          });
+        }
+
+        col.innerHTML = `
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div>
+              <div class="text-[10px] font-mono font-bold ${idx >= 5 ? 'text-amber-400' : 'text-slate-400'}">${dayNames[idx]}</div>
+              <div class="text-sm font-bold ${isToday ? 'text-amber-300 font-display' : 'text-white'}">${day.getDate()}</div>
+            </div>
+            <button onclick="openNewCalendarEventModal('${dateStr}')" title="Add event on this day" class="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-300 transition cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Events Stream -->
+          <div class="flex-1 space-y-2 overflow-y-auto max-h-[320px] pr-0.5">
+            ${eventsHtml}
+          </div>
+        `;
+        grid.appendChild(col);
+      });
+      refreshIcons();
+    }
+
+    function renderCalendarFullAgenda() {
+      const feed = document.getElementById('calendar-full-agenda-feed');
+      const counter = document.getElementById('calendar-full-agenda-counter');
+      if (!feed) return;
+
+      feed.innerHTML = '';
+      const sorted = [...allCalendarEvents].sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
+      if (counter) counter.textContent = `${sorted.length} total schedule items`;
+
+      if (sorted.length === 0) {
+        feed.innerHTML = `<div class="p-12 text-center text-xs text-slate-500 font-mono">No events scheduled. Click "+ Schedule Event" to create one.</div>`;
+        return;
+      }
+
+      sorted.forEach(ev => {
+        const isFestival = ev.event_type === 'festival';
+        const startDate = ev.start_time ? new Date(ev.start_time) : null;
+        const timeStr = isFestival || ev.is_all_day ? 'All Day' : (startDate ? startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'All Day');
+        const dateStr = startDate ? startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border flex items-start justify-between gap-4 transition cursor-pointer ${
+          isFestival 
+            ? 'bg-purple-950/20 border-purple-500/30 hover:border-purple-400' 
+            : 'theme-card border-white/10 hover:border-amber-500/40'
+        }`;
+        card.onclick = () => openNewCalendarEventModal(null, ev);
+        card.innerHTML = `
+          <div class="space-y-1.5 flex-1 min-w-0">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-bold text-white">${escapeHtml(ev.summary)}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${isFestival ? 'bg-purple-600/30 text-purple-200 border border-purple-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${timeStr}</span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono flex items-center space-x-3">
+              <span>📅 ${dateStr}</span>
+              ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
+              ${ev.attendees && ev.attendees.length > 0 ? `<span>👥 ${escapeHtml(ev.attendees.join(', '))}</span>` : ''}
+            </div>
+            ${ev.description ? `<p class="text-xs text-slate-300 font-sans leading-relaxed">${escapeHtml(ev.description)}</p>` : ''}
+          </div>
+
+          <div class="flex items-center space-x-2 flex-shrink-0" onclick="event.stopPropagation()">
+            <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-500/30 text-xs font-mono transition cursor-pointer">
+              📝 Prep
+            </button>
+            <button onclick="deleteCalendarEvent('${ev.id}', '${escapeHtml(ev.summary)}')" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+      refreshIcons();
     }
 
     function renderCalendarAgenda(events) {
@@ -10687,7 +11350,8 @@ DASHBOARD_HTML = r"""
 
         const card = document.createElement('div');
         if (isFestival) {
-          card.className = 'p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 hover:border-purple-400/60 transition space-y-2 relative overflow-hidden';
+          card.className = 'p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 hover:border-purple-400/60 transition space-y-2 relative overflow-hidden cursor-pointer';
+          card.onclick = () => openNewCalendarEventModal(null, ev);
           card.innerHTML = `
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-purple-200 truncate pr-2">${escapeHtml(ev.summary)}</span>
@@ -10698,19 +11362,20 @@ DASHBOARD_HTML = r"""
               ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ''}
             </div>
             ${ev.description ? `<p class="text-[11px] text-slate-300 leading-relaxed font-sans">${escapeHtml(ev.description)}</p>` : ''}
-            <div class="pt-1.5 border-t border-purple-500/20 flex items-center justify-between text-[10px]">
-              <span class="text-purple-400/60 font-mono">🌟 Cultural & Public Holiday</span>
+            <div class="pt-1.5 border-t border-purple-500/20 flex items-center justify-between text-[10px]" onclick="event.stopPropagation()">
+              <span class="text-purple-400/60 font-mono">🌟 Cultural Holiday</span>
               <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr}')" class="px-2 py-0.5 rounded bg-purple-600/40 hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-500/40 transition cursor-pointer">
-                📝 Add Note in Vault
+                📝 Add Note
               </button>
             </div>
           `;
         } else {
-          card.className = `p-3.5 rounded-xl bg-black/40 border transition space-y-2 ${
+          card.className = `p-3.5 rounded-xl bg-black/40 border transition space-y-2 cursor-pointer ${
             isPast 
               ? 'border-white/5 opacity-70 hover:opacity-100 hover:border-slate-500' 
               : 'border-white/10 hover:border-amber-500/40'
           }`;
+          card.onclick = () => openNewCalendarEventModal(null, ev);
           card.innerHTML = `
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold ${isPast ? 'text-slate-300' : 'text-amber-300'} truncate pr-2">${escapeHtml(ev.summary)}</span>
@@ -10728,11 +11393,11 @@ DASHBOARD_HTML = r"""
             ${ev.attendees && ev.attendees.length > 0 ? `
               <div class="text-[10px] font-mono text-slate-500">Attendees: <span class="text-cyan-300">${escapeHtml(ev.attendees.join(', '))}</span></div>
             ` : ''}
-            <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]">
-              <span class="text-slate-500 font-mono">${isPast ? '⏮️ Past Event' : '🛡️ Synced & Saved'}</span>
+            <div class="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px]" onclick="event.stopPropagation()">
+              <span class="text-slate-500 font-mono">${isPast ? '⏮️ Past Event' : '🛡️ Synced'}</span>
               <div class="flex items-center space-x-1.5">
                 <button onclick="draftMeetingPrepInObsidian('${escapeHtml(ev.summary)}', '${dateStr} ${timeStr}')" class="px-2 py-0.5 rounded bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition cursor-pointer">
-                  📝 Prep in Obsidian
+                  📝 Prep
                 </button>
                 <button onclick="deleteCalendarEvent('${ev.id}', '${escapeHtml(ev.summary)}')" title="Delete Event" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition cursor-pointer">
                   <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -10747,25 +11412,68 @@ DASHBOARD_HTML = r"""
       refreshIcons();
     }
 
-    function openNewCalendarEventModal(defaultDate = null) {
+    function openNewCalendarEventModal(defaultDate = null, existingEvent = null) {
       playCyberClick();
-      document.getElementById('calendar-input-summary').value = '';
-      document.getElementById('calendar-input-location').value = '';
-      document.getElementById('calendar-input-attendees').value = '';
-      document.getElementById('calendar-input-description').value = '';
+      const titleEl = document.getElementById('calendar-modal-title');
+      const saveLabel = document.getElementById('calendar-modal-save-label');
+      const deleteBtn = document.getElementById('btn-delete-calendar-modal-event');
+      const obsidianBtn = document.getElementById('btn-obsidian-calendar-modal-event');
+      const idInput = document.getElementById('calendar-input-id');
 
-      const now = new Date();
-      if (defaultDate) {
-        document.getElementById('calendar-input-start').value = `${defaultDate}T10:00`;
-        document.getElementById('calendar-input-end').value = `${defaultDate}T11:00`;
+      if (existingEvent) {
+        if (typeof existingEvent === 'string') {
+          try { existingEvent = JSON.parse(existingEvent); } catch(e) {}
+        }
+        if (idInput) idInput.value = existingEvent.id || '';
+        if (titleEl) titleEl.textContent = 'Edit Calendar Event';
+        if (saveLabel) saveLabel.textContent = 'Save Changes';
+        if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+        if (obsidianBtn) obsidianBtn.style.display = 'inline-flex';
+
+        document.getElementById('calendar-input-summary').value = existingEvent.summary || '';
+        document.getElementById('calendar-input-location').value = existingEvent.location || '';
+        document.getElementById('calendar-input-attendees').value = (existingEvent.attendees || []).join(', ');
+        document.getElementById('calendar-input-description').value = existingEvent.description || '';
+
+        // Formats for datetime-local input
+        const formatLocal = (dtStr) => {
+          if (!dtStr) return '';
+          try {
+            const d = new Date(dtStr);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          } catch(e) {
+            return dtStr.slice(0, 16);
+          }
+        };
+        document.getElementById('calendar-input-start').value = formatLocal(existingEvent.start_time);
+        document.getElementById('calendar-input-end').value = formatLocal(existingEvent.end_time);
+
       } else {
-        const nextHour = new Date(now.getTime() + 3600000);
-        const nextTwoHours = new Date(now.getTime() + 7200000);
-        const pad = (n) => String(n).padStart(2, '0');
-        const startStr = `${nextHour.getFullYear()}-${pad(nextHour.getMonth() + 1)}-${pad(nextHour.getDate())}T${pad(nextHour.getHours())}:00`;
-        const endStr = `${nextTwoHours.getFullYear()}-${pad(nextTwoHours.getMonth() + 1)}-${pad(nextTwoHours.getDate())}T${pad(nextTwoHours.getHours())}:00`;
-        document.getElementById('calendar-input-start').value = startStr;
-        document.getElementById('calendar-input-end').value = endStr;
+        if (idInput) idInput.value = '';
+        if (titleEl) titleEl.textContent = 'Schedule Google Calendar Event';
+        if (saveLabel) saveLabel.textContent = 'Confirm & Save';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        if (obsidianBtn) obsidianBtn.style.display = 'none';
+
+        document.getElementById('calendar-input-summary').value = '';
+        document.getElementById('calendar-input-location').value = '';
+        document.getElementById('calendar-input-attendees').value = '';
+        document.getElementById('calendar-input-description').value = '';
+
+        const now = new Date();
+        if (defaultDate) {
+          document.getElementById('calendar-input-start').value = `${defaultDate}T10:00`;
+          document.getElementById('calendar-input-end').value = `${defaultDate}T11:00`;
+        } else {
+          const nextHour = new Date(now.getTime() + 3600000);
+          const nextTwoHours = new Date(now.getTime() + 7200000);
+          const pad = (n) => String(n).padStart(2, '0');
+          const startStr = `${nextHour.getFullYear()}-${pad(nextHour.getMonth() + 1)}-${pad(nextHour.getDate())}T${pad(nextHour.getHours())}:00`;
+          const endStr = `${nextTwoHours.getFullYear()}-${pad(nextTwoHours.getMonth() + 1)}-${pad(nextTwoHours.getDate())}T${pad(nextTwoHours.getHours())}:00`;
+          document.getElementById('calendar-input-start').value = startStr;
+          document.getElementById('calendar-input-end').value = endStr;
+        }
       }
 
       const m = document.getElementById('calendar-event-modal');
@@ -10781,6 +11489,7 @@ DASHBOARD_HTML = r"""
     }
 
     async function saveCalendarEventFromModal() {
+      const id = document.getElementById('calendar-input-id')?.value || null;
       const summary = document.getElementById('calendar-input-summary').value.trim();
       const start = document.getElementById('calendar-input-start').value;
       const end = document.getElementById('calendar-input-end').value;
@@ -10796,17 +11505,20 @@ DASHBOARD_HTML = r"""
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Scheduling...</span>`;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Saving...</span>`;
         refreshIcons();
       }
 
       const attendees = attendeesStr ? attendeesStr.split(',').map(a => a.trim()).filter(Boolean) : [];
+      const endpoint = id ? '/api/calendar/event' : '/api/calendar/create';
+      const method = id ? 'PUT' : 'POST';
 
       try {
-        const res = await fetch('/api/calendar/create', {
-          method: 'POST',
+        const res = await fetch(endpoint, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            id: id,
             summary: summary,
             start_time: start,
             end_time: end,
@@ -10818,26 +11530,41 @@ DASHBOARD_HTML = r"""
         const data = await res.json();
         if (res.ok && (data.status === 'success' || (data.result && data.result.status === 'success'))) {
           playHudBeep(1600);
-          showProactiveToast('Event Scheduled', `"${summary}" created in Calendar.`);
-          appendSystemLog(`[Calendar Engine] Scheduled "${summary}" for ${start}`);
+          showSubtleNotification(id ? 'Event Updated' : 'Event Scheduled', `"${summary}" saved to Calendar.`);
+          appendSystemLog(`[Calendar Engine] ${id ? 'Updated' : 'Scheduled'} "${summary}"`);
           closeCalendarEventModal();
           await fetchCalendarEvents();
         } else {
-          alert(`Failed to create event: ${data.detail || (data.result && data.result.message) || 'Error'}`);
+          alert(`Failed to save event: ${data.detail || (data.result && data.result.message) || 'Error'}`);
         }
       } catch (e) {
-        alert(`Error scheduling event: ${e.message}`);
+        alert(`Error saving event: ${e.message}`);
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="calendar-check" class="w-3.5 h-3.5"></i><span>Confirm & Schedule</span>`;
+          btn.innerHTML = `<i data-lucide="calendar-check" class="w-3.5 h-3.5"></i><span>Confirm & Save</span>`;
           refreshIcons();
         }
       }
     }
 
+    async function deleteCalendarEventFromModal() {
+      const id = document.getElementById('calendar-input-id')?.value;
+      const summary = document.getElementById('calendar-input-summary')?.value || 'Event';
+      if (!id) return;
+      closeCalendarEventModal();
+      await deleteCalendarEvent(id, summary);
+    }
+
+    function prepCurrentEventInObsidian() {
+      const summary = document.getElementById('calendar-input-summary')?.value || 'Event';
+      const start = document.getElementById('calendar-input-start')?.value || '';
+      closeCalendarEventModal();
+      draftMeetingPrepInObsidian(summary, start);
+    }
+
     async function deleteCalendarEvent(id, summary) {
-      if (!confirm(`Delete event "${summary}" from your schedule?`)) return;
+      if (!confirm(`⚠️ Confirm Event Deletion:\nAre you sure you want to delete "${summary}" from your schedule and Google Calendar?`)) return;
       try {
         const res = await fetch(`/api/calendar/event?event_id=${encodeURIComponent(id)}`, {
           method: 'DELETE'
@@ -10845,7 +11572,7 @@ DASHBOARD_HTML = r"""
         const data = await res.json();
         if (res.ok && data.status === 'success') {
           playHudBeep(900);
-          showProactiveToast('Event Deleted', `Removed "${summary}"`);
+          showSubtleNotification('Event Deleted', `Removed "${summary}"`);
           appendSystemLog(`[Calendar Engine] Deleted event "${summary}"`);
           await fetchCalendarEvents();
         } else {
@@ -11741,9 +12468,9 @@ DASHBOARD_HTML = r"""
       }
 
       // 6. Restore Audio & TTS Voice Setting
-      updateAudioIcon();
-      initTtsState();
-      initSpeechRecognition();
+      try { updateAudioIcon(); } catch(e) {}
+      try { initTtsState(); } catch(e) {}
+      try { if (typeof initSpeechRecognition === 'function') initSpeechRecognition(); } catch(e) {}
 
       // 7. Setup Window Drag & Drop Document Ingestion
       window.addEventListener('dragover', (e) => {
@@ -11764,19 +12491,19 @@ DASHBOARD_HTML = r"""
       });
 
       // 8. Connect WebSocket & Load Data
-      initWebSocket();
-      fetchChatSessions(true);
-      fetchInbox();
-      fetchTraces();
-      fetchPendingApprovals();
-      fetchObsidianStatus();
-      fetchObsidianNotes();
-      fetchCalendarEvents();
-      refreshIcons();
+      try { initWebSocket(); } catch(e) { console.error('WS init error:', e); }
+      try { fetchChatSessions(true); } catch(e) { console.error('Chat sessions load error:', e); }
+      try { fetchInbox(); } catch(e) {}
+      try { fetchTraces(); } catch(e) {}
+      try { fetchPendingApprovals(); } catch(e) {}
+      try { fetchObsidianStatus(); } catch(e) {}
+      try { fetchObsidianNotes(); } catch(e) {}
+      try { fetchCalendarEvents(); } catch(e) {}
+      try { refreshIcons(); } catch(e) {}
 
       // 9. Periodic Fast Background Refresh (15s)
       setInterval(() => {
-        fetchInbox(false);
+        try { fetchInbox(false); } catch(e) {}
       }, 15000);
     });
   
