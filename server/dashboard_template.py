@@ -647,29 +647,31 @@ DASHBOARD_HTML = r"""
       #blend-cursor { display: none !important; }
     }
 
-    /* ── Old Regime Architectural Precision Cornering & Sharp Blueprint Geometry ── */
+    /* ── Dynamic Border Radius Engine ── */
     :root {
-      --radius-corner: 0px;
-      --radius-sm: 0px;
-      --radius-sharp: 0px;
+      --radius-ui: 6px;
+      --radius-sm: 4px;
+      --radius-lg: 10px;
+      --radius-xl: 14px;
+      --radius-2xl: 18px;
     }
 
-    /* Universal enforcement: Overrule all Tailwind rounded classes to sharp architectural corners */
+    /* Universal radius: All Tailwind rounded classes follow --radius-ui */
     .rounded-3xl, .rounded-2xl, .rounded-xl, .rounded-lg, .rounded-md, .rounded, .rounded-sm,
     [class*="rounded-2xl"], [class*="rounded-xl"], [class*="rounded-lg"], [class*="rounded-md"], [class*="rounded-3xl"], [class*="rounded-sm"] {
-      border-radius: 0px !important;
+      border-radius: var(--radius-ui) !important;
     }
 
-    /* Convert all pill buttons, badges, and boxes to sharp rectangles while keeping small status dots/avatars circular */
+    /* Pill elements scale with radius but keep status dots/avatars circular */
     .rounded-full:not(.avatar-circle):not(.cur-dot):not(.cur-circle):not(.status-dot):not([id^="status-dot"]):not(.badge-dot):not(.eq-bar):not(.online-pulse-dot):not(.avatar-bot):not(.theme-avatar-bot) {
-      border-radius: 0px !important;
+      border-radius: calc(var(--radius-ui) * 2) !important;
     }
 
-    .theme-card, .seamless-card, .bubble-card, .user-bubble, 
-    .workspace-pill, .nav-item, .btn-brand-primary, .theme-btn-primary, 
+    .theme-card, .seamless-card, .bubble-card, .user-bubble,
+    .workspace-pill, .nav-item, .btn-brand-primary, .theme-btn-primary,
     button, input, textarea, select, kbd, .modal-card, .toast-notification,
     .quick-action-card, .tab-btn, .corner-crosshair {
-      border-radius: 0px !important;
+      border-radius: var(--radius-ui) !important;
     }
 
     /* Glass Panels with Dynamic Theme & Transparency Variables */
@@ -692,8 +694,8 @@ DASHBOARD_HTML = r"""
       backdrop-filter: blur(var(--card-blur));
       -webkit-backdrop-filter: blur(var(--card-blur));
       box-shadow: var(--shadow-card), var(--bevel-highlight) !important;
-      border-radius: 0px !important;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease !important;
+      border-radius: var(--radius-ui) !important;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease, border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     .theme-card:hover {
       background-color: var(--bg-card-hover);
@@ -707,7 +709,7 @@ DASHBOARD_HTML = r"""
     .nav-item {
       color: var(--text-muted);
       border: 1px solid transparent;
-      border-radius: 0px !important;
+      border-radius: var(--radius-ui) !important;
       transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .nav-item:hover {
@@ -3751,6 +3753,68 @@ DASHBOARD_HTML = r"""
         </div>
       </div>
 
+      <!-- Section 2.7: Border Radius & Corner Softness Engine -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-violet-300">
+            <i data-lucide="circle" class="w-3.5 h-3.5 text-violet-400"></i>
+            <span>🔲 Corner Softness & Border Radius Engine</span>
+          </div>
+          <span id="label-border-radius" class="text-[10px] text-violet-300 font-mono font-bold">6px — Subtle</span>
+        </div>
+
+        <!-- Radius Preset Buttons -->
+        <div class="grid grid-cols-5 gap-2">
+          <button onclick="setBorderRadius(0); playCyberClick();" data-radius="0" class="radius-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-1.5">
+            <div class="w-full h-6 border-2 border-slate-400/60 mx-auto" style="border-radius: 0px;"></div>
+            <div class="font-bold text-[10px]">Sharp</div>
+            <div class="text-[9px] text-slate-500 font-mono">0px</div>
+          </button>
+          <button onclick="setBorderRadius(6); playCyberClick();" data-radius="6" class="radius-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-violet-500 bg-violet-600/20 text-white space-y-1.5">
+            <div class="w-full h-6 border-2 border-violet-400/80 mx-auto" style="border-radius: 6px;"></div>
+            <div class="font-bold text-[10px]">Subtle</div>
+            <div class="text-[9px] text-violet-400 font-mono">6px</div>
+          </button>
+          <button onclick="setBorderRadius(12); playCyberClick();" data-radius="12" class="radius-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-1.5">
+            <div class="w-full h-6 border-2 border-slate-400/60 mx-auto" style="border-radius: 12px;"></div>
+            <div class="font-bold text-[10px]">Rounded</div>
+            <div class="text-[9px] text-slate-500 font-mono">12px</div>
+          </button>
+          <button onclick="setBorderRadius(20); playCyberClick();" data-radius="20" class="radius-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-1.5">
+            <div class="w-full h-6 border-2 border-slate-400/60 mx-auto" style="border-radius: 20px;"></div>
+            <div class="font-bold text-[10px]">Soft</div>
+            <div class="text-[9px] text-slate-500 font-mono">20px</div>
+          </button>
+          <button onclick="setBorderRadius(32); playCyberClick();" data-radius="32" class="radius-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-1.5">
+            <div class="w-full h-6 border-2 border-slate-400/60 mx-auto" style="border-radius: 32px;"></div>
+            <div class="font-bold text-[10px]">Pill</div>
+            <div class="text-[9px] text-slate-500 font-mono">32px</div>
+          </button>
+        </div>
+
+        <!-- Fine-grained slider -->
+        <div class="p-3 rounded-xl bg-black/30 border theme-border space-y-2">
+          <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span class="flex items-center space-x-1"><i data-lucide="sliders-horizontal" class="w-3 h-3 text-violet-400"></i><span>Fine-tune corner radius</span></span>
+            <span class="text-violet-300 font-bold" id="label-radius-slider">6px</span>
+          </div>
+          <input type="range" id="slider-border-radius" min="0" max="32" value="6" oninput="setBorderRadius(this.value, false)" class="w-full accent-violet-500 cursor-pointer">
+          <div class="text-[10px] text-slate-600 flex justify-between">
+            <span>■ Sharp 0px</span>
+            <span>● Pill 32px</span>
+          </div>
+        </div>
+
+        <!-- Live Preview Strip -->
+        <div class="p-3 rounded-xl bg-black/20 border theme-border flex items-center gap-3 flex-wrap">
+          <div id="radius-preview-card" class="px-4 py-2 text-xs font-bold text-white" style="background: linear-gradient(135deg, var(--color-brand), var(--color-accent)); border-radius: var(--radius-ui);">Card Preview</div>
+          <div id="radius-preview-btn" class="px-3 py-1.5 text-xs font-mono text-white border border-violet-400/50" style="background: rgba(139,92,246,0.2); border-radius: var(--radius-ui);">Button</div>
+          <div id="radius-preview-input" class="px-3 py-1.5 text-xs font-mono text-slate-400 border border-white/10 bg-white/5" style="border-radius: var(--radius-ui);">Input field</div>
+          <div id="radius-preview-badge" class="px-2.5 py-0.5 text-[10px] font-mono font-bold" style="background: rgba(var(--rgb-card), 0.8); border: 1px solid var(--border-main); color: var(--color-brand); border-radius: calc(var(--radius-ui) * 2);">Badge</div>
+          <span class="text-[10px] text-slate-500 font-mono ml-auto">Live preview</span>
+        </div>
+      </div>
+
       <!-- Section 3: Custom Theme Studio & Palette Creator -->
       <div class="space-y-4 pt-3 border-t theme-border">
         <div class="flex items-center justify-between">
@@ -4670,6 +4734,54 @@ DASHBOARD_HTML = r"""
     const STORAGE_AUDIO = 'omarchy_audio_enabled';
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
     const STORAGE_SHADOW_STYLE = 'sovereign_shadow_style';
+    const STORAGE_BORDER_RADIUS = 'sovereign_border_radius';
+
+    // ── Border Radius & Corner Softness Engine ──
+    function setBorderRadius(val, updateSlider = true) {
+      const v = parseInt(val, 10);
+      const root = document.documentElement;
+      root.style.setProperty('--radius-ui', `${v}px`);
+      root.style.setProperty('--radius-sm', `${Math.max(0, v - 2)}px`);
+      root.style.setProperty('--radius-lg', `${v + 4}px`);
+      root.style.setProperty('--radius-xl', `${v + 8}px`);
+      root.style.setProperty('--radius-2xl', `${v + 12}px`);
+
+      localStorage.setItem(STORAGE_BORDER_RADIUS, v);
+
+      // Update slider value + label
+      if (updateSlider) {
+        const slider = document.getElementById('slider-border-radius');
+        if (slider) slider.value = v;
+      }
+      const sliderLabel = document.getElementById('label-radius-slider');
+      if (sliderLabel) sliderLabel.textContent = `${v}px`;
+
+      // Update main label with preset name
+      const names = { 0: 'Sharp', 6: 'Subtle', 12: 'Rounded', 20: 'Soft', 32: 'Pill' };
+      const nearestName = Object.keys(names).reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
+      const label = document.getElementById('label-border-radius');
+      if (label) label.textContent = `${v}px — ${names[nearestName] || 'Custom'}`;
+
+      // Update active state on preset buttons
+      document.querySelectorAll('.radius-preset-btn').forEach(btn => {
+        const isActive = parseInt(btn.getAttribute('data-radius')) === v;
+        if (isActive) {
+          btn.classList.add('border-violet-500', 'bg-violet-600/20', 'text-white');
+          btn.classList.remove('border-transparent', 'text-slate-300');
+        } else {
+          btn.classList.remove('border-violet-500', 'bg-violet-600/20', 'text-white');
+          btn.classList.add('border-transparent', 'text-slate-300');
+        }
+      });
+
+      // Update live preview elements
+      ['radius-preview-card', 'radius-preview-btn', 'radius-preview-input'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.borderRadius = `${v}px`;
+      });
+      const badge = document.getElementById('radius-preview-badge');
+      if (badge) badge.style.borderRadius = `${v * 2}px`;
+    }
 
     // ── Architectural Shadow Depth & Offset Customizer ──
     function setShadowStyle(styleName, save = true) {
@@ -4719,6 +4831,10 @@ DASHBOARD_HTML = r"""
       }
       const savedShadowStyle = localStorage.getItem(STORAGE_SHADOW_STYLE) || 'hard-offset';
       setShadowStyle(savedShadowStyle, false);
+
+      // Restore border radius
+      const savedRadius = parseInt(localStorage.getItem(STORAGE_BORDER_RADIUS) ?? '6', 10);
+      setBorderRadius(savedRadius, true);
     }
 
     // ── Old Regime Smooth Scrolling & Reset Protocol ──
