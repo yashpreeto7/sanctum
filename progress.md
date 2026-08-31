@@ -69,6 +69,28 @@
     3. **Interactive HUD Voice Switcher**: Added a glass pill button (`[ ✨ Female: Hazel ]`) in the top bar of the fullscreen HUD so users can tap to cycle between available female/male voices, automatically persisting the user's choice to `localStorage`.
   - Visual proof captured at [screenshot_voice_female_voice_configured.png](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/screenshot_voice_female_voice_configured.png).
 
+  ## Completed Phases (Next-Gen Architectural Leap)
+- **Phase 25: Universal Model Context Protocol (MCP) Client Hub**:
+  - Implemented async stdio/SSE JSON-RPC 2.0 `MCPClient` in [`execution/tools/mcp_client.py`](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/execution/tools/mcp_client.py).
+  - Implemented multi-server `MCPManager` in [`execution/tools/mcp_manager.py`](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/execution/tools/mcp_manager.py) with starter templates (Filesystem, SQLite, GitHub, Brave Search).
+  - Wired namespaced tool execution (`mcp:{server}:{tool}`) into LangGraph orchestrator.
+  - Exposed MCP management REST APIs (`/api/mcp/servers`, `/api/mcp/tools`, `/api/mcp/call`).
+
+- **Phase 26: Persistent Episodic & Semantic Memory Graph (Mem0-Style)**:
+  - Implemented SQLite-backed `MemoryGraph` in [`execution/ml/memory_graph.py`](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/execution/ml/memory_graph.py) with fact extraction, confidence scoring, category filtering, and recency tracking.
+  - Injected memory context automatically into reasoning prompt for zero-amnesia interactions.
+  - Exposed Memory Graph REST APIs (`/api/memory/list`, `/api/memory/add`, `/api/memory/delete`, `/api/memory/search`, `/api/memory/events`).
+
+- **Phase 27: Proactive Executive Scheduler & Background Daemons**:
+  - Implemented async background `ExecutiveScheduler` in [`execution/orchestration/scheduler.py`](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/execution/orchestration/scheduler.py).
+  - Built autonomous Daily Executive Briefing synthesizer and continuous inbox triage watcher.
+  - Integrated scheduler startup into FastAPI lifecycle.
+
+- **Phase 28: Dashboard UI Studio (Memory Vault & MCP Studio & Daily Briefing)**:
+  - Added dedicated Memory Vault tab (`#view-memory`) in [`server/dashboard_template.py`](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/server/dashboard_template.py) with fact cards, category filter chips, search, and episodic timeline.
+  - Added MCP Server Hub Studio panel in Settings tab (`#view-system`) with real-time status badges and toggle controls.
+  - Added Executive Morning Intelligence widget at the top of Operations Overview (`#view-home`).
+
   - Upgraded `--shadow-card-hover` to a deep expanded contact shadow (`0 20px 48px -8px ...`) with specular top bevel (`inset 0 1px 0 0 ...`).
   - Enforced high-priority hover lift (`transform: translateY(-3px) !important;`) across `.theme-card` and `.seamless-card`.
   - Executed autonomous browser session across all 14 presets (Sovereign Slate, Titanium Onyx, Minimal Studio, Obsidian Gold, Sovereign Manifesto, Light Studio, Tokyo Night) and verified rich physical depth and crisp cornering.

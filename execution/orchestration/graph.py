@@ -320,6 +320,16 @@ Available tools:
             f"{tool_schema}"
         )
 
+        # ── Fetch User Memory Graph Context & Extract Facts ────────────────
+        memory_context = ""
+        try:
+            from execution.ml.memory_graph import memory_graph
+            memory_context = memory_graph.get_context_for_prompt(raw_cmd, max_items=6)
+            if sender == "user" or state.get("is_interactive_command", False):
+                memory_graph.extract_memories_from_text(raw_cmd, source="chat")
+        except Exception as e:
+            logger.debug(f"Memory graph note: {e}")
+
         # Include conversation history if available
         history = state.get("chat_history") or []
         history_str = ""
@@ -336,6 +346,7 @@ Available tools:
 
         reasoning_prompt = (
             f"{history_str}"
+            f"{memory_context + chr(10) + chr(10) if memory_context else ''}"
             f"Current User Request: \"{raw_cmd}\"\n\n"
             f"Factual Summary: {summary}\n"
             f"Sender: {sender}\n"
@@ -711,7 +722,13 @@ Available tools:
             elif any(w in cmd_lower for w in ["create note", "take note", "save note", "make note", "write note", "add note", "create a note"]):
                 note_title = facts.get("clean_subject") or "Personal Note"
                 if note_title == "User Command" or not note_title:
-                    note_title = summary[:30]
+                    clean_t = raw_cmd
+                    for p in ["create note about", "take note about", "save note about", "make note about", "write note about", "create a note about", "take note of", "save note on", "save note", "create note", "take note"]:
+                        if p in clean_t.lower():
+                            idx = clean_t.lower().find(p) + len(p)
+                            clean_t = clean_t[idx:].strip()
+                            break
+                    note_title = clean_t[:80].strip(" .!?,") or summary[:80]
                 return ReasoningPlan(
                     tool_name="obsidian.create_note",
                     tool_args={
@@ -1185,6 +1202,28 @@ Available tools:
             else:
                 output_message = f"✅ File `{res['path']}` written ({res['bytes_written']} bytes)."
             result = res
+
+        elif tool_name.startswith("mcp:"):
+            try:
+                import asyncio
+                import json
+                from execution.tools.mcp_manager import mcp_manager
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        import nest_asyncio
+                        nest_asyncio.apply()
+                        res = loop.run_until_complete(mcp_manager.call_namespaced_tool(tool_name, args))
+                    else:
+                        res = loop.run_until_complete(mcp_manager.call_namespaced_tool(tool_name, args))
+                except Exception:
+                    res = asyncio.run(mcp_manager.call_namespaced_tool(tool_name, args))
+
+                output_message = f"### ⚡ MCP Tool Output: `{tool_name}`\n\n```json\n{json.dumps(res, indent=2)}\n```"
+                result = res
+            except Exception as e:
+                output_message = f"❌ MCP Tool Execution Error ({tool_name}): {e}"
+                result = {"error": str(e)}
 
         return result, output_message
 

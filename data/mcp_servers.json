@@ -1,0 +1,49 @@
+{
+  "filesystem": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-filesystem",
+      "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT"
+    ],
+    "env": {},
+    "enabled": false,
+    "description": "Local file system operations, reading directories, writing and searching files."
+  },
+  "sqlite": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-sqlite",
+      "--db-path",
+      "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/data/sovereign.db"
+    ],
+    "env": {},
+    "enabled": false,
+    "description": "Direct SQLite querying, table introspection, and analytical queries."
+  },
+  "github": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-github"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+    },
+    "enabled": false,
+    "description": "Interact with GitHub repositories, pull requests, issues, and code search."
+  },
+  "brave_search": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-brave-search"
+    ],
+    "env": {
+      "BRAVE_API_KEY": ""
+    },
+    "enabled": false,
+    "description": "High-privacy global web and news search via Brave Search API."
+  }
+}

@@ -1845,7 +1845,14 @@ DASHBOARD_HTML = r"""
             <span>Pipeline Topology</span>
           </a>
 
-          <a onclick="switchTab('rag'); playCyberClick();" id="nav-rag" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+                    <a onclick="switchTab('memory'); playCyberClick();" id="nav-memory" class="nav-item flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition">
+            <div class="flex items-center space-x-3">
+              <i data-lucide="brain-circuit" class="w-4 h-4 text-rose-400"></i>
+              <span>Memory Graph</span>
+            </div>
+            <span id="nav-memory-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">0</span>
+          </a>
+<a onclick="switchTab('rag'); playCyberClick();" id="nav-rag" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
             <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
             <span>Memory & Vector RAG</span>
           </a>
@@ -1963,6 +1970,51 @@ DASHBOARD_HTML = r"""
 
         <!-- ══════════════════ TAB 1: HOME ══════════════════ -->
         <section id="view-home" class="view-container space-y-6">
+          <!-- ⚡ Autonomous Daily Executive Intelligence Briefing -->
+          <div id="executive-briefing-card" class="p-5 rounded-2xl theme-card border space-y-3 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                  <i data-lucide="sun-medium" class="w-4 h-4 text-amber-300"></i>
+                </div>
+                <div>
+                  <h3 id="briefing-headline" class="text-sm font-bold text-white font-display">Executive Morning Intelligence</h3>
+                  <span id="briefing-date" class="text-[10px] font-mono text-slate-400">Autonomous Briefing • Local Cores Active</span>
+                </div>
+              </div>
+              <button onclick="triggerExecutiveBriefing(); playCyberClick();" id="btn-refresh-briefing" class="px-2.5 py-1 rounded-xl theme-card border hover:border-brand text-xs font-mono text-slate-300 hover:text-white flex items-center space-x-1.5 transition">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                <span>Regenerate</span>
+              </button>
+            </div>
+            <p id="briefing-summary" class="text-xs text-slate-200 leading-relaxed font-sans"></p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1" id="briefing-metrics-row">
+              <div class="p-2.5 rounded-xl bg-black/30 border theme-border flex items-center space-x-2">
+                <i data-lucide="mail" class="w-4 h-4 text-indigo-400"></i>
+                <div>
+                  <div class="text-[10px] text-slate-400 font-mono">Unread Inbox</div>
+                  <div id="briefing-unread-metric" class="text-xs font-bold text-white">0 Messages</div>
+                </div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-black/30 border theme-border flex items-center space-x-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+                <div>
+                  <div class="text-[10px] text-slate-400 font-mono">Today Schedule</div>
+                  <div id="briefing-events-metric" class="text-xs font-bold text-white">0 Events</div>
+                </div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-black/30 border theme-border flex items-center space-x-2">
+                <i data-lucide="brain" class="w-4 h-4 text-rose-400"></i>
+                <div>
+                  <div class="text-[10px] text-slate-400 font-mono">Memory Context</div>
+                  <div id="briefing-memory-metric" class="text-xs font-bold text-white">Active</div>
+                </div>
+              </div>
+            </div>
+            <div id="briefing-actions-container" class="space-y-1.5 pt-1"></div>
+          </div>
+
+
           
           <!-- Hero Banner -->
           <div class="p-6 rounded-2xl theme-card border flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -3005,7 +3057,66 @@ DASHBOARD_HTML = r"""
 
 
         <!-- ══════════════════ TAB 7: KNOWLEDGE (RAG) ════════════════ -->
-        <section id="view-rag" class="view-container hidden space-y-6">
+                <!-- ══════════════════ TAB: AUTONOMOUS MEMORY GRAPH ══════════════════ -->
+        <section id="view-memory" class="view-container hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl theme-card border">
+            <div>
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-white shadow-md">
+                  <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h2 class="text-base font-bold font-display text-white">Autonomous Memory Graph</h2>
+                  <p class="text-xs text-slate-400">Mem0-style episodic timeline and semantic user facts injected into every prompt</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <input type="text" id="memory-search-input" onkeyup="searchMemoriesLive(this.value)" placeholder="Search facts, preferences..." class="px-3 py-1.5 pl-8 rounded-xl bg-black/40 border theme-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500/50 w-48 sm:w-64">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+              </div>
+              <button onclick="openAddMemoryModal(); playCyberClick();" class="px-3 py-1.5 rounded-xl btn-brand-primary text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Add Fact</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Filter Bar -->
+          <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-mono">
+            <button onclick="filterMemoryCategory('all')" id="mem-cat-all" class="mem-cat-btn px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold transition">All Facts (<span id="mem-count-all">0</span>)</button>
+            <button onclick="filterMemoryCategory('preference')" id="mem-cat-preference" class="mem-cat-btn px-3 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-white transition">Preferences (<span id="mem-count-preference">0</span>)</button>
+            <button onclick="filterMemoryCategory('personal')" id="mem-cat-personal" class="mem-cat-btn px-3 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-white transition">Personal (<span id="mem-count-personal">0</span>)</button>
+            <button onclick="filterMemoryCategory('project')" id="mem-cat-project" class="mem-cat-btn px-3 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-white transition">Projects (<span id="mem-count-project">0</span>)</button>
+            <button onclick="filterMemoryCategory('system')" id="mem-cat-system" class="mem-cat-btn px-3 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-white transition">System (<span id="mem-count-system">0</span>)</button>
+          </div>
+
+          <!-- Memory Cards Grid -->
+          <div id="memory-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Dynamic Memory Cards rendered here -->
+          </div>
+
+          <!-- Episodic Timeline Section -->
+          <div class="p-5 rounded-2xl theme-card border space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
+                <h3 class="text-sm font-bold text-white font-display">Episodic Timeline & System Events</h3>
+              </div>
+              <button onclick="fetchEpisodicEvents(); playCyberClick();" class="text-xs text-slate-400 hover:text-white font-mono flex items-center space-x-1">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                <span>Refresh</span>
+              </button>
+            </div>
+            <div id="episodic-events-container" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <!-- Dynamic Events rendered here -->
+            </div>
+          </div>
+        </section>
+
+<section id="view-rag" class="view-container hidden space-y-6">
           <div class="p-5 rounded-2xl theme-card border flex items-center justify-between">
             <div class="space-y-1">
               <h2 class="text-base font-display font-bold text-white">Hybrid Knowledge Vault (RAG)</h2>
@@ -3255,6 +3366,31 @@ DASHBOARD_HTML = r"""
         </section>
 
         <section id="view-system" class="view-container hidden space-y-6">
+          <!-- 🏛️ Universal Model Context Protocol (MCP) Hub Studio -->
+          <div class="p-5 rounded-2xl theme-card border space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white shadow-md">
+                  <i data-lucide="cpu" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-white font-display">Model Context Protocol (MCP) Server Hub</h3>
+                  <p class="text-xs text-slate-400">Connect SovereignOS to standardized external tools (GitHub, SQLite, Postgres, Slack, Filesystem, Brave)</p>
+                </div>
+              </div>
+              <button onclick="openAddMCPServerModal(); playCyberClick();" class="px-3 py-1.5 rounded-xl btn-brand-primary text-xs font-semibold flex items-center space-x-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Add MCP Server</span>
+              </button>
+            </div>
+
+            <!-- Server Cards List -->
+            <div id="mcp-servers-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <!-- Dynamic MCP Servers rendered here -->
+            </div>
+          </div>
+
+
           <div class="p-5 rounded-2xl theme-card border space-y-4">
             <h2 class="text-base font-display font-bold text-white">System Config & Runtime Diagnostics</h2>
             <div class="grid grid-cols-2 gap-4 text-xs font-mono">
@@ -11012,6 +11148,321 @@ DASHBOARD_HTML = r"""
         fetchInbox(false);
       }, 15000);
     });
+  
+    // ══════════════════════════════════════════════════════════════════════════
+    // AUTONOMOUS MEMORY GRAPH, MCP SERVER STUDIO & EXECUTIVE BRIEFING CLIENT JS
+    // ══════════════════════════════════════════════════════════════════════════
+
+    let allMemoriesList = [];
+    let currentMemoryCategory = 'all';
+
+    async function fetchMemories() {
+      try {
+        const res = await fetch('/api/memory/list');
+        const data = await res.json();
+        if (data.status === 'success') {
+          allMemoriesList = data.memories || [];
+          document.getElementById('nav-memory-badge').textContent = allMemoriesList.length;
+          document.getElementById('mem-count-all').textContent = allMemoriesList.length;
+
+          // Update counts
+          const cats = ['preference', 'personal', 'project', 'system'];
+          cats.forEach(c => {
+            const count = allMemoriesList.filter(m => m.category === c).length;
+            const el = document.getElementById(`mem-count-${c}`);
+            if (el) el.textContent = count;
+          });
+
+          renderMemoryCards();
+          fetchEpisodicEvents();
+        }
+      } catch (err) {
+        console.error('Failed to fetch memories:', err);
+      }
+    }
+
+    function filterMemoryCategory(category) {
+      currentMemoryCategory = category;
+      document.querySelectorAll('.mem-cat-btn').forEach(btn => {
+        btn.className = 'mem-cat-btn px-3 py-1.5 rounded-xl theme-card border text-slate-300 hover:text-white transition';
+      });
+      const activeBtn = document.getElementById(`mem-cat-${category}`);
+      if (activeBtn) {
+        activeBtn.className = 'mem-cat-btn px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold transition';
+      }
+      renderMemoryCards();
+    }
+
+    function searchMemoriesLive(query) {
+      const q = (query || '').toLowerCase().trim();
+      renderMemoryCards(q);
+    }
+
+    function renderMemoryCards(filterQuery = '') {
+      const container = document.getElementById('memory-cards-grid');
+      if (!container) return;
+
+      let filtered = allMemoriesList;
+      if (currentMemoryCategory !== 'all') {
+        filtered = filtered.filter(m => m.category === currentMemoryCategory);
+      }
+      if (filterQuery) {
+        filtered = filtered.filter(m => 
+          (m.entity || '').toLowerCase().includes(filterQuery) ||
+          (m.attribute || '').toLowerCase().includes(filterQuery) ||
+          (m.value || '').toLowerCase().includes(filterQuery) ||
+          (m.category || '').toLowerCase().includes(filterQuery)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center rounded-2xl theme-card border border-dashed text-slate-400 space-y-2">
+            <i data-lucide="brain" class="w-8 h-8 text-rose-400/50 mx-auto"></i>
+            <div class="text-xs font-mono">No persistent memories match this filter.</div>
+            <p class="text-[11px] text-slate-500">Add facts manually or speak naturally to the copilot to automatically learn your preferences.</p>
+          </div>
+        `;
+        refreshIcons();
+        return;
+      }
+
+      const catColors = {
+        preference: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+        personal: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        project: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+        system: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+      };
+
+      container.innerHTML = filtered.map(m => `
+        <div class="p-4 rounded-xl theme-card border space-y-3 relative group transition hover:border-rose-500/40">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded border ${catColors[m.category] || 'bg-slate-500/20 text-slate-300 border-slate-500/30'}">${escapeHtml(m.category)}</span>
+            <div class="flex items-center space-x-1 opacity-60 group-hover:opacity-100 transition">
+              <button onclick="deleteMemoryItem(${m.id})" title="Delete fact" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs font-mono font-bold text-white flex items-center space-x-1 truncate">
+              <span class="text-rose-400">${escapeHtml(m.entity)}</span>
+              <span class="text-slate-500">.</span>
+              <span class="text-slate-200">${escapeHtml(m.attribute)}</span>
+            </div>
+            <div class="text-xs text-slate-300 font-sans leading-relaxed select-text bg-black/30 p-2 rounded-lg border theme-border">
+              "${escapeHtml(m.value)}"
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1 border-t theme-border">
+            <span>Accessed: ${m.access_count || 0}x</span>
+            <span>Conf: ${(m.confidence * 100).toFixed(0)}%</span>
+          </div>
+        </div>
+      `).join('');
+
+      refreshIcons();
+    }
+
+    async function deleteMemoryItem(id) {
+      if (!confirm('Are you sure you want to delete this memory fact?')) return;
+      try {
+        const res = await fetch(`/api/memory/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          fetchMemories();
+          showToast('Memory Deleted', 'Fact removed from persistent memory graph.', 'info');
+        }
+      } catch (e) {
+        showToast('Error', 'Failed to delete memory.', 'error');
+      }
+    }
+
+    function openAddMemoryModal() {
+      const entity = prompt('Enter Entity (e.g. user, project, contact):', 'user');
+      if (!entity) return;
+      const attribute = prompt('Enter Attribute (e.g. communication_style, framework, preferred_editor):', '');
+      if (!attribute) return;
+      const value = prompt('Enter Value / Fact description:', '');
+      if (!value) return;
+      const category = prompt('Enter Category (preference, personal, project, system):', 'preference') || 'preference';
+
+      fetch('/api/memory/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entity, attribute, value, category, confidence: 1.0, source: 'manual_ui' })
+      }).then(r => r.json()).then(d => {
+        fetchMemories();
+        showToast('Memory Added', `Learned ${entity}.${attribute}`, 'success');
+      }).catch(err => {
+        showToast('Error', 'Failed to add memory fact', 'error');
+      });
+    }
+
+    async function fetchEpisodicEvents() {
+      const container = document.getElementById('episodic-events-container');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/memory/events');
+        const data = await res.json();
+        const events = data.events || [];
+        if (events.length === 0) {
+          container.innerHTML = `<div class="text-xs font-mono text-slate-500 p-3">No recent episodic events logged.</div>`;
+          return;
+        }
+        container.innerHTML = events.slice(0, 15).map(ev => `
+          <div class="p-2.5 rounded-xl bg-black/30 border theme-border flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2.5 truncate">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"></span>
+              <span class="font-bold text-white font-mono text-[11px]">${escapeHtml(ev.event_type)}</span>
+              <span class="text-slate-300 truncate font-sans">${escapeHtml(ev.summary)}</span>
+            </div>
+            <span class="text-[10px] font-mono text-slate-500 flex-shrink-0 ml-2">${(ev.timestamp || '').slice(11, 19)}</span>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Failed to fetch episodic events:', err);
+      }
+    }
+
+    // ── MCP Server Studio JS ──────────────────────────────────────────────────
+    async function fetchMCPServers() {
+      const container = document.getElementById('mcp-servers-list');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/mcp/servers');
+        const data = await res.json();
+        const servers = data.servers || [];
+
+        if (servers.length === 0) {
+          container.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-400 font-mono">No MCP servers configured.</div>`;
+          return;
+        }
+
+        container.innerHTML = servers.map(s => `
+          <div class="p-4 rounded-xl theme-card border space-y-3 transition hover:border-indigo-500/40">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-lg ${s.is_running ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-500/20 text-slate-400'} flex items-center justify-center text-xs font-mono">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="font-bold text-xs text-white font-display">${escapeHtml(s.name)}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${s.is_running ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-slate-500/20 text-slate-400 border-slate-500/30'}">
+                  ${s.is_running ? `ONLINE (${s.tool_count} tools)` : 'DISABLED'}
+                </span>
+                <button onclick="toggleMCPServerState('${s.name}', ${!s.enabled})" class="p-1 rounded hover:bg-white/10 text-slate-300 transition" title="Toggle Server">
+                  <i data-lucide="${s.enabled ? 'pause' : 'play'}" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 font-sans leading-relaxed">${escapeHtml(s.description || 'MCP Integration plugin')}</p>
+            <div class="p-2 rounded-lg bg-black/40 border theme-border text-[11px] font-mono text-cyan-400 truncate">
+              $ ${escapeHtml(s.command)} ${(s.args || []).join(' ')}
+            </div>
+          </div>
+        `).join('');
+        refreshIcons();
+      } catch (err) {
+        console.error('Failed to fetch MCP servers:', err);
+      }
+    }
+
+    async function toggleMCPServerState(name, enabled) {
+      try {
+        const res = await fetch('/api/mcp/servers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, command: 'npx', args: [], enabled })
+        });
+        if (res.ok) {
+          fetchMCPServers();
+          showToast('MCP Server Updated', `${name} state changed.`, 'info');
+        }
+      } catch (e) {
+        showToast('Error', 'Failed to toggle MCP server', 'error');
+      }
+    }
+
+    function openAddMCPServerModal() {
+      const name = prompt('Enter MCP Server Name (e.g. github, sqlite, brave_search, filesystem):');
+      if (!name) return;
+      const command = prompt('Enter Command (e.g. npx, python, node):', 'npx') || 'npx';
+      const argsStr = prompt('Enter Arguments (space-separated):', '-y @modelcontextprotocol/server-sqlite');
+      const args = argsStr ? argsStr.split(' ') : [];
+      const description = prompt('Enter Description:', 'Standard MCP Server Connector') || '';
+
+      fetch('/api/mcp/servers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, command, args, enabled: true, description })
+      }).then(r => r.json()).then(d => {
+        fetchMCPServers();
+        showToast('MCP Server Registered', `${name} saved.`, 'success');
+      }).catch(err => {
+        showToast('Error', 'Failed to add MCP server', 'error');
+      });
+    }
+
+    // ── Executive Intelligence Briefing JS ─────────────────────────────────────
+    async function fetchExecutiveBriefing() {
+      try {
+        const res = await fetch('/api/scheduler/briefing');
+        const data = await res.json();
+        if (data.status === 'success' && data.briefing) {
+          const b = data.briefing;
+          const hl = document.getElementById('briefing-headline');
+          const dt = document.getElementById('briefing-date');
+          const sm = document.getElementById('briefing-summary');
+          const unreadM = document.getElementById('briefing-unread-metric');
+          const eventsM = document.getElementById('briefing-events-metric');
+          const actBox = document.getElementById('briefing-actions-container');
+
+          if (hl) hl.textContent = b.headline || 'Executive Intelligence';
+          if (dt) dt.textContent = b.date || 'Autonomous Briefing • Local Cores Active';
+          if (sm) sm.textContent = b.summary || '';
+          if (unreadM && b.metrics) unreadM.textContent = `${b.metrics.unread_emails || 0} Messages`;
+          if (eventsM && b.metrics) eventsM.textContent = `${b.metrics.today_events || 0} Events`;
+
+          if (actBox && b.action_items) {
+            actBox.innerHTML = b.action_items.map(act => `
+              <div class="flex items-center space-x-2 text-xs text-slate-300 bg-black/20 px-3 py-1.5 rounded-lg border theme-border">
+                <span class="text-amber-400 font-bold">⚡</span>
+                <span class="font-sans select-text">${escapeHtml(act)}</span>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch executive briefing:', err);
+      }
+    }
+
+    async function triggerExecutiveBriefing() {
+      const btn = document.getElementById('btn-refresh-briefing');
+      if (btn) btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i><span>Synthesizing...</span>`;
+      try {
+        const res = await fetch('/api/scheduler/briefing/trigger', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          fetchExecutiveBriefing();
+          showToast('Briefing Generated', 'Fresh executive intelligence compiled.', 'success');
+        }
+      } catch (e) {
+        showToast('Error', 'Failed to generate briefing', 'error');
+      } finally {
+        if (btn) btn.innerHTML = `<i data-lucide="refresh-cw" class="w-3 h-3"></i><span>Regenerate</span>`;
+        refreshIcons();
+      }
+    }
+
+    // Auto-fetch on dashboard init
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchMemories();
+      fetchMCPServers();
+      fetchExecutiveBriefing();
+    });
+
   </script>
 </body>
 </html>

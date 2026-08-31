@@ -1186,6 +1186,163 @@ async def proactive_background_worker():
 async def start_background_tasks():
     asyncio.create_task(proactive_background_worker())
     folder_watcher.start_background_watcher(interval_seconds=10)
+    try:
+        from execution.tools.mcp_manager import mcp_manager
+        from execution.orchestration.scheduler import executive_scheduler
+        asyncio.create_task(mcp_manager.start_all_enabled())
+        asyncio.create_task(executive_scheduler.start())
+    except Exception as e:
+        logger.error(f"Startup task initialization error: {e}")
+
+
+# ── MCP Universal Hub API ───────────────────────────────────────────────────
+
+class MCPServerPayload(BaseModel):
+    name: str
+    command: str
+    args: List[str] = []
+    env: Dict[str, str] = {}
+    enabled: bool = True
+    description: str = ""
+
+
+class MCPCallPayload(BaseModel):
+    namespaced_name: str
+    arguments: Dict[str, Any] = {}
+
+
+@app.get("/api/mcp/servers")
+async def list_mcp_servers():
+    """Lists status and configuration of all MCP servers."""
+    from execution.tools.mcp_manager import mcp_manager
+    return {"status": "success", "servers": mcp_manager.list_servers_status()}
+
+
+@app.post("/api/mcp/servers")
+async def add_or_update_mcp_server(payload: MCPServerPayload):
+    """Registers or updates an MCP server configuration."""
+    from execution.tools.mcp_manager import mcp_manager
+    success = await mcp_manager.add_or_update_server(
+        name=payload.name,
+        config={
+            "command": payload.command,
+            "args": payload.args,
+            "env": payload.env,
+            "enabled": payload.enabled,
+            "description": payload.description,
+        },
+        auto_start=payload.enabled,
+    )
+    return {"status": "success" if success else "error", "server": payload.name}
+
+
+@app.delete("/api/mcp/servers/{name}")
+async def delete_mcp_server(name: str):
+    """Deletes an MCP server configuration."""
+    from execution.tools.mcp_manager import mcp_manager
+    success = await mcp_manager.delete_server(name)
+    return {"status": "success" if success else "not_found", "server": name}
+
+
+@app.get("/api/mcp/tools")
+async def list_all_mcp_tools():
+    """Returns all discovered tools across all active MCP servers."""
+    from execution.tools.mcp_manager import mcp_manager
+    return {"status": "success", "tools": mcp_manager.list_all_tools()}
+
+
+@app.post("/api/mcp/call")
+async def call_mcp_tool(payload: MCPCallPayload):
+    """Executes a namespaced MCP tool call."""
+    from execution.tools.mcp_manager import mcp_manager
+    try:
+        res = await mcp_manager.call_namespaced_tool(payload.namespaced_name, payload.arguments)
+        return {"status": "success", "result": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Persistent Memory Graph API ─────────────────────────────────────────────
+
+class MemoryPayload(BaseModel):
+    entity: str
+    attribute: str
+    value: str
+    category: str = "preference"
+    confidence: float = 1.0
+    source: str = "manual"
+
+
+@app.get("/api/memory/list")
+async def list_memories(category: Optional[str] = None):
+    """Retrieves all semantic memories with optional category filter."""
+    from execution.ml.memory_graph import memory_graph
+    mems = memory_graph.get_all_memories(category=category)
+    return {"status": "success", "count": len(mems), "memories": mems}
+
+
+@app.post("/api/memory/add")
+async def add_memory(payload: MemoryPayload):
+    """Adds or updates a memory in the persistent memory graph."""
+    from execution.ml.memory_graph import memory_graph
+    mem = memory_graph.add_or_update_memory(
+        entity=payload.entity,
+        attribute=payload.attribute,
+        value=payload.value,
+        category=payload.category,
+        confidence=payload.confidence,
+        source=payload.source,
+    )
+    return {"status": "success", "memory": mem}
+
+
+@app.delete("/api/memory/{memory_id}")
+async def delete_memory_endpoint(memory_id: int):
+    """Deletes a memory by ID."""
+    from execution.ml.memory_graph import memory_graph
+    deleted = memory_graph.delete_memory(memory_id)
+    return {"status": "success" if deleted else "not_found", "memory_id": memory_id}
+
+
+@app.get("/api/memory/search")
+async def search_memories_endpoint(q: str = ""):
+    """Searches memory graph for matching entities or values."""
+    from execution.ml.memory_graph import memory_graph
+    results = memory_graph.search_memories(q)
+    return {"status": "success", "query": q, "count": len(results), "matches": results}
+
+
+@app.get("/api/memory/events")
+async def list_episodic_events():
+    """Retrieves recent episodic events from the timeline."""
+    from execution.ml.memory_graph import memory_graph
+    events = memory_graph.get_recent_events(limit=50)
+    return {"status": "success", "count": len(events), "events": events}
+
+
+# ── Proactive Executive Scheduler API ───────────────────────────────────────
+
+@app.get("/api/scheduler/briefing")
+async def get_latest_briefing():
+    """Retrieves the latest executive daily briefing."""
+    from execution.orchestration.scheduler import executive_scheduler
+    return {"status": "success", "briefing": executive_scheduler.latest_briefing}
+
+
+@app.post("/api/scheduler/briefing/trigger")
+async def trigger_executive_briefing():
+    """Forces generation of a fresh executive morning briefing."""
+    from execution.orchestration.scheduler import executive_scheduler
+    briefing = await executive_scheduler.generate_executive_briefing()
+    return {"status": "success", "briefing": briefing}
+
+
+@app.get("/api/scheduler/status")
+async def get_scheduler_status():
+    """Returns background daemon statuses and next scheduled run intervals."""
+    from execution.orchestration.scheduler import executive_scheduler
+    return {"status": "success", "scheduler": executive_scheduler.get_status()}
+
 
 
 class ResearchPayload(BaseModel):

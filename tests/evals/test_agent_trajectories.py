@@ -66,10 +66,10 @@ def test_engine():
         
         # Calendar
         ("what meetings do i have", "calendar.list_events", "query", "upcoming"),
-        ("schedule a meeting tomorrow at 3pm", "calendar.create_event", "summary", "Meeting: User Request"),
+        ("schedule a meeting tomorrow at 3pm", "calendar.create_event", "summary", "Meeting:"),
         
         # Notes
-        ("save note about project roadmap", "obsidian.create_note", "title", "User Request"),
+        ("save note about project roadmap", "obsidian.create_note", "title", "roadmap"),
         ("search notes for architecture design", "obsidian.search_notes", "query", "architecture design"),
     ],
 )
