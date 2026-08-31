@@ -12,7 +12,7 @@ Features:
 
 DASHBOARD_HTML = r"""
 <!DOCTYPE html>
-<html lang="en" class="dark" data-theme="sovereign-slate">
+<html lang="en" data-theme="sovereign-manifesto">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,8 +37,7 @@ DASHBOARD_HTML = r"""
     }
   </script>
   
-  <!-- Lenis Momentum & Smooth Scrolling Engine -->
-  <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+  <!-- Smooth Scrolling & View Physics (Native Engine) -->
   
   <script>
     tailwind.config = {
@@ -70,222 +69,23 @@ DASHBOARD_HTML = r"""
   <style>
     :root {
       /* Card & Glass Opacity CSS Variables (Dynamic) */
-      --card-opacity: 0.65;
-      --sidebar-opacity: 0.82;
-      --surface-opacity: 0.70;
-      --card-blur: 14px;
+      --card-opacity: 0.95;
+      --sidebar-opacity: 0.95;
+      --surface-opacity: 0.95;
+      --card-blur: 8px;
 
-      /* Sovereign Slate (Default Professional - Linear/Raycast Style) */
-      --rgb-base: 13, 16, 23;
-      --rgb-sidebar: 18, 22, 31;
-      --rgb-surface: 22, 27, 38;
-      --rgb-card: 24, 30, 42;
-      --rgb-card-hover: 32, 40, 56;
-      
-      --bg-base: rgb(var(--rgb-base));
-      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
-      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
-      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
-      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #242d3e;
-      --border-accent: #6366f1;
-      --color-brand: #6366f1;
-      --color-brand-hover: #4f46e5;
-      --color-accent: #38bdf8;
-      --color-highlight: #a855f7;
-      --color-cyan: #38bdf8;
-      --color-emerald: #10b981;
-      --color-amber: #f59e0b;
-      --color-rose: #f43f5e;
-      --color-purple: #8b5cf6;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
-      --waybar-bg: rgba(18, 22, 31, 0.88);
-
-      /* Old Regime Tactile Shadows & Smooth Transition Tokens */
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.6);
-      --shadow-raised: 0 14px 40px -4px rgba(0, 0, 0, 0.85);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
-      --card-transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
-      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* ── Sovereign Professional Themes ── */
-    [data-theme="sovereign-slate"] {
-      --rgb-base: 13, 16, 23;
-      --rgb-sidebar: 18, 22, 31;
-      --rgb-surface: 22, 27, 38;
-      --rgb-card: 24, 30, 42;
-      --rgb-card-hover: 32, 40, 56;
-      --bg-base: rgb(var(--rgb-base));
-      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
-      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
-      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
-      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #242d3e;
-      --border-accent: #6366f1;
-      --color-brand: #6366f1;
-      --color-brand-hover: #4f46e5;
-      --color-accent: #38bdf8;
-      --color-highlight: #a855f7;
-      --color-cyan: #38bdf8;
-      --color-emerald: #10b981;
-      --color-amber: #f59e0b;
-      --color-rose: #f43f5e;
-      --color-purple: #8b5cf6;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
-      --waybar-bg: rgba(18, 22, 31, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.6);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
-    }
-
-    [data-theme="sovereign-onyx"] {
-      --rgb-base: 9, 9, 11;
-      --rgb-sidebar: 14, 14, 17;
-      --rgb-surface: 20, 20, 24;
-      --rgb-card: 24, 24, 29;
-      --rgb-card-hover: 32, 32, 39;
-      --bg-base: rgb(var(--rgb-base));
-      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
-      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
-      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
-      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #27272a;
-      --border-accent: #3b82f6;
-      --color-brand: #3b82f6;
-      --color-brand-hover: #2563eb;
-      --color-accent: #60a5fa;
-      --color-highlight: #818cf8;
-      --color-cyan: #67e8f9;
-      --color-emerald: #34d399;
-      --color-amber: #fbbf24;
-      --color-rose: #fb7185;
-      --color-purple: #a78bfa;
-      --text-main: #ffffff;
-      --text-muted: #a1a1aa;
-      --glow-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.25);
-      --waybar-bg: rgba(14, 14, 17, 0.90);
-      --shadow-card: 0 8px 26px -4px rgba(0, 0, 0, 0.88), 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.98), 0 8px 20px -3px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.6);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
-    }
-
-    [data-theme="sovereign-studio"] {
-      --rgb-base: 11, 14, 15;
-      --rgb-sidebar: 16, 20, 22;
-      --rgb-surface: 21, 27, 30;
-      --rgb-card: 25, 33, 37;
-      --rgb-card-hover: 34, 44, 49;
-      --bg-base: rgb(var(--rgb-base));
-      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
-      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
-      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
-      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #233138;
-      --border-accent: #10b981;
-      --color-brand: #10b981;
-      --color-brand-hover: #059669;
-      --color-accent: #2dd4bf;
-      --color-highlight: #06b6d4;
-      --color-cyan: #22d3ee;
-      --color-emerald: #10b981;
-      --color-amber: #f59e0b;
-      --color-rose: #f43f5e;
-      --color-purple: #8b5cf6;
-      --text-main: #f0fdf4;
-      --text-muted: #94a3b8;
-      --glow-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.25);
-      --waybar-bg: rgba(16, 20, 22, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.78), 0 2px 8px -2px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(16, 185, 129, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.6);
-      --bevel-highlight: inset 0 1px 0 0 rgba(16, 185, 129, 0.15);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(16, 185, 129, 0.3);
-    }
-
-    [data-theme="sovereign-obsidian"] {
-      --rgb-base: 14, 12, 10;
-      --rgb-sidebar: 20, 17, 14;
-      --rgb-surface: 28, 24, 20;
-      --rgb-card: 34, 29, 24;
-      --rgb-card-hover: 44, 38, 32;
-      --bg-base: rgb(var(--rgb-base));
-      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
-      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
-      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
-      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #3d342a;
-      --border-accent: #f59e0b;
-      --color-brand: #f59e0b;
-      --color-brand-hover: #d97706;
-      --color-accent: #fbbf24;
-      --color-highlight: #f97316;
-      --color-cyan: #38bdf8;
-      --color-emerald: #10b981;
-      --color-amber: #f59e0b;
-      --color-rose: #ef4444;
-      --color-purple: #c084fc;
-      --text-main: #fef3c7;
-      --text-muted: #a8a29e;
-      --glow-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.25);
-      --waybar-bg: rgba(20, 17, 14, 0.90);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(245, 158, 11, 0.08);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(245, 158, 11, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.7);
-      --bevel-highlight: inset 0 1px 0 0 rgba(245, 158, 11, 0.18);
-      --bevel-highlight-hover: inset 0 1px 0 0 rgba(245, 158, 11, 0.35);
-    }
-
-    [data-theme="sovereign-light"] {
-      --rgb-base: 248, 250, 252;
-      --rgb-sidebar: 255, 255, 255;
-      --rgb-surface: 241, 245, 249;
-      --rgb-card: 255, 255, 255;
-      --rgb-card-hover: 241, 245, 249;
-      --bg-base: #f8fafc;
-      --bg-sidebar: rgba(255, 255, 255, 0.95);
-      --bg-surface: rgba(241, 245, 249, 0.95);
-      --bg-card: rgba(255, 255, 255, 0.95);
-      --bg-card-hover: #f1f5f9;
-      --border-main: #e2e8f0;
-      --border-accent: #4f46e5;
-      --color-brand: #4f46e5;
-      --color-brand-hover: #4338ca;
-      --color-accent: #0284c7;
-      --color-highlight: #7c3aed;
-      --color-cyan: #0284c7;
-      --color-emerald: #059669;
-      --color-amber: #d97706;
-      --color-rose: #e11d48;
-      --color-purple: #7c3aed;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15);
-      --waybar-bg: rgba(255, 255, 255, 0.92);
-      --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 1px 4px -1px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(15, 23, 42, 0.06);
-      --shadow-card-hover: 0 16px 36px -4px rgba(15, 23, 42, 0.15), 0 6px 14px -2px rgba(79, 70, 229, 0.18), 0 0 0 1px rgba(79, 70, 229, 0.5);
-      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
-      --bevel-highlight-hover: inset 0 1px 0 0 #ffffff;
-    }
-
-    /* ── Sovereign Manifesto (Old Regime Editorial Swiss/Parchment) ── */
-    [data-theme="sovereign-manifesto"] {
+      /* Sovereign Manifesto (Old Regime Editorial Swiss/Parchment - Default Master Base) */
       --rgb-base: 245, 240, 232;
       --rgb-sidebar: 234, 228, 216;
       --rgb-surface: 252, 251, 250;
       --rgb-card: 252, 251, 250;
       --rgb-card-hover: 240, 234, 223;
-      --bg-base: #f5f0e8;
-      --bg-sidebar: #eae4d8;
-      --bg-surface: #fcfbfa;
-      --bg-card: #fcfbfa;
-      --bg-card-hover: #f0eadf;
+      
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.1));
       --border-main: #0a0a0a;
       --border-accent: #d42b2b;
       --color-brand: #d42b2b;
@@ -300,26 +100,229 @@ DASHBOARD_HTML = r"""
       --text-main: #0a0a0a;
       --text-muted: #5c584e;
       --glow-shadow: 0 4px 16px -2px rgba(212, 43, 43, 0.25);
-      --waybar-bg: #eae4d8;
+      --waybar-bg: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+
+      /* Old Regime Tangible Architectural Offset Shadows */
+      --shadow-card: 3px 3px 0px #0a0a0a;
+      --shadow-card-hover: 5px 5px 0px #d42b2b, 0 0 0 1px #0a0a0a;
+      --shadow-raised: 5px 5px 0px #0a0a0a;
+      --bevel-highlight: inset 0 0 0 0 transparent;
+      --bevel-highlight-hover: inset 0 0 0 0 transparent;
+      --card-transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ── Sovereign Manifesto (Explicit Preset Selector) ── */
+    [data-theme="sovereign-manifesto"] {
+      --rgb-base: 245, 240, 232;
+      --rgb-sidebar: 234, 228, 216;
+      --rgb-surface: 252, 251, 250;
+      --rgb-card: 252, 251, 250;
+      --rgb-card-hover: 240, 234, 223;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.1));
+      --border-main: #0a0a0a;
+      --border-accent: #d42b2b;
+      --color-brand: #d42b2b;
+      --color-brand-hover: #b91c1c;
+      --color-accent: #1a3dc4;
+      --color-highlight: #f5c518;
+      --color-cyan: #1a3dc4;
+      --color-emerald: #15803d;
+      --color-amber: #b45309;
+      --color-rose: #d42b2b;
+      --color-purple: #4338ca;
+      --text-main: #0a0a0a;
+      --text-muted: #5c584e;
+      --glow-shadow: 0 4px 16px -2px rgba(212, 43, 43, 0.25);
+      --waybar-bg: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --shadow-card: 3px 3px 0px #0a0a0a;
       --shadow-card-hover: 5px 5px 0px #d42b2b, 0 0 0 1px #0a0a0a;
       --bevel-highlight: inset 0 0 0 0 transparent;
       --bevel-highlight-hover: inset 0 0 0 0 transparent;
     }
 
-    /* ── Omarchy Cyberpunk & Aesthetic Themes ── */
-    [data-theme="omarchy-cyberpunk"] {
-      --rgb-base: 7, 8, 13;
-      --rgb-sidebar: 11, 13, 20;
-      --rgb-surface: 15, 18, 29;
-      --rgb-card: 18, 22, 34;
-      --rgb-card-hover: 28, 34, 52;
+    /* ── Sovereign Slate (Dark Architectural Blueprint) ── */
+    [data-theme="sovereign-slate"] {
+      --rgb-base: 12, 15, 23;
+      --rgb-sidebar: 18, 23, 34;
+      --rgb-surface: 24, 32, 48;
+      --rgb-card: 24, 32, 48;
+      --rgb-card-hover: 34, 44, 66;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #1f273d;
+      --border-main: #2b3852;
+      --border-accent: #6366f1;
+      --color-brand: #6366f1;
+      --color-brand-hover: #4f46e5;
+      --color-accent: #38bdf8;
+      --color-highlight: #a855f7;
+      --color-cyan: #38bdf8;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glow-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.35);
+      --waybar-bg: rgba(18, 23, 34, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.7);
+      --shadow-card-hover: 5px 5px 0px #6366f1, 0 12px 28px -4px rgba(99, 102, 241, 0.45);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
+    }
+
+    /* ── Sovereign Onyx (Titanium Pure Black Blueprint) ── */
+    [data-theme="sovereign-onyx"] {
+      --rgb-base: 9, 9, 11;
+      --rgb-sidebar: 17, 17, 20;
+      --rgb-surface: 26, 26, 32;
+      --rgb-card: 26, 26, 32;
+      --rgb-card-hover: 38, 38, 46;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #33333e;
+      --border-accent: #3b82f6;
+      --color-brand: #3b82f6;
+      --color-brand-hover: #2563eb;
+      --color-accent: #60a5fa;
+      --color-highlight: #818cf8;
+      --color-cyan: #67e8f9;
+      --color-emerald: #34d399;
+      --color-amber: #fbbf24;
+      --color-rose: #fb7185;
+      --color-purple: #a78bfa;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --glow-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.35);
+      --waybar-bg: rgba(17, 17, 20, 0.94);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.85);
+      --shadow-card-hover: 5px 5px 0px #3b82f6, 0 12px 28px -4px rgba(59, 130, 246, 0.45);
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── Sovereign Studio (Forest Graphite Blueprint) ── */
+    [data-theme="sovereign-studio"] {
+      --rgb-base: 10, 14, 15;
+      --rgb-sidebar: 17, 24, 26;
+      --rgb-surface: 23, 34, 37;
+      --rgb-card: 23, 34, 37;
+      --rgb-card-hover: 34, 49, 54;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #2a3d44;
+      --border-accent: #10b981;
+      --color-brand: #10b981;
+      --color-brand-hover: #059669;
+      --color-accent: #2dd4bf;
+      --color-highlight: #06b6d4;
+      --color-cyan: #22d3ee;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-purple: #8b5cf6;
+      --text-main: #f0fdf4;
+      --text-muted: #94a3b8;
+      --glow-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.35);
+      --waybar-bg: rgba(17, 24, 26, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.75);
+      --shadow-card-hover: 5px 5px 0px #10b981, 0 12px 28px -4px rgba(16, 185, 129, 0.45);
+      --bevel-highlight: inset 0 1px 0 0 rgba(16, 185, 129, 0.15);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(16, 185, 129, 0.3);
+    }
+
+    /* ── Sovereign Obsidian (Warm Gold Amber Blueprint) ── */
+    [data-theme="sovereign-obsidian"] {
+      --rgb-base: 14, 11, 8;
+      --rgb-sidebar: 23, 19, 14;
+      --rgb-surface: 34, 28, 21;
+      --rgb-card: 34, 28, 21;
+      --rgb-card-hover: 48, 40, 30;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #423628;
+      --border-accent: #f59e0b;
+      --color-brand: #f59e0b;
+      --color-brand-hover: #d97706;
+      --color-accent: #fbbf24;
+      --color-highlight: #f97316;
+      --color-cyan: #38bdf8;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #ef4444;
+      --color-purple: #c084fc;
+      --text-main: #fef3c7;
+      --text-muted: #a8a29e;
+      --glow-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.35);
+      --waybar-bg: rgba(23, 19, 14, 0.94);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.8);
+      --shadow-card-hover: 5px 5px 0px #f59e0b, 0 12px 28px -4px rgba(245, 158, 11, 0.5);
+      --bevel-highlight: inset 0 1px 0 0 rgba(245, 158, 11, 0.18);
+      --bevel-highlight-hover: inset 0 1px 0 0 rgba(245, 158, 11, 0.35);
+    }
+
+    /* ── Sovereign Light (High Contrast Clean Blueprint) ── */
+    [data-theme="sovereign-light"] {
+      --rgb-base: 248, 250, 252;
+      --rgb-sidebar: 255, 255, 255;
+      --rgb-surface: 255, 255, 255;
+      --rgb-card: 255, 255, 255;
+      --rgb-card-hover: 241, 245, 249;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.1));
+      --border-main: #0f172a;
+      --border-accent: #4f46e5;
+      --color-brand: #4f46e5;
+      --color-brand-hover: #4338ca;
+      --color-accent: #0284c7;
+      --color-highlight: #7c3aed;
+      --color-cyan: #0284c7;
+      --color-emerald: #059669;
+      --color-amber: #d97706;
+      --color-rose: #e11d48;
+      --color-purple: #7c3aed;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --glow-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.2);
+      --waybar-bg: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --shadow-card: 3px 3px 0px #0f172a;
+      --shadow-card-hover: 5px 5px 0px #4f46e5, 0 0 0 1px #0f172a;
+      --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+      --bevel-highlight-hover: inset 0 1px 0 0 #ffffff;
+    }
+
+    /* ── Omarchy Cyberpunk & Aesthetic Themes ── */
+    [data-theme="omarchy-cyberpunk"] {
+      --rgb-base: 7, 8, 13;
+      --rgb-sidebar: 13, 16, 26;
+      --rgb-surface: 20, 26, 42;
+      --rgb-card: 20, 26, 42;
+      --rgb-card-hover: 30, 40, 64;
+      --bg-base: rgb(var(--rgb-base));
+      --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
+      --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
+      --bg-card: rgba(var(--rgb-card), var(--card-opacity));
+      --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
+      --border-main: #273352;
       --border-accent: #00f0ff;
       --color-brand: #6366f1;
       --color-brand-hover: #4f46e5;
@@ -332,26 +335,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #9d4edd;
       --text-main: #f1f5f9;
       --text-muted: #94a3b8;
-      --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.18);
-      --waybar-bg: rgba(11, 13, 20, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 240, 255, 0.12);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(0, 240, 255, 0.35), 0 0 0 1px rgba(0, 240, 255, 0.7);
+      --glow-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+      --waybar-bg: rgba(13, 16, 26, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 8px 20px rgba(0, 240, 255, 0.18);
+      --shadow-card-hover: 5px 5px 0px #00f0ff, 0 16px 36px rgba(0, 240, 255, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(0, 240, 255, 0.18);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 240, 255, 0.35);
     }
 
     [data-theme="omarchy-tokyonight"] {
       --rgb-base: 22, 22, 30;
-      --rgb-sidebar: 26, 27, 38;
-      --rgb-surface: 31, 35, 53;
-      --rgb-card: 31, 35, 53;
-      --rgb-card-hover: 41, 46, 66;
+      --rgb-sidebar: 29, 31, 44;
+      --rgb-surface: 37, 42, 64;
+      --rgb-card: 37, 42, 64;
+      --rgb-card-hover: 49, 56, 84;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #292e42;
+      --border-main: #363d59;
       --border-accent: #7aa2f7;
       --color-brand: #7aa2f7;
       --color-brand-hover: #565f89;
@@ -364,26 +367,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #bb9af7;
       --text-main: #c0caf5;
       --text-muted: #7aa2f7;
-      --glow-shadow: 0 0 20px rgba(122, 162, 247, 0.18);
-      --waybar-bg: rgba(26, 27, 38, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(122, 162, 247, 0.1);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(122, 162, 247, 0.32), 0 0 0 1px rgba(122, 162, 247, 0.6);
+      --glow-shadow: 0 0 20px rgba(122, 162, 247, 0.25);
+      --waybar-bg: rgba(29, 31, 44, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.7);
+      --shadow-card-hover: 5px 5px 0px #7aa2f7, 0 14px 30px -4px rgba(122, 162, 247, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-catppuccin"] {
       --rgb-base: 17, 17, 27;
-      --rgb-sidebar: 24, 24, 37;
-      --rgb-surface: 30, 30, 46;
-      --rgb-card: 30, 30, 46;
-      --rgb-card-hover: 49, 50, 68;
+      --rgb-sidebar: 26, 26, 40;
+      --rgb-surface: 36, 36, 56;
+      --rgb-card: 36, 36, 56;
+      --rgb-card-hover: 54, 55, 78;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #313244;
+      --border-main: #3d3e56;
       --border-accent: #cba6f7;
       --color-brand: #cba6f7;
       --color-brand-hover: #b4befe;
@@ -396,26 +399,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #cba6f7;
       --text-main: #cdd6f4;
       --text-muted: #a6adc8;
-      --glow-shadow: 0 0 20px rgba(203, 166, 247, 0.18);
-      --waybar-bg: rgba(24, 24, 37, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(203, 166, 247, 0.1);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(203, 166, 247, 0.3), 0 0 0 1px rgba(203, 166, 247, 0.6);
+      --glow-shadow: 0 0 20px rgba(203, 166, 247, 0.25);
+      --waybar-bg: rgba(26, 26, 40, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.7);
+      --shadow-card-hover: 5px 5px 0px #cba6f7, 0 14px 30px -4px rgba(203, 166, 247, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-nord"] {
       --rgb-base: 36, 41, 51;
-      --rgb-sidebar: 46, 52, 64;
-      --rgb-surface: 59, 66, 82;
-      --rgb-card: 59, 66, 82;
-      --rgb-card-hover: 67, 76, 94;
+      --rgb-sidebar: 48, 55, 68;
+      --rgb-surface: 62, 70, 88;
+      --rgb-card: 62, 70, 88;
+      --rgb-card-hover: 76, 86, 106;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #4c566a;
+      --border-main: #526079;
       --border-accent: #88c0d0;
       --color-brand: #88c0d0;
       --color-brand-hover: #81a1c1;
@@ -428,26 +431,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #b48ead;
       --text-main: #eceff4;
       --text-muted: #d8dee9;
-      --glow-shadow: 0 0 20px rgba(136, 192, 208, 0.2);
-      --waybar-bg: rgba(46, 52, 64, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.7), 0 2px 8px -2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(136, 192, 208, 0.1);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.9), 0 8px 20px -3px rgba(136, 192, 208, 0.3), 0 0 0 1px rgba(136, 192, 208, 0.6);
+      --glow-shadow: 0 0 20px rgba(136, 192, 208, 0.25);
+      --waybar-bg: rgba(48, 55, 68, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.65);
+      --shadow-card-hover: 5px 5px 0px #88c0d0, 0 14px 30px -4px rgba(136, 192, 208, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
 
     [data-theme="omarchy-gruvbox"] {
       --rgb-base: 29, 32, 33;
-      --rgb-sidebar: 40, 40, 40;
-      --rgb-surface: 50, 48, 47;
-      --rgb-card: 50, 48, 47;
-      --rgb-card-hover: 60, 56, 54;
+      --rgb-sidebar: 42, 42, 42;
+      --rgb-surface: 56, 54, 52;
+      --rgb-card: 56, 54, 52;
+      --rgb-card-hover: 70, 66, 64;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #504945;
+      --border-main: #5a524d;
       --border-accent: #fabd2f;
       --color-brand: #fabd2f;
       --color-brand-hover: #fe8019;
@@ -460,26 +463,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #d3869b;
       --text-main: #ebdbb2;
       --text-muted: #a89984;
-      --glow-shadow: 0 0 20px rgba(250, 189, 47, 0.18);
-      --waybar-bg: rgba(40, 40, 40, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(250, 189, 47, 0.08);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(250, 189, 47, 0.3), 0 0 0 1px rgba(250, 189, 47, 0.6);
+      --glow-shadow: 0 0 20px rgba(250, 189, 47, 0.25);
+      --waybar-bg: rgba(42, 42, 42, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.7);
+      --shadow-card-hover: 5px 5px 0px #fabd2f, 0 14px 30px -4px rgba(250, 189, 47, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
     }
 
     [data-theme="omarchy-synthwave"] {
       --rgb-base: 20, 13, 33;
-      --rgb-sidebar: 26, 16, 47;
-      --rgb-surface: 36, 23, 61;
-      --rgb-card: 36, 23, 61;
-      --rgb-card-hover: 49, 32, 82;
+      --rgb-sidebar: 30, 19, 54;
+      --rgb-surface: 42, 28, 72;
+      --rgb-card: 42, 28, 72;
+      --rgb-card-hover: 56, 38, 96;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #3d2666;
+      --border-main: #4d3080;
       --border-accent: #ff2a85;
       --color-brand: #ff2a85;
       --color-brand-hover: #ff7b00;
@@ -492,26 +495,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #b967ff;
       --text-main: #f5f5f7;
       --text-muted: #a79fc2;
-      --glow-shadow: 0 0 25px rgba(255, 42, 133, 0.25);
-      --waybar-bg: rgba(26, 16, 47, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 8px -2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 42, 133, 0.18);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.95), 0 8px 20px -3px rgba(255, 42, 133, 0.4), 0 0 0 1px rgba(255, 42, 133, 0.75);
+      --glow-shadow: 0 0 25px rgba(255, 42, 133, 0.35);
+      --waybar-bg: rgba(30, 19, 54, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 8px 20px rgba(255, 42, 133, 0.25);
+      --shadow-card-hover: 5px 5px 0px #ff2a85, 0 16px 36px rgba(255, 42, 133, 0.55);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 42, 133, 0.2);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 42, 133, 0.4);
     }
 
     [data-theme="omarchy-matrix"] {
       --rgb-base: 2, 7, 2;
-      --rgb-sidebar: 5, 15, 5;
-      --rgb-surface: 10, 24, 10;
-      --rgb-card: 10, 24, 10;
-      --rgb-card-hover: 16, 38, 16;
+      --rgb-sidebar: 7, 20, 7;
+      --rgb-surface: 14, 32, 14;
+      --rgb-card: 14, 32, 14;
+      --rgb-card-hover: 22, 50, 22;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #143814;
+      --border-main: #1c4d1c;
       --border-accent: #00ff41;
       --color-brand: #00ff41;
       --color-brand-hover: #39ff14;
@@ -524,26 +527,26 @@ DASHBOARD_HTML = r"""
       --color-purple: #00e5ff;
       --text-main: #c4ffc4;
       --text-muted: #4e9a4e;
-      --glow-shadow: 0 0 25px rgba(0, 255, 65, 0.25);
-      --waybar-bg: rgba(5, 15, 5, 0.9);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.88), 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 255, 65, 0.15);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.98), 0 8px 20px -3px rgba(0, 255, 65, 0.35), 0 0 0 1px rgba(0, 255, 65, 0.7);
+      --glow-shadow: 0 0 25px rgba(0, 255, 65, 0.35);
+      --waybar-bg: rgba(7, 20, 7, 0.94);
+      --shadow-card: 3px 3px 0px #000000, 0 8px 20px rgba(0, 255, 65, 0.2);
+      --shadow-card-hover: 5px 5px 0px #00ff41, 0 16px 36px rgba(0, 255, 65, 0.55);
       --bevel-highlight: inset 0 1px 0 0 rgba(0, 255, 65, 0.18);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(0, 255, 65, 0.35);
     }
 
     [data-theme="omarchy-dracula"] {
       --rgb-base: 25, 26, 33;
-      --rgb-sidebar: 33, 34, 44;
-      --rgb-surface: 40, 42, 54;
-      --rgb-card: 40, 42, 54;
-      --rgb-card-hover: 68, 71, 90;
+      --rgb-sidebar: 36, 38, 48;
+      --rgb-surface: 46, 49, 64;
+      --rgb-card: 46, 49, 64;
+      --rgb-card-hover: 62, 66, 84;
       --bg-base: rgb(var(--rgb-base));
       --bg-sidebar: rgba(var(--rgb-sidebar), var(--sidebar-opacity));
       --bg-surface: rgba(var(--rgb-surface), var(--surface-opacity));
       --bg-card: rgba(var(--rgb-card), var(--card-opacity));
       --bg-card-hover: rgba(var(--rgb-card-hover), calc(var(--card-opacity) + 0.15));
-      --border-main: #44475a;
+      --border-main: #4e526a;
       --border-accent: #bd93f9;
       --color-brand: #bd93f9;
       --color-brand-hover: #ff79c6;
@@ -556,10 +559,10 @@ DASHBOARD_HTML = r"""
       --color-purple: #bd93f9;
       --text-main: #f8f8f2;
       --text-muted: #6272a4;
-      --glow-shadow: 0 0 20px rgba(189, 147, 249, 0.2);
-      --waybar-bg: rgba(33, 34, 44, 0.88);
-      --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.75), 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(189, 147, 249, 0.12);
-      --shadow-card-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.92), 0 8px 20px -3px rgba(189, 147, 249, 0.32), 0 0 0 1px rgba(189, 147, 249, 0.6);
+      --glow-shadow: 0 0 20px rgba(189, 147, 249, 0.3);
+      --waybar-bg: rgba(36, 38, 48, 0.92);
+      --shadow-card: 3px 3px 0px #000000, 0 6px 16px -2px rgba(0, 0, 0, 0.75);
+      --shadow-card-hover: 5px 5px 0px #bd93f9, 0 14px 30px -4px rgba(189, 147, 249, 0.45);
       --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
       --bevel-highlight-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
     }
@@ -744,7 +747,12 @@ DASHBOARD_HTML = r"""
       z-index: 45;
     }
 
-    /* Custom Scrollbar */
+    /* Universal Sleek Scrollbars & Anti-Chaining */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-main) transparent;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border-main); border-radius: 999px; }
@@ -753,33 +761,88 @@ DASHBOARD_HTML = r"""
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Waybar Rice Styling */
+    /* Anti-Chaining: Prevent inner scroll bounce jitter from leaking to outer main container */
+    .overflow-y-auto,
+    .overflow-x-auto,
+    #main-content-scroll,
+    #chat-messages-box,
+    #chat-sessions-list,
+    #traces-list-container,
+    #obsidian-notes-list-container,
+    #obsidian-markdown-body,
+    #calendar-agenda-stream,
+    #research-history-list,
+    #spotlight-results-container,
+    #full-activity-log,
+    #activity-log-feed,
+    .code-container pre,
+    .theme-modal {
+      overscroll-behavior: contain;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Native hardware-accelerated smooth scrolling */
+    #main-content-scroll,
+    #chat-messages-box,
+    #traces-list-container,
+    #obsidian-notes-list-container,
+    #obsidian-markdown-body {
+      scroll-behavior: smooth;
+    }
+
+    /* Waybar Hud Styling */
     .waybar-hud {
-      background: var(--waybar-bg);
-      border-bottom: 1px solid var(--border-main);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: var(--waybar-bg) !important;
+      border-bottom: 1px solid var(--border-main) !important;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 1px 12px rgba(0, 0, 0, 0.4), var(--bevel-highlight);
+      color: var(--text-main);
     }
     .workspace-pill {
       font-family: 'JetBrains Mono', monospace;
-      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
+      border: 1px solid transparent;
     }
     .workspace-pill.active {
-      background: var(--color-brand);
-      color: #ffffff;
-      box-shadow: 0 0 12px var(--color-brand);
+      background: var(--color-brand) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 10px -1px var(--color-brand), 0 0 14px var(--color-brand) !important;
+      border-color: var(--color-brand) !important;
       font-weight: 700;
     }
     .workspace-pill:not(.active) {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
+      background: rgba(var(--rgb-card), 0.4);
+      border-color: var(--border-main);
+      color: var(--text-muted, #94a3b8);
     }
     .workspace-pill:not(.active):hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(var(--rgb-card), 0.85);
+      border-color: var(--color-brand);
       color: var(--text-main);
       transform: translateY(-1px);
+    }
+
+    /* Floating Dropdown Menus: Solid high-contrast surface independent of card opacity */
+    .theme-dropdown-menu {
+      z-index: 100 !important;
+      background: rgb(var(--rgb-surface)) !important;
+      background-color: rgba(var(--rgb-surface), 0.98) !important;
+      backdrop-filter: blur(32px) !important;
+      -webkit-backdrop-filter: blur(32px) !important;
+      border: 1px solid var(--border-main) !important;
+      box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border-main), var(--bevel-highlight) !important;
+      color: var(--text-main) !important;
+    }
+    [data-theme="sovereign-light"] .theme-dropdown-menu {
+      z-index: 100 !important;
+      background: #ffffff !important;
+      background-color: rgba(255, 255, 255, 0.98) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px #e2e8f0 !important;
+      color: #0f172a !important;
     }
 
     /* Equalizer Bar Animation */
@@ -834,14 +897,10 @@ DASHBOARD_HTML = r"""
       box-shadow: var(--shadow-card), var(--bevel-highlight);
     }
     .bubble-card {
-      background-color: var(--bg-card) !important;
-      border: 1px solid var(--border-main) !important;
+      background: transparent !important;
+      border: none !important;
       color: var(--text-main) !important;
-      box-shadow: var(--shadow-card), var(--bevel-highlight);
-      transition: var(--card-transition);
-    }
-    .bubble-card:hover {
-      box-shadow: var(--shadow-card-hover), var(--bevel-highlight-hover);
+      box-shadow: none !important;
     }
     .theme-text-brand { color: var(--color-brand) !important; }
     .theme-border-brand { border-color: var(--color-brand) !important; }
@@ -850,36 +909,258 @@ DASHBOARD_HTML = r"""
     @keyframes viewFadeIn {
       from {
         opacity: 0;
-        transform: translateY(6px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
       }
     }
     .view-container:not(.hidden) {
-      animation: viewFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: viewFadeIn 0.18s ease-out;
     }
     [id^="inbox-item-row-"], [id^="trace-node-card-"], .hover-glide-row {
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
     }
 
-    /* ── Universal Input and Textarea Dynamic Theming ── */
-    input, textarea, select, #chat-input-textarea, #chat-search-input, #spotlight-search-input {
+    /* ── Universal Input, Search Bar and Textarea Dynamic Theming ── */
+    input, textarea, select, #chat-input-textarea, #chat-search-input, #spotlight-search-input, #inbox-search-input, #traces-search-input, #obsidian-search-input {
       color: var(--text-main) !important;
     }
-    input::placeholder, textarea::placeholder, #chat-input-textarea::placeholder, #chat-search-input::placeholder {
+    input::placeholder, textarea::placeholder, #chat-input-textarea::placeholder, #chat-search-input::placeholder, #spotlight-search-input::placeholder, #inbox-search-input::placeholder, #traces-search-input::placeholder, #obsidian-search-input::placeholder {
       color: var(--text-muted) !important;
+    }
+    #spotlight-search-input {
+      background-color: rgba(var(--rgb-card), 0.7) !important;
+      border: 1px solid var(--border-main) !important;
+      color: var(--text-main) !important;
+      font-size: 0.925rem;
+    }
+    #spotlight-search-input:focus {
+      border-color: var(--color-brand) !important;
+      box-shadow: 0 0 0 2px var(--border-accent), 0 0 16px -2px var(--color-brand) !important;
+    }
+    [data-theme="sovereign-light"] #spotlight-search-input,
+    [data-theme="sovereign-manifesto"] #spotlight-search-input {
+      background-color: var(--bg-card) !important;
+      border-color: var(--border-main) !important;
+      color: var(--text-main) !important;
+    }
+    .focus\:border-brand:focus,
+    .focus-border-brand:focus {
+      border-color: var(--color-brand) !important;
+      box-shadow: 0 0 0 2px var(--border-accent) !important;
+    }
+
+    /* ── Spotlight HUD Dynamic Theming ── */
+    .spotlight-item-idle {
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      color: var(--text-main) !important;
+    }
+    .spotlight-item-idle:hover {
+      background: rgba(var(--rgb-card), 0.6) !important;
+      border-color: var(--border-main) !important;
+      color: var(--text-main) !important;
+    }
+    .spotlight-item-active {
+      background: var(--color-brand) !important;
+      border: 1px solid var(--border-accent) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 16px -2px var(--color-brand), var(--bevel-highlight) !important;
+    }
+    .spotlight-item-active .spotlight-item-title {
+      color: #ffffff !important;
+    }
+    .spotlight-item-active .spotlight-item-desc {
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .spotlight-item-active .spotlight-item-shortcut {
+      background: rgba(0, 0, 0, 0.25) !important;
+      border-color: rgba(255, 255, 255, 0.3) !important;
+      color: #ffffff !important;
+    }
+    .spotlight-item-idle .spotlight-item-title {
+      color: var(--text-main) !important;
+    }
+    .spotlight-item-idle .spotlight-item-desc {
+      color: var(--text-muted) !important;
+    }
+    .spotlight-item-idle .spotlight-item-shortcut {
+      background: rgba(var(--rgb-card), 0.5) !important;
+      border: 1px solid var(--border-main) !important;
+      color: var(--text-muted) !important;
+    }
+
+    /* ── ChatGPT-Style Streamlined Prose & Typography ── */
+    .prose-chat {
+      color: var(--text-main);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+    }
+    .prose-chat p {
+      margin-bottom: 0.875rem;
+    }
+    .prose-chat p:last-child {
+      margin-bottom: 0;
+    }
+    .prose-chat ul {
+      list-style-type: disc;
+      padding-left: 1.35rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .prose-chat ol {
+      list-style-type: decimal;
+      padding-left: 1.35rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .prose-chat li {
+      margin-bottom: 0.35rem;
+      line-height: 1.6;
+    }
+    .prose-chat h1, .prose-chat h2, .prose-chat h3, .prose-chat h4 {
+      color: var(--text-main);
+      font-weight: 700;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.35;
+    }
+    .prose-chat h1 { font-size: 1.25rem; }
+    .prose-chat h2 { font-size: 1.1rem; }
+    .prose-chat h3 { font-size: 1rem; }
+    .prose-chat h4 { font-size: 0.9375rem; }
+    .prose-chat strong, .prose-chat b {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .prose-chat a {
+      color: var(--color-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .prose-chat blockquote {
+      border-left: 3px solid var(--color-brand);
+      padding-left: 1rem;
+      margin: 0.75rem 0;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .prose-chat code:not(pre code) {
+      background: rgba(var(--rgb-card), 0.6);
+      border: 1px solid var(--border-main);
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.375rem;
+      font-size: 0.825rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--color-brand);
+    }
+
+    /* ── JARVIS 3D Luminous Liquid Voice Orb & Visualizer ── */
+    .jarvis-orb-sphere {
+      width: 175px !important;
+      height: 175px !important;
+      border-radius: 50% !important;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #6366f1 45%, #4338ca 70%, #0f172a 100%) !important;
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.5), inset 0 0 40px rgba(255, 255, 255, 0.6), 0 0 100px rgba(99, 102, 241, 0.4) !important;
+      border: 2px solid rgba(255, 255, 255, 0.7) !important;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: orb-breathe 4s ease-in-out infinite;
+      user-select: none;
+    }
+    .jarvis-orb-sphere.listening {
+      background: radial-gradient(circle at 35% 30%, #fda4af 0%, #f43f5e 45%, #9f1239 70%, #1e1b4b 100%) !important;
+      box-shadow: 0 0 85px rgba(244, 63, 94, 0.75), inset 0 0 45px rgba(255, 255, 255, 0.7), 0 0 130px rgba(244, 63, 94, 0.5) !important;
+      border: 2px solid rgba(253, 164, 175, 0.9) !important;
+      animation: orb-pulse-listening 1.8s ease-in-out infinite;
+    }
+    .jarvis-orb-sphere.thinking {
+      background: radial-gradient(circle at 35% 30%, #fef08a 0%, #eab308 45%, #ca8a04 70%, #1e1b4b 100%) !important;
+      box-shadow: 0 0 85px rgba(234, 179, 8, 0.75), inset 0 0 45px rgba(255, 255, 255, 0.7), 0 0 130px rgba(234, 179, 8, 0.45) !important;
+      border: 2px solid rgba(254, 240, 138, 0.9) !important;
+      animation: orb-spin-glow 2.2s linear infinite;
+    }
+    .jarvis-orb-sphere.speaking {
+      background: radial-gradient(circle at 35% 30%, #67e8f9 0%, #06b6d4 40%, #3b82f6 70%, #1e1b4b 100%) !important;
+      box-shadow: 0 0 95px rgba(6, 182, 212, 0.85), inset 0 0 50px rgba(255, 255, 255, 0.8), 0 0 150px rgba(59, 130, 246, 0.6) !important;
+      border: 2px solid rgba(103, 232, 249, 0.95) !important;
+      animation: orb-speak-morph 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes orb-breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    @keyframes orb-pulse-listening {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.14); filter: brightness(1.2); }
+    }
+    @keyframes orb-spin-glow {
+      0% { transform: scale(1.02) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(180deg); }
+      100% { transform: scale(1.02) rotate(360deg); }
+    }
+    @keyframes orb-speak-morph {
+      0% { transform: scale(1); border-radius: 50% !important; }
+      50% { transform: scale(1.16); border-radius: 46% 54% 50% 50% / 52% 48% 52% 48% !important; }
+      100% { transform: scale(1.08); border-radius: 54% 46% 50% 50% / 48% 52% 48% 52% !important; }
+    }
+
+    .jarvis-ring-outer {
+      border-radius: 50% !important;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* ── Fullscreen JARVIS Voice High-Contrast Typography ── */
+    #jarvis-voice-modal {
+      color: #f8fafc !important;
+    }
+    #jarvis-voice-modal p,
+    #jarvis-voice-modal div,
+    #jarvis-voice-modal span {
+      color: #f8fafc;
+    }
+    #jarvis-live-transcript {
+      color: #ffffff !important;
+      font-size: 1.65rem !important;
+      font-weight: 500 !important;
+      line-height: 1.4 !important;
+      text-shadow: 0 0 24px rgba(255, 255, 255, 0.45) !important;
+    }
+    #jarvis-voice-state-title {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+    #jarvis-transcript-role {
+      color: #38bdf8 !important;
+      font-weight: 700 !important;
+    }
+    #jarvis-active-voice-label {
+      color: #38bdf8 !important;
+    }
+    #label-jarvis-mute {
+      color: #ffffff !important;
     }
 
     /* ── Full Fluid Width Workspace Layout (Zero Empty Margins on Collapse) ── */
     .view-container {
       width: 100% !important;
       max-width: 100% !important;
+      min-height: 0;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     #main-content-scroll {
       width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
@@ -887,6 +1168,22 @@ DASHBOARD_HTML = r"""
     #app-sidebar.collapsed + main #main-content-scroll {
       padding-left: 2rem;
       padding-right: 2rem;
+    }
+
+    /* Enforce active scrolling for all sub-panels */
+    #chat-messages-box,
+    #chat-sessions-list,
+    #traces-list-container,
+    #obsidian-notes-list-container,
+    #obsidian-markdown-body,
+    #calendar-agenda-stream,
+    #research-history-list,
+    #spotlight-results-container,
+    #full-activity-log,
+    #activity-log-feed {
+      overflow-y: auto !important;
+      min-height: 0 !important;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* ── Sovereign Light Mode Complete Readability Overrides ── */
@@ -950,25 +1247,25 @@ DASHBOARD_HTML = r"""
       border-color: #e2e8f0 !important;
     }
     [data-theme="sovereign-light"] .theme-card {
-      background-color: #ffffff !important;
+      background-color: var(--bg-card) !important;
       border-color: #e2e8f0 !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06) !important;
     }
     [data-theme="sovereign-light"] .theme-card:hover {
-      background-color: #f8fafc !important;
+      background-color: var(--bg-card-hover) !important;
       border-color: #cbd5e1 !important;
       box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
     }
     [data-theme="sovereign-light"] .theme-bg-sidebar {
-      background-color: #ffffff !important;
+      background-color: var(--bg-sidebar) !important;
       border-color: #e2e8f0 !important;
     }
     [data-theme="sovereign-light"] .theme-bg-surface {
-      background-color: #f8fafc !important;
+      background-color: var(--bg-surface) !important;
       border-color: #e2e8f0 !important;
     }
     [data-theme="sovereign-light"] .waybar-hud {
-      background: rgba(255, 255, 255, 0.96) !important;
+      background: var(--waybar-bg) !important;
       border-color: #e2e8f0 !important;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
     }
@@ -977,7 +1274,7 @@ DASHBOARD_HTML = r"""
     }
     [data-theme="sovereign-light"] .nav-item:hover {
       color: #0f172a !important;
-      background-color: #f1f5f9 !important;
+      background-color: var(--bg-card-hover) !important;
       border-color: #e2e8f0 !important;
     }
     [data-theme="sovereign-light"] .nav-item.active {
@@ -987,7 +1284,7 @@ DASHBOARD_HTML = r"""
       border-left: 3px solid #4f46e5 !important;
     }
     [data-theme="sovereign-light"] .workspace-pill:not(.active) {
-      background: #f1f5f9 !important;
+      background: rgba(var(--rgb-sidebar), var(--sidebar-opacity)) !important;
       color: #475569 !important;
       border: 1px solid #e2e8f0 !important;
     }
@@ -996,7 +1293,7 @@ DASHBOARD_HTML = r"""
     }
     [data-theme="sovereign-light"] pre, 
     [data-theme="sovereign-light"] code:not(pre code) {
-      background-color: #f1f5f9 !important;
+      background-color: rgba(var(--rgb-sidebar), var(--sidebar-opacity)) !important;
       color: #0f172a !important;
       border-color: #cbd5e1 !important;
     }
@@ -1006,7 +1303,7 @@ DASHBOARD_HTML = r"""
       color-scheme: light;
     }
     [data-theme="sovereign-manifesto"] body {
-      background-color: #f5f0e8 !important;
+      background-color: var(--bg-base) !important;
       color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] h1,
@@ -1036,7 +1333,7 @@ DASHBOARD_HTML = r"""
     [data-theme="sovereign-manifesto"] .bg-black\/50,
     [data-theme="sovereign-manifesto"] .bg-black\/60,
     [data-theme="sovereign-manifesto"] .bg-black\/80 {
-      background-color: #eae4d8 !important;
+      background-color: rgba(var(--rgb-sidebar), var(--sidebar-opacity)) !important;
       border-color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .bg-slate-900,
@@ -1046,7 +1343,7 @@ DASHBOARD_HTML = r"""
     [data-theme="sovereign-manifesto"] .bg-slate-900\/90,
     [data-theme="sovereign-manifesto"] .bg-slate-800,
     [data-theme="sovereign-manifesto"] .bg-slate-800\/90 {
-      background-color: #fcfbfa !important;
+      background-color: rgba(var(--rgb-card), var(--card-opacity)) !important;
       border-color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] input,
@@ -1069,22 +1366,22 @@ DASHBOARD_HTML = r"""
       border-color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .theme-card {
-      background-color: #fcfbfa !important;
+      background-color: var(--bg-card) !important;
       border-color: #0a0a0a !important;
-      box-shadow: 2px 2px 0px #0a0a0a !important;
+      box-shadow: 3px 3px 0px #0a0a0a !important;
       border-radius: 0px !important;
     }
     [data-theme="sovereign-manifesto"] .theme-card:hover {
-      background-color: #ffffff !important;
+      background-color: var(--bg-card-hover) !important;
       border-color: #0a0a0a !important;
-      box-shadow: 3px 3px 0px #0a0a0a !important;
+      box-shadow: 5px 5px 0px #d42b2b, 0 0 0 1px #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .theme-bg-sidebar {
-      background-color: #eae4d8 !important;
+      background-color: var(--bg-sidebar) !important;
       border-color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .theme-bg-surface {
-      background-color: #f5f0e8 !important;
+      background-color: var(--bg-surface) !important;
       border-color: #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .theme-border {
@@ -1110,17 +1407,19 @@ DASHBOARD_HTML = r"""
       background-color: #0a0a0a !important;
       color: #f5f0e8 !important;
       border: 1px solid #0a0a0a !important;
-      box-shadow: 2px 2px 0px #d42b2b !important;
+      box-shadow: 3px 3px 0px #d42b2b !important;
     }
     [data-theme="sovereign-manifesto"] .btn-brand-primary:hover {
       background-color: #d42b2b !important;
       color: #ffffff !important;
       border-color: #0a0a0a !important;
+      box-shadow: 5px 5px 0px #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .user-bubble {
       background-color: #0a0a0a !important;
       color: #f5f0e8 !important;
       border: 1px solid #0a0a0a !important;
+      box-shadow: 3px 3px 0px #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .theme-avatar-bot {
       background: #d42b2b !important;
@@ -1128,10 +1427,10 @@ DASHBOARD_HTML = r"""
       border: 1px solid #0a0a0a !important;
     }
     [data-theme="sovereign-manifesto"] .bubble-card {
-      background-color: #fcfbfa !important;
+      background-color: transparent !important;
       color: #0a0a0a !important;
-      border: 1px solid #0a0a0a !important;
-      box-shadow: 2px 2px 0px #0a0a0a !important;
+      border: none !important;
+      box-shadow: none !important;
     }
     [data-theme="sovereign-manifesto"] .workspace-pill.active {
       background: #0a0a0a !important;
@@ -1277,131 +1576,204 @@ DASHBOARD_HTML = r"""
   <div id="omarchy-crt-overlay" class="fixed inset-0 hidden"></div>
 
   <!-- ─── 1. SOVEREIGN TOP STATUS BAR / WAYBAR ─────────────────────── -->
-  <header class="waybar-hud h-10 px-3 flex items-center justify-between z-30 flex-shrink-0 text-xs font-mono select-none w-full border-b theme-border bg-black/60 backdrop-blur-xl">
+  <header class="waybar-hud h-12 px-3 sm:px-4 flex items-center justify-between z-50 flex-shrink-0 text-xs font-mono select-none w-full border-b overflow-visible">
     
-    <!-- Left: Distro Logo, Sidebar Toggle & Workspaces -->
-    <div class="flex items-center space-x-2 min-w-0 flex-shrink">
+    <!-- Left: Distro Brand, Sidebar Toggle, Autonomous Core Status & Attention Badges -->
+    <div class="flex items-center space-x-2 min-w-0 flex-shrink-0">
       <!-- Distro Pill -->
-      <div class="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-lg bg-black/50 border border-white/10 text-white shadow-sm flex-shrink-0">
-        <div class="w-3.5 h-3.5 rounded-md bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[9px] font-bold">
-          S
+      <div onclick="switchTab('home'); playCyberClick();" title="SovereignOS Operations Overview" class="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand cursor-pointer transition flex-shrink-0 group">
+        <div class="w-5 h-5 rounded-lg btn-brand-primary flex items-center justify-center text-white text-[10px] font-bold shadow-sm group-hover:scale-105 transition">
+          <i data-lucide="shield" class="w-3 h-3"></i>
         </div>
-        <span class="font-bold tracking-wider text-[11px] text-white font-display">SOVEREIGN<span class="text-indigo-400">OS</span></span>
-        <span class="text-[8px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono hidden sm:inline border border-indigo-500/30">PRO</span>
+        <span class="font-bold tracking-wider text-xs text-white font-display">SOVEREIGN<span class="theme-text-brand">OS</span></span>
       </div>
 
       <!-- Sidebar Hide/Show Toggle Button -->
-      <button onclick="toggleAppSidebar()" id="btn-toggle-sidebar" title="Toggle Left Dashboard / Sidebar (Ctrl+B / ⌘B)" class="p-1.5 rounded-lg bg-black/40 hover:bg-indigo-500/20 text-slate-300 hover:text-white border border-white/10 text-xs flex items-center justify-center transition cursor-pointer flex-shrink-0">
+      <button onclick="toggleAppSidebar()" id="btn-toggle-sidebar" title="Toggle Sidebar (Ctrl+B / ⌘B)" class="p-2 rounded-xl theme-card border hover:border-brand text-slate-300 hover:text-white text-xs flex items-center justify-center transition cursor-pointer flex-shrink-0">
         <i data-lucide="panel-left-close" class="w-3.5 h-3.5" id="icon-sidebar-toggle"></i>
       </button>
 
-      <!-- Workspace Switcher -->
-      <div class="flex items-center space-x-1 bg-black/30 p-0.5 rounded-lg border border-white/5 overflow-x-auto no-scrollbar max-w-[44vw] flex-shrink">
-        <button onclick="switchTab('home'); playCyberClick();" id="ws-home" class="workspace-pill active px-2 py-0.5 rounded text-[10px] cursor-pointer">Overview</button>
-        <button onclick="switchTab('chat'); playCyberClick();" id="ws-chat" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Copilot</button>
-        <button onclick="switchTab('traces'); playCyberClick();" id="ws-traces" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Traces</button>
-        <button onclick="switchTab('inbox'); playCyberClick();" id="ws-inbox" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Inbox</button>
-        <button onclick="switchTab('approvals'); playCyberClick();" id="ws-approvals" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Approvals</button>
-        <button onclick="switchTab('topology'); playCyberClick();" id="ws-topology" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Topology</button>
-        <button onclick="switchTab('rag'); playCyberClick();" id="ws-rag" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Memory</button>
-        <button onclick="switchTab('obsidian'); playCyberClick();" id="ws-obsidian" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Vault</button>
-        <button onclick="switchTab('calendar'); playCyberClick();" id="ws-calendar" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer">Schedule</button>
-        <button onclick="switchTab('research'); playCyberClick();" id="ws-research" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer text-cyan-300">Research</button>
-        <button onclick="switchTab('documents'); playCyberClick();" id="ws-documents" class="workspace-pill px-2 py-0.5 rounded text-[10px] cursor-pointer text-emerald-300">Documents</button>
+      <!-- ⚡ Autonomous Core Live Brain Status Pill (Always Visible) -->
+      <div class="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl theme-card border text-[11px] font-mono flex-shrink-0">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-slate-400 font-semibold">Core:</span>
+        <span class="text-emerald-400 font-bold" id="nav-agent-status-label">Active</span>
       </div>
+
+      <!-- Actionable Triage Alert Badges (Live Attention Stream) -->
+      <button onclick="switchTab('inbox'); playCyberClick();" title="View Inbox & ML Triage Stream" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand flex items-center space-x-1.5 cursor-pointer text-slate-300 hover:text-white transition flex-shrink-0">
+        <i data-lucide="mail" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span id="nav-inbox-counter" class="font-mono font-bold text-cyan-300">0</span>
+        <span class="text-[10px] text-slate-400">Inbox</span>
+      </button>
+
+      <button onclick="switchTab('approvals'); playCyberClick();" title="View Security Action Gates & Pending Approvals" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand flex items-center space-x-1.5 cursor-pointer text-slate-300 hover:text-white transition flex-shrink-0">
+        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span id="nav-approvals-counter" class="font-mono font-bold text-amber-300">0</span>
+        <span class="text-[10px] text-slate-400">Gates</span>
+      </button>
     </div>
 
-    <!-- Center: Audio Spectrum Visualizer (Equalizer Bar for Spotify/Music) -->
-    <div onclick="toggleAudioVisualizerSync()" title="Audio Spectrum: Click to Sync Live Audio Visualizer" class="hidden md:flex items-center space-x-2 bg-black/40 hover:bg-black/60 px-2.5 py-0.5 rounded-full border border-white/10 cursor-pointer transition flex-shrink-0">
-      <div class="flex items-center space-x-1">
-        <i data-lucide="activity" class="w-3 h-3 text-indigo-400" id="icon-music-sync"></i>
-        <span id="label-music-status" class="text-[9px] text-slate-300 font-mono hidden xl:inline">SYNC</span>
+    <!-- Center: ⌘K Universal Command Palette Search Trigger (Always Visible) -->
+    <button onclick="openSpotlightModal(); playCyberClick();" title="Quick Command Palette & Search (Ctrl+K / ⌘K)" class="flex items-center space-x-2.5 px-3.5 py-1.5 rounded-xl theme-card border hover:border-brand text-xs transition cursor-pointer text-slate-400 hover:text-white group max-w-xs mx-2 justify-between flex-shrink">
+      <div class="flex items-center space-x-2 min-w-0">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 theme-text-brand group-hover:scale-110 transition flex-shrink-0"></i>
+        <span class="font-sans text-[11px] text-slate-400 truncate">Ask Copilot, search vault...</span>
+      </div>
+      <kbd class="px-1.5 py-0.5 rounded bg-black/40 border theme-border text-[10px] font-mono theme-text-brand font-bold flex-shrink-0">⌘K</kbd>
+    </button>
+
+    <!-- Right: Focus Ambient Audio, Pomodoro Timer, Themes & Quick Settings -->
+    <div class="flex items-center space-x-2 flex-shrink-0">
+      <!-- ⏱️ Focus / Pomodoro Timer (Always Visible) -->
+      <div class="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl theme-card border text-[11px] font-mono text-slate-300 flex-shrink-0">
+        <i data-lucide="timer" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span id="nav-pomodoro-timer" class="font-bold text-amber-300">25:00</span>
+        <button onclick="togglePomodoroTimer()" id="btn-pomodoro-toggle" title="Start / Pause Focus Timer" class="hover:text-white p-0.5 text-slate-400 hover:bg-white/10 rounded cursor-pointer transition">
+          <i data-lucide="play" class="w-3 h-3" id="icon-pomodoro-play"></i>
+        </button>
+        <button onclick="resetPomodoroTimer()" title="Reset Timer to 25:00" class="hover:text-white p-0.5 text-slate-400 hover:bg-white/10 rounded cursor-pointer transition">
+          <i data-lucide="rotate-ccw" class="w-2.5 h-2.5"></i>
+        </button>
       </div>
 
-      <!-- 12 Animated Frequency Equalizer Bars -->
-      <div class="flex items-end space-x-0.5 h-3.5 w-14 px-0.5 py-0.5 rounded bg-black/30" id="equalizer-bars-container">
-        <div class="eq-bar" style="height: 4px;"></div>
-        <div class="eq-bar" style="height: 8px;"></div>
-        <div class="eq-bar" style="height: 12px;"></div>
-        <div class="eq-bar" style="height: 10px;"></div>
-        <div class="eq-bar" style="height: 14px;"></div>
-        <div class="eq-bar" style="height: 11px;"></div>
-        <div class="eq-bar" style="height: 6px;"></div>
-        <div class="eq-bar" style="height: 13px;"></div>
-        <div class="eq-bar" style="height: 9px;"></div>
-        <div class="eq-bar" style="height: 12px;"></div>
-        <div class="eq-bar" style="height: 7px;"></div>
-        <div class="eq-bar" style="height: 4px;"></div>
-      </div>
+      <!-- 🎙️ JARVIS Real-Time Hands-Free Voice Assistant Trigger -->
+      <button onclick="openJarvisVoiceModal(); playCyberClick();" id="btn-nav-jarvis-voice" title="Launch Real-Time Hands-Free Voice Assistant (JARVIS VAD Mode)" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand flex items-center space-x-1.5 cursor-pointer text-slate-300 hover:text-white transition group flex-shrink-0">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75 hidden" id="dot-voice-ping"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-slate-500" id="dot-voice-status"></span>
+        </span>
+        <i data-lucide="mic" class="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition"></i>
+        <span class="text-[11px] font-mono font-bold">Voice</span>
+      </button>
 
-      <span class="text-slate-600">|</span>
-      <span id="waybar-clock" class="text-indigo-300 font-bold text-[10px]">12:00:00</span>
-    </div>
+      <!-- 🎧 Cyber Ambient Audio & Focus Soundscape Generator -->
+      <div class="relative flex-shrink-0" id="nav-ambient-audio-container">
+        <button onclick="toggleAmbientAudioDropdown(event); playCyberClick();" id="btn-ambient-audio" title="Cyber Ambient Soundscape Generator" class="px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand flex items-center space-x-1.5 cursor-pointer text-slate-300 hover:text-white transition">
+          <i data-lucide="headphones" class="w-3.5 h-3.5 text-indigo-400" id="icon-ambient-headphones"></i>
+          <span class="text-[11px] font-mono" id="label-ambient-track">Sound</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="dot-ambient-playing"></span>
+        </button>
 
-    <!-- Right: Telemetry, Theme/Wallpaper Pickers & Desktop Mode Controls -->
-    <div class="flex items-center space-x-1.5 flex-shrink-0">
-      <!-- Simulated CPU/RAM Telemetry -->
-      <div class="hidden 2xl:flex items-center space-x-1.5 bg-black/30 px-2.5 py-0.5 rounded-lg border border-white/5 text-[9px]">
-        <div class="flex items-center space-x-1 text-slate-300">
-          <i data-lucide="cpu" class="w-2.5 h-2.5 text-cyan-400"></i>
-          <span id="waybar-cpu">14%</span>
+        <!-- Floating Ambient Audio Popover with solid background -->
+        <div id="menu-ambient-audio" class="hidden absolute right-0 mt-2 w-64 p-3 rounded-2xl theme-dropdown-menu z-[100] space-y-3 shadow-2xl">
+          <div class="flex items-center justify-between border-b theme-border pb-2">
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="music" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span class="font-bold text-xs text-white">Focus Soundscapes</span>
+            </div>
+            <button onclick="toggleAmbientPlayback()" id="btn-ambient-playpause" class="px-2.5 py-1 rounded-lg btn-brand-primary text-[10px] font-mono font-bold cursor-pointer transition">
+              Play
+            </button>
+          </div>
+
+          <!-- Soundscape Preset Options -->
+          <div class="space-y-1">
+            <button onclick="selectAmbientPreset('rain')" id="ambient-preset-rain" class="ambient-option-btn w-full px-2.5 py-1.5 rounded-xl text-left text-xs flex items-center justify-between hover:bg-white/10 transition cursor-pointer text-cyan-300 bg-white/5 border theme-border">
+              <div class="flex items-center space-x-2">
+                <span>🌧️</span>
+                <span class="font-sans font-medium text-[11px]">Cyber Rain & Drone</span>
+              </div>
+              <span class="text-[9px] font-mono text-slate-400">Pink noise</span>
+            </button>
+            <button onclick="selectAmbientPreset('space')" id="ambient-preset-space" class="ambient-option-btn w-full px-2.5 py-1.5 rounded-xl text-left text-xs flex items-center justify-between hover:bg-white/10 transition cursor-pointer text-slate-300">
+              <div class="flex items-center space-x-2">
+                <span>🌌</span>
+                <span class="font-sans font-medium text-[11px]">Deep Space Warp</span>
+              </div>
+              <span class="text-[9px] font-mono text-slate-400">55Hz Sub</span>
+            </button>
+            <button onclick="selectAmbientPreset('alpha')" id="ambient-preset-alpha" class="ambient-option-btn w-full px-2.5 py-1.5 rounded-xl text-left text-xs flex items-center justify-between hover:bg-white/10 transition cursor-pointer text-slate-300">
+              <div class="flex items-center space-x-2">
+                <span>🧠</span>
+                <span class="font-sans font-medium text-[11px]">Binaural Alpha (432Hz)</span>
+              </div>
+              <span class="text-[9px] font-mono text-slate-400">10Hz beat</span>
+            </button>
+          </div>
+
+          <!-- Volume Slider -->
+          <div class="space-y-1 pt-1 border-t theme-border">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+              <span>Volume</span>
+              <span id="label-ambient-volume">30%</span>
+            </div>
+            <input type="range" id="slider-ambient-volume" min="0" max="100" value="30" oninput="setAmbientVolume(this.value)" class="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
         </div>
-        <span class="text-slate-600">/</span>
-        <div class="flex items-center space-x-1 text-slate-300">
-          <i data-lucide="hard-drive" class="w-2.5 h-2.5 text-purple-400"></i>
-          <span id="waybar-ram">1.4GB</span>
-        </div>
       </div>
 
-      <!-- Audio SFX Toggle -->
-      <button onclick="toggleAudioSFX()" id="btn-audio-sfx" title="Toggle Synthesized Audio SFX" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="icon-audio-sfx"></i>
+      <!-- 🎨 Themes Picker Trigger (Always Visible) -->
+      <button onclick="openThemeModal(); playCyberClick();" title="Theme Selector" class="px-2.5 py-1.5 rounded-xl btn-brand-primary text-xs flex items-center space-x-1.5 transition cursor-pointer font-medium shadow-md flex-shrink-0">
+        <i data-lucide="palette" class="w-3.5 h-3.5"></i>
+        <span id="current-theme-label" class="font-mono text-[11px]">Theme</span>
       </button>
 
-      <!-- TTS Speech Output Toggle (JARVIS Mode) -->
-      <button onclick="toggleSpeechTTS()" id="btn-toggle-tts" title="Toggle Sovereign Speech Synthesis (Voice Engine)" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="volume-x" class="w-3 h-3 text-slate-400" id="icon-tts-state"></i>
-        <span id="label-tts-state" class="text-[9px] font-mono text-slate-400 hidden sm:inline">Voice</span>
-      </button>
+      <!-- ⚙️ Quick Settings / Tools Dropdown Container (Always Visible) -->
+      <div class="relative flex-shrink-0" id="nav-quick-settings-container">
+        <button onclick="toggleQuickSettingsMenu(event); playCyberClick();" id="nav-quick-settings-btn" title="Quick Tools & Controls" class="p-2 rounded-xl theme-card border hover:border-brand text-slate-300 hover:text-white transition cursor-pointer flex items-center justify-center">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+        </button>
 
-      <!-- Global Spotlight Trigger -->
-      <button onclick="openSpotlightModal()" title="Quick Command Palette (Ctrl+K / Cmd+K)" class="px-2.5 py-0.5 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
-        <i data-lucide="command" class="w-3 h-3 text-indigo-400"></i>
-        <span class="font-mono font-bold">⌘K</span>
-      </button>
+        <!-- Floating Quick Tools Dropdown Menu with solid theme-dropdown-menu background -->
+        <div id="nav-quick-settings-menu" class="hidden absolute right-0 mt-2 w-56 p-1.5 rounded-2xl theme-dropdown-menu z-[100] space-y-0.5 text-xs font-mono shadow-2xl">
+          <button onclick="openWallpaperModal(); closeQuickSettingsMenu(); playCyberClick();" class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="image" class="w-4 h-4 text-purple-400"></i>
+              <span class="text-xs font-sans font-medium text-white">Backdrop Canvas</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">Glass/BG</span>
+          </button>
 
-      <!-- Wallpaper & Glass Customizer Trigger -->
-      <button onclick="openWallpaperModal()" title="Background & Canvas Customizer" class="px-2 py-0.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 text-[10px] flex items-center space-x-1 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="image" class="w-3 h-3 text-purple-400"></i>
-        <span class="hidden lg:inline">Backdrop</span>
-      </button>
+          <button onclick="toggleSpeechTTS(); closeQuickSettingsMenu();" id="btn-toggle-tts" class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="volume-2" class="w-4 h-4 text-cyan-400" id="icon-tts-state"></i>
+              <span class="text-xs font-sans font-medium text-white">Voice Synthesis</span>
+            </div>
+            <span id="label-tts-state" class="text-[10px] text-slate-400 font-mono">TTS</span>
+          </button>
 
-      <!-- Themes Picker Trigger -->
-      <button onclick="openThemeModal()" title="Theme Selector" class="px-2.5 py-0.5 rounded-lg bg-gradient-to-r from-indigo-600/40 to-purple-600/40 hover:from-indigo-600/60 hover:to-purple-600/60 text-white border border-indigo-400/30 text-[10px] flex items-center space-x-1 transition cursor-pointer shadow-sm flex-shrink-0">
-        <i data-lucide="palette" class="w-3 h-3 text-indigo-300"></i>
-        <span id="current-theme-label" class="hidden sm:inline">Sovereign Slate</span>
-      </button>
+          <button onclick="toggleAudioSFX(); closeQuickSettingsMenu();" id="btn-audio-sfx" class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="bell" class="w-4 h-4 text-emerald-400" id="icon-audio-sfx"></i>
+              <span class="text-xs font-sans font-medium text-white">Audio SFX</span>
+            </div>
+            <span id="label-sfx-state" class="text-[10px] text-emerald-400 font-mono">ON</span>
+          </button>
 
-      <!-- Desktop Mode / Standalone Window Helper -->
-      <button onclick="openDesktopLauncherModal()" title="Desktop Standalone Mode" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-200 border border-white/10 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="app-window" class="w-3.5 h-3.5 text-amber-400"></i>
-      </button>
+          <div class="border-t theme-border my-1"></div>
 
-      <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullScreen()" title="Fullscreen F11" class="p-1.5 rounded-lg bg-black/40 hover:bg-white/10 text-slate-300 border border-white/5 transition cursor-pointer flex-shrink-0">
-        <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-      </button>
+          <button onclick="openDesktopLauncherModal(); closeQuickSettingsMenu(); playCyberClick();" class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="app-window" class="w-4 h-4 text-amber-400"></i>
+              <span class="text-xs font-sans font-medium text-white">Desktop App</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">PWA</span>
+          </button>
+
+          <button onclick="toggleFullScreen(); closeQuickSettingsMenu(); playCyberClick();" class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="maximize-2" class="w-4 h-4 text-indigo-400"></i>
+              <span class="text-xs font-sans font-medium text-white">Fullscreen</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">F11</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
   <!-- ─── 2. MAIN APP SHELL (SIDEBAR + CONTENT) ──────────────────────── -->
-  <div class="flex-1 flex overflow-hidden z-10">
+  <div class="flex-1 flex overflow-hidden z-10 min-h-0">
 
     <!-- ─── LEFT SIDEBAR ─────────────────────────────────────────────── -->
-    <aside id="app-sidebar" class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 transition-all duration-300">
+    <aside id="app-sidebar" class="w-64 flex-shrink-0 theme-bg-sidebar border-r theme-border flex flex-col justify-between h-full z-20 transition-all duration-300 min-h-0">
       
       <!-- Top Brand & New Chat -->
-      <div class="p-4 space-y-4">
+      <div class="p-4 space-y-4 flex-shrink-0">
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center space-x-2.5">
             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 font-bold text-sm">
@@ -1428,7 +1800,7 @@ DASHBOARD_HTML = r"""
         </button>
 
         <!-- Main Navigation Menu -->
-        <div class="space-y-1 pt-1">
+        <div class="space-y-1 pt-1 overflow-y-auto max-h-[calc(100vh-320px)]">
           <div class="text-[10px] font-mono uppercase tracking-wider text-slate-500 px-3 py-1 font-bold">WORKSPACE</div>
           
           <a onclick="switchTab('home'); playCyberClick();" id="nav-home" class="nav-item active flex items-center space-x-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition">
@@ -1523,7 +1895,7 @@ DASHBOARD_HTML = r"""
       </div>
 
       <!-- Quick Actions & User Profile -->
-      <div class="p-3 border-t theme-border space-y-3">
+      <div class="p-3 border-t theme-border space-y-3 flex-shrink-0">
         <div class="px-2">
           <div class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-2">QUICK ACTIONS</div>
           <div class="space-y-1.5 text-xs">
@@ -1556,7 +1928,7 @@ DASHBOARD_HTML = r"""
     </aside>
 
     <!-- ─── MAIN VIEW CONTAINER ──────────────────────────────────────── -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative z-10 min-h-0 min-w-0">
       
       <!-- Sub-header Breadcrumb Bar -->
       <div class="h-12 border-b theme-border bg-black/20 backdrop-blur-md px-6 flex items-center justify-between flex-shrink-0">
@@ -1587,7 +1959,7 @@ DASHBOARD_HTML = r"""
       </div>
 
       <!-- Dynamic Tab Content Views -->
-      <div class="flex-1 overflow-y-auto p-6 space-y-6" id="main-content-scroll">
+      <div class="flex-1 overflow-y-auto p-6 space-y-6 min-h-0" id="main-content-scroll">
 
         <!-- ══════════════════ TAB 1: HOME ══════════════════ -->
         <section id="view-home" class="view-container space-y-6">
@@ -1909,12 +2281,12 @@ DASHBOARD_HTML = r"""
         </section>
 
         <!-- ══════════════════ TAB 2: CHAT & COPILOT ══════════════════ -->
-        <section id="view-chat" class="view-container hidden h-[calc(100vh-140px)] flex gap-4">
+        <section id="view-chat" class="view-container hidden h-[calc(100vh-140px)] flex gap-4 min-h-0">
           
           <!-- LEFT SUB-COLUMN: Chat Sessions History -->
-          <div class="w-72 flex-shrink-0 flex flex-col justify-between theme-card border rounded-2xl overflow-hidden">
+          <div class="w-72 flex-shrink-0 flex flex-col justify-between theme-card border rounded-2xl overflow-hidden h-full min-h-0">
             <!-- Search & Actions -->
-            <div class="p-3 border-b theme-border space-y-2">
+            <div class="p-3 border-b theme-border space-y-2 flex-shrink-0">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Conversations</span>
                 <button onclick="createNewChatSession(); playCyberClick();" title="New Chat" class="p-1.5 rounded-lg btn-brand-primary transition cursor-pointer">
@@ -1928,21 +2300,21 @@ DASHBOARD_HTML = r"""
             </div>
 
             <!-- Sessions List -->
-            <div class="flex-1 overflow-y-auto p-2 space-y-1" id="chat-sessions-list">
+            <div class="flex-1 overflow-y-auto p-2 space-y-1 min-h-0" id="chat-sessions-list">
               <!-- Dynamically populated -->
             </div>
 
             <!-- Bottom Session Controls -->
-            <div class="p-2 border-t theme-border flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <div class="p-2 border-t theme-border flex items-center justify-between text-[11px] font-mono text-slate-400 flex-shrink-0">
               <button onclick="clearAllChatSessionsPrompt()" class="text-rose-400 hover:text-rose-300 transition cursor-pointer">Clear All</button>
               <span id="chat-sessions-count">0 sessions</span>
             </div>
           </div>
 
           <!-- RIGHT SUB-COLUMN: Chat Conversation View -->
-          <div class="flex-1 flex flex-col justify-between theme-card border rounded-2xl overflow-hidden">
+          <div class="flex-1 flex flex-col justify-between theme-card border rounded-2xl overflow-hidden h-full min-h-0">
             <!-- Chat Topbar -->
-            <div class="p-3.5 border-b theme-border bg-black/20 flex items-center justify-between">
+            <div class="p-3.5 border-b theme-border bg-black/20 flex items-center justify-between flex-shrink-0">
               <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white">
                   <i data-lucide="bot" class="w-4 h-4"></i>
@@ -1971,7 +2343,7 @@ DASHBOARD_HTML = r"""
             </div>
 
             <!-- Messages Container -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-messages-box">
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" id="chat-messages-box">
               <div class="flex items-start space-x-3">
                 <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white flex-shrink-0">
                   <i data-lucide="bot" class="w-4 h-4"></i>
@@ -1986,7 +2358,7 @@ DASHBOARD_HTML = r"""
             </div>
 
             <!-- Input Box -->
-            <div class="p-3 border-t theme-border bg-black/30 relative">
+            <div class="p-3 border-t theme-border bg-black/30 relative flex-shrink-0">
               <input type="file" id="chat-doc-file-input" accept=".pdf,.txt,.md,.json" style="display:none;" onchange="handleDocFileUpload(event)">
               
               <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl p-2 focus-within:border-cyan-400 transition">
@@ -1998,8 +2370,8 @@ DASHBOARD_HTML = r"""
                 <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sovereign Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
                 
                 <!-- Voice Input Microphone Button -->
-                <button type="button" onclick="toggleVoiceRecording()" id="btn-voice-input" title="Voice Input (Speech-to-Text)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative">
-                  <i data-lucide="mic" class="w-4 h-4" id="icon-voice-input"></i>
+                <button type="button" onclick="openJarvisVoiceModal(); playCyberClick();" id="btn-voice-input" title="🎙️ Launch Real-Time JARVIS Voice Assistant (VAD Hands-Free Mode)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative group">
+                  <i data-lucide="mic" class="w-4 h-4 text-rose-400 group-hover:scale-110 transition" id="icon-voice-input"></i>
                   <span id="voice-pulse-ring" class="hidden absolute inset-0 rounded-lg border-2 border-rose-500 animate-ping"></span>
                 </button>
 
@@ -2035,20 +2407,20 @@ DASHBOARD_HTML = r"""
               <p class="text-xs text-slate-400 font-mono">Real-time LangSmith-style visibility into every LangGraph node, inputs, outputs, tool calls, and latencies.</p>
             </div>
             <div class="flex items-center space-x-2 flex-wrap gap-2">
-              <div class="relative inline-block text-left">
+              <div class="relative inline-block text-left" id="trace-simulate-container">
                 <button onclick="toggleTraceSimulateMenu(); playCyberClick();" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm">
                   <i data-lucide="play" class="w-3.5 h-3.5"></i>
                   <span>Simulate Run</span>
                   <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
                 </button>
-                <div id="trace-simulate-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl border border-white/10 bg-slate-900 shadow-2xl z-50 divide-y divide-white/5 py-1.5 font-mono text-xs ring-1 ring-cyan-500/40">
-                  <button onclick="triggerSimulatedTrace('rag'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                <div id="trace-simulate-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl theme-dropdown-menu shadow-2xl z-[100] divide-y divide-white/5 py-1.5 font-mono text-xs ring-1 ring-cyan-500/40">
+                  <button onclick="triggerSimulatedTrace('rag'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-white/10 text-slate-200 hover:theme-text-brand flex items-center space-x-2 cursor-pointer transition">
                     <span>🧠 Knowledge RAG Synthesis</span>
                   </button>
-                  <button onclick="triggerSimulatedTrace('calendar_event'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                  <button onclick="triggerSimulatedTrace('calendar_event'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-white/10 text-slate-200 hover:theme-text-brand flex items-center space-x-2 cursor-pointer transition">
                     <span>📅 Calendar Event Scheduling</span>
                   </button>
-                  <button onclick="triggerSimulatedTrace('high_risk_gate'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 flex items-center space-x-2 cursor-pointer transition">
+                  <button onclick="triggerSimulatedTrace('high_risk_gate'); toggleTraceSimulateMenu();" class="w-full text-left px-3.5 py-2.5 hover:bg-white/10 text-slate-200 hover:theme-text-brand flex items-center space-x-2 cursor-pointer transition">
                     <span>⚠️ High-Risk Approval Gate</span>
                   </button>
                 </div>
@@ -2122,20 +2494,20 @@ DASHBOARD_HTML = r"""
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
             <!-- Left 1 Column: Traces List -->
-            <div class="p-4 rounded-2xl theme-card border space-y-3 h-[680px] flex flex-col">
-              <div class="flex items-center justify-between text-xs font-mono text-slate-400 border-b theme-border pb-2">
+            <div class="p-4 rounded-2xl theme-card border space-y-3 h-[680px] flex flex-col min-h-0">
+              <div class="flex items-center justify-between text-xs font-mono text-slate-400 border-b theme-border pb-2 flex-shrink-0">
                 <span>EXECUTION RUNS</span>
                 <span id="traces-list-badge">0 Runs</span>
               </div>
-              <div class="flex-1 overflow-y-auto space-y-2" id="traces-list-container">
+              <div class="flex-1 overflow-y-auto space-y-2 min-h-0" id="traces-list-container">
                 <!-- Dynamically populated -->
               </div>
             </div>
 
             <!-- Right 2 Columns: Selected Trace Details, Visual DAG Flow & Expandable Nodes -->
-            <div class="lg:col-span-2 p-5 rounded-2xl theme-card border space-y-4 h-[680px] flex flex-col overflow-y-auto">
+            <div class="lg:col-span-2 p-5 rounded-2xl theme-card border space-y-4 h-[680px] flex flex-col overflow-y-auto min-h-0" id="trace-detail-scroll-pane">
               <!-- Top Trace Header & Controls -->
               <div class="border-b theme-border pb-3 flex items-center justify-between flex-wrap gap-2">
                 <div class="space-y-0.5">
@@ -2209,28 +2581,55 @@ DASHBOARD_HTML = r"""
                 <i data-lucide="archive" class="w-3.5 h-3.5 text-cyan-400"></i>
                 <span>Archive Read</span>
               </button>
-              <button onclick="fetchInboxEmails(); fetchSentEmails(); playCyberClick();" class="px-3 py-1.5 rounded-xl theme-card border hover:border-indigo-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
+              <button onclick="fetchInbox(true, true); playCyberClick();" title="Flush old cache and sync live emails from active Gmail account" class="px-3 py-1.5 rounded-xl theme-card border hover:border-indigo-400 text-slate-300 hover:text-white text-xs flex items-center space-x-1.5 transition cursor-pointer">
                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-400"></i>
-                <span>Sync</span>
+                <span>Sync Live Gmail</span>
+              </button>
+              <button onclick="clearInboxCache(); playCyberClick();" title="Clear cached messages" class="px-3 py-1.5 rounded-xl theme-card border hover:border-rose-400 text-slate-400 hover:text-rose-300 text-xs flex items-center space-x-1.5 transition cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                <span>Clear Cache</span>
               </button>
             </div>
           </div>
 
           <!-- Inbox Search & Filter Bar -->
-          <div class="p-3.5 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
-            <div class="flex items-center space-x-2 flex-1 min-w-[240px]">
+          <div class="p-3 rounded-2xl theme-card border flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center space-x-2 flex-1 min-w-[220px]">
               <div class="flex items-center space-x-2 bg-black/40 border theme-border rounded-xl px-3 py-1.5 flex-1">
                 <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
                 <input type="text" id="inbox-search-input" oninput="filterInboxDisplay()" placeholder="Search emails by sender, subject, or content..." class="w-full bg-transparent text-xs placeholder-slate-500 focus:outline-none font-mono">
               </div>
             </div>
             
-            <div class="flex items-center space-x-1.5 font-mono text-xs select-none">
-              <button onclick="setInboxFilter('all')" id="inbox-filter-all" class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold cursor-pointer transition">All</button>
-              <button onclick="setInboxFilter('priority')" id="inbox-filter-priority" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-rose-300 hover:text-white cursor-pointer transition">🔥 Priority</button>
-              <button onclick="setInboxFilter('actionable')" id="inbox-filter-actionable" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-amber-300 hover:text-white cursor-pointer transition">⚡ Action</button>
-              <button onclick="setInboxFilter('spam')" id="inbox-filter-spam" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-slate-400 hover:text-white cursor-pointer transition">Spam</button>
-              <button onclick="setInboxFilter('sent')" id="inbox-filter-sent" class="px-3 py-1 rounded-lg bg-black/40 border theme-border text-cyan-300 hover:text-white cursor-pointer transition">📤 Sent</button>
+            <div class="flex items-center space-x-1 font-mono text-xs select-none flex-wrap gap-1">
+              <button onclick="setInboxFilter('all')" id="inbox-filter-all" class="inbox-tab-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold cursor-pointer transition flex items-center space-x-1.5 shadow-sm">
+                <span>All</span>
+                <span id="tab-count-all" class="px-1.5 py-0.2 text-[10px] rounded-full bg-black/30">0</span>
+              </button>
+              <button onclick="setInboxFilter('important')" id="inbox-filter-important" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>⚡ Important</span>
+                <span id="tab-count-important" class="px-1.5 py-0.2 text-[10px] rounded-full bg-amber-500/20 text-amber-300">0</span>
+              </button>
+              <button onclick="setInboxFilter('job_career')" id="inbox-filter-job_career" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>💼 Career</span>
+                <span id="tab-count-job_career" class="px-1.5 py-0.2 text-[10px] rounded-full bg-cyan-500/20 text-cyan-300">0</span>
+              </button>
+              <button onclick="setInboxFilter('system_update')" id="inbox-filter-system_update" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>🔔 Updates</span>
+                <span id="tab-count-system_update" class="px-1.5 py-0.2 text-[10px] rounded-full bg-blue-500/20 text-blue-300">0</span>
+              </button>
+              <button onclick="setInboxFilter('marketing_promo')" id="inbox-filter-marketing_promo" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>📢 Promo</span>
+                <span id="tab-count-marketing_promo" class="px-1.5 py-0.2 text-[10px] rounded-full bg-purple-500/20 text-purple-300">0</span>
+              </button>
+              <button onclick="setInboxFilter('likely_scam')" id="inbox-filter-likely_scam" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>🚨 Scam</span>
+                <span id="tab-count-likely_scam" class="px-1.5 py-0.2 text-[10px] rounded-full bg-rose-500/20 text-rose-300">0</span>
+              </button>
+              <button onclick="setInboxFilter('sent')" id="inbox-filter-sent" class="inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5">
+                <span>📤 Sent</span>
+                <span id="tab-count-sent" class="px-1.5 py-0.2 text-[10px] rounded-full bg-emerald-500/20 text-emerald-300">0</span>
+              </button>
             </div>
           </div>
 
@@ -2687,21 +3086,21 @@ DASHBOARD_HTML = r"""
           </div>
 
           <!-- 2-Column Split: Left Note List, Right Markdown Reader/Editor -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[640px]">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[640px] min-h-0">
             
             <!-- Left: Notes List -->
-            <div class="lg:col-span-5 theme-card border rounded-2xl p-4 flex flex-col h-full overflow-hidden">
-              <div class="flex items-center justify-between pb-3 border-b border-white/5 text-xs font-mono">
+            <div class="lg:col-span-5 theme-card border rounded-2xl p-4 flex flex-col h-full overflow-hidden min-h-0">
+              <div class="flex items-center justify-between pb-3 border-b border-white/5 text-xs font-mono flex-shrink-0">
                 <span class="text-slate-400 uppercase font-bold">Markdown Documents</span>
                 <span id="obsidian-notes-list-count" class="text-[11px] text-purple-400 font-bold">0</span>
               </div>
-              <div class="flex-1 overflow-y-auto space-y-2 pt-3 pr-1" id="obsidian-notes-list-container">
+              <div class="flex-1 overflow-y-auto space-y-2 pt-3 pr-1 min-h-0" id="obsidian-notes-list-container">
                 <div class="p-8 text-center text-xs text-slate-500 font-mono">Loading notes...</div>
               </div>
             </div>
 
             <!-- Right: Note Viewer / Editor -->
-            <div class="lg:col-span-7 theme-card border rounded-2xl p-5 flex flex-col h-full overflow-hidden relative">
+            <div class="lg:col-span-7 theme-card border rounded-2xl p-5 flex flex-col h-full overflow-hidden relative min-h-0">
               <div id="obsidian-empty-view" class="flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-400 space-y-2">
                 <i data-lucide="file-text" class="w-10 h-10 text-purple-400/40"></i>
                 <div class="text-sm font-semibold text-white">Select a note to preview</div>
@@ -2709,7 +3108,7 @@ DASHBOARD_HTML = r"""
               </div>
 
               <!-- Active Note Content View -->
-              <div id="obsidian-active-view" class="hidden flex-1 flex flex-col h-full overflow-hidden space-y-3">
+              <div id="obsidian-active-view" class="hidden flex-1 flex flex-col h-full overflow-hidden space-y-3 min-h-0">
                 <!-- Note Title & Toolbar -->
                 <div class="flex items-center justify-between pb-3 border-b border-white/5 flex-shrink-0">
                   <div class="space-y-0.5 min-w-0 flex-1 pr-3">
@@ -2753,7 +3152,7 @@ DASHBOARD_HTML = r"""
                 </div>
 
                 <!-- Markdown Content Display Area -->
-                <div id="obsidian-markdown-body" class="flex-1 overflow-y-auto p-4 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap"></div>
+                <div id="obsidian-markdown-body" class="flex-1 overflow-y-auto p-6 rounded-2xl theme-card border theme-border prose-chat select-text min-h-0"></div>
               </div>
             </div>
           </div>
@@ -2797,7 +3196,7 @@ DASHBOARD_HTML = r"""
           </div>
 
           <!-- 2-Column Calendar Layout: Left Month Grid, Right Upcoming Agenda -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0">
             
             <!-- Left 7x5 Interactive Grid -->
             <div class="lg:col-span-8 theme-card border rounded-2xl p-5 space-y-3">
@@ -2819,8 +3218,8 @@ DASHBOARD_HTML = r"""
             </div>
 
             <!-- Right: Upcoming Events Agenda Feed -->
-            <div class="lg:col-span-4 theme-card border rounded-2xl p-5 flex flex-col h-full space-y-3">
-              <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="lg:col-span-4 theme-card border rounded-2xl p-5 flex flex-col h-full space-y-3 min-h-0">
+              <div class="flex items-center justify-between pb-2 border-b border-white/5 flex-shrink-0">
                 <div class="flex items-center space-x-2">
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                   <span class="text-xs font-mono uppercase font-bold text-slate-300">Agenda & Festivals</span>
@@ -2829,7 +3228,7 @@ DASHBOARD_HTML = r"""
               </div>
 
               <!-- Quick Filter Pills -->
-              <div class="flex items-center space-x-1 overflow-x-auto pb-1 text-[11px] font-mono select-none">
+              <div class="flex items-center space-x-1 overflow-x-auto pb-1 text-[11px] font-mono select-none flex-shrink-0">
                 <button onclick="setCalendarFilter('all')" id="cal-filter-btn-all" class="px-2.5 py-1 rounded-lg bg-amber-500 text-black font-bold cursor-pointer transition">All</button>
                 <button onclick="setCalendarFilter('schedule')" id="cal-filter-btn-schedule" class="px-2.5 py-1 rounded-lg bg-black/40 border theme-border text-slate-300 hover:text-white cursor-pointer transition">My Schedule</button>
                 <button onclick="setCalendarFilter('festival')" id="cal-filter-btn-festival" class="px-2.5 py-1 rounded-lg bg-purple-600/30 border border-purple-500/30 text-purple-300 hover:text-white cursor-pointer transition">🎉 Festivals</button>
@@ -2837,7 +3236,7 @@ DASHBOARD_HTML = r"""
               </div>
 
               <!-- Agenda Events Scroll Feed -->
-              <div class="flex-1 overflow-y-auto space-y-2.5 max-h-[500px] pr-1" id="calendar-agenda-stream">
+              <div class="flex-1 overflow-y-auto space-y-2.5 max-h-[500px] pr-1 min-h-0" id="calendar-agenda-stream">
                 <div class="p-8 text-center text-xs text-slate-500 font-mono">Loading schedule & festivals...</div>
               </div>
             </div>
@@ -2984,7 +3383,7 @@ DASHBOARD_HTML = r"""
               </div>
 
               <!-- Rendered Markdown & Mermaid Container -->
-              <div id="research-dossier-content" class="space-y-4 text-xs text-slate-200 leading-relaxed font-sans select-text">
+              <div id="research-dossier-content" class="space-y-4 prose-chat select-text">
                 <div class="p-12 text-center text-slate-500 font-mono space-y-2">
                   <i data-lucide="microscope" class="w-8 h-8 text-slate-600 mx-auto"></i>
                   <p>Enter a technical topic above to begin multi-step autonomous research.</p>
@@ -3176,6 +3575,42 @@ DASHBOARD_HTML = r"""
             <div class="w-full h-6 rounded-lg bg-gradient-to-r from-[#bd93f9] via-[#ff79c6] to-[#50fa7b] mb-1.5"></div>
             <div class="font-bold text-xs">Dracula Abyss</div>
             <div class="text-[10px] text-purple-300 font-mono">Vampire Dusk</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2.5: Architectural Shadow & Contrast Depth Engine -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-300">
+            <i data-lucide="box" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>📐 Architectural Shadow & Tactile Contrast Engine</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono">Customizable live tactile slab depth</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- 1. Hard Offset (Old Regime Swiss) -->
+          <button onclick="setShadowStyle('hard-offset'); playCyberClick();" data-shadow-style="hard-offset" class="shadow-style-btn p-3 rounded-xl border text-left transition cursor-pointer theme-card border-indigo-500 bg-indigo-600/30 text-white">
+            <div class="font-bold text-xs">Old Regime Offset</div>
+            <div class="text-[10px] text-indigo-300 font-mono">3px Hard / 5px Hover</div>
+          </button>
+
+          <!-- 2. Deep Bold Brutalist -->
+          <button onclick="setShadowStyle('deep-bold'); playCyberClick();" data-shadow-style="deep-bold" class="shadow-style-btn p-3 rounded-xl border text-left transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white">
+            <div class="font-bold text-xs">Deep Brutalist</div>
+            <div class="text-[10px] text-slate-400 font-mono">5px Hard / 7px Hover</div>
+          </button>
+
+          <!-- 3. Hybrid Ambient -->
+          <button onclick="setShadowStyle('hybrid'); playCyberClick();" data-shadow-style="hybrid" class="shadow-style-btn p-3 rounded-xl border text-left transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white">
+            <div class="font-bold text-xs">Hybrid Bloom</div>
+            <div class="text-[10px] text-slate-400 font-mono">3px Offset + Bloom</div>
+          </button>
+
+          <!-- 4. Subtle Hairline -->
+          <button onclick="setShadowStyle('subtle'); playCyberClick();" data-shadow-style="subtle" class="shadow-style-btn p-3 rounded-xl border text-left transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white">
+            <div class="font-bold text-xs">Fine Hairline</div>
+            <div class="text-[10px] text-slate-400 font-mono">1.5px Crisp Outline</div>
           </button>
         </div>
       </div>
@@ -3881,22 +4316,22 @@ DASHBOARD_HTML = r"""
 
   <!-- ─── 5.10 AI EMAIL STUDIO & COMPOSE MODAL ───────────────────────── -->
   <div id="ai-compose-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;">
-    <div class="theme-modal max-w-2xl w-full p-6 rounded-2xl border space-y-4 shadow-2xl overflow-y-auto max-h-[92vh]">
+    <div class="w-full max-w-2xl theme-bg-surface border theme-border rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-y-auto max-h-[92vh]">
       <!-- Header -->
       <div class="flex items-center justify-between border-b theme-border pb-3">
         <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-cyan-500/20">
+          <div class="w-8 h-8 rounded-xl btn-brand-primary flex items-center justify-center shadow-md">
             <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
           </div>
           <div>
-            <h3 class="text-sm font-bold text-white font-display flex items-center space-x-2">
+            <h3 class="text-sm font-bold theme-text-main font-display flex items-center space-x-2">
               <span>AI Email Studio & Smart Composer</span>
-              <span class="px-2 py-0.5 rounded-md text-[9px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">Qwen 2.5 Copilot</span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-mono theme-card border theme-border theme-text-brand font-semibold">AI Copilot</span>
             </h3>
-            <p class="text-[11px] text-slate-400 font-mono">Compose, refine, and dispatch professional emails with local AI generation.</p>
+            <p class="text-[11px] theme-text-muted font-mono">Compose, refine, and dispatch professional emails with local AI generation.</p>
           </div>
         </div>
-        <button onclick="closeAiComposeModal()" class="text-slate-400 hover:text-white transition cursor-pointer p-1">
+        <button onclick="closeAiComposeModal()" class="theme-text-muted hover:theme-text-main transition cursor-pointer p-1">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
@@ -3905,54 +4340,54 @@ DASHBOARD_HTML = r"""
       <div class="space-y-2 text-xs">
         <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <label class="font-mono text-[11px] text-slate-300">To (Recipient Email):</label>
-            <div class="flex items-center space-x-1 font-mono text-[10px] text-slate-400">
+            <label class="font-mono text-[11px] theme-text-main font-medium">To (Recipient Email):</label>
+            <div class="flex items-center space-x-1 font-mono text-[10px] theme-text-muted">
               <span>Quick:</span>
-              <button onclick="setComposeRecipient('rahul@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Rahul</button>
-              <button onclick="setComposeRecipient('sarah.j@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Sarah</button>
-              <button onclick="setComposeRecipient('jashanjashan372@gmail.com')" type="button" class="px-1.5 py-0.5 rounded bg-white/5 hover:bg-cyan-500/20 hover:text-cyan-300 transition text-slate-300">Jashan</button>
+              <button onclick="setComposeRecipient('rahul@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Rahul</button>
+              <button onclick="setComposeRecipient('sarah.j@techcorp.io')" type="button" class="px-1.5 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Sarah</button>
+              <button onclick="setComposeRecipient('jashanjashan372@gmail.com')" type="button" class="px-1.5 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Jashan</button>
             </div>
           </div>
-          <input type="email" id="compose-to" placeholder="recipient@example.com" class="w-full bg-black/40 border theme-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-cyan-400" />
+          <input type="email" id="compose-to" placeholder="recipient@example.com" class="w-full theme-card border theme-border rounded-xl px-3 py-2 text-xs theme-text-main placeholder-slate-400 font-mono focus:outline-none focus:border-brand" />
         </div>
 
         <!-- Subject Line -->
         <div class="space-y-1">
-          <label class="font-mono text-[11px] text-slate-300">Subject Line:</label>
-          <input type="text" id="compose-subject" placeholder="e.g. Project Update & Next Steps" class="w-full bg-black/40 border theme-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-cyan-400" />
+          <label class="font-mono text-[11px] theme-text-main font-medium">Subject Line:</label>
+          <input type="text" id="compose-subject" placeholder="e.g. Project Update & Next Steps" class="w-full theme-card border theme-border rounded-xl px-3 py-2 text-xs theme-text-main placeholder-slate-400 font-mono focus:outline-none focus:border-brand" />
         </div>
 
         <!-- AI Assistant Assistance Card -->
-        <div class="p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-2.5">
+        <div class="p-3.5 rounded-xl theme-card border theme-border space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-cyan-300 flex items-center space-x-1.5">
+            <span class="text-[11px] font-bold theme-text-brand flex items-center space-x-1.5">
               <i data-lucide="bot" class="w-3.5 h-3.5"></i>
               <span>AI Writing Directives & Intent</span>
             </span>
             <!-- Tone selector -->
             <div class="flex items-center space-x-1 text-[10px] font-mono" id="compose-tone-selector">
-              <button onclick="setComposeTone('professional')" id="tone-btn-professional" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md bg-cyan-500/30 text-cyan-200 border border-cyan-500/50 font-bold transition">Professional</button>
-              <button onclick="setComposeTone('concise')" id="tone-btn-concise" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Concise</button>
-              <button onclick="setComposeTone('friendly')" id="tone-btn-friendly" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Friendly</button>
-              <button onclick="setComposeTone('urgent')" id="tone-btn-urgent" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Urgent</button>
-              <button onclick="setComposeTone('executive')" id="tone-btn-executive" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition">Executive</button>
+              <button onclick="setComposeTone('professional')" id="tone-btn-professional" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md btn-brand-primary text-white font-bold transition">Professional</button>
+              <button onclick="setComposeTone('concise')" id="tone-btn-concise" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card border theme-border theme-text-muted hover:theme-text-main transition">Concise</button>
+              <button onclick="setComposeTone('friendly')" id="tone-btn-friendly" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card border theme-border theme-text-muted hover:theme-text-main transition">Friendly</button>
+              <button onclick="setComposeTone('urgent')" id="tone-btn-urgent" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card border theme-border theme-text-muted hover:theme-text-main transition">Urgent</button>
+              <button onclick="setComposeTone('executive')" id="tone-btn-executive" type="button" class="compose-tone-btn px-2 py-0.5 rounded-md theme-card border theme-border theme-text-muted hover:theme-text-main transition">Executive</button>
             </div>
           </div>
 
-          <textarea id="compose-ai-prompt" rows="2" placeholder="Tell AI what to write (e.g. Follow up on yesterday's architecture sync, confirm RAG pipeline status, and ask for a 15-min call tomorrow afternoon)" class="w-full bg-black/50 border border-indigo-500/20 rounded-xl p-2.5 text-xs text-white placeholder-slate-400 font-sans focus:outline-none focus:border-cyan-400 resize-none"></textarea>
+          <textarea id="compose-ai-prompt" rows="2" placeholder="Tell AI what to write (e.g. Follow up on yesterday's architecture sync, confirm RAG pipeline status, and ask for a 15-min call tomorrow afternoon)" class="w-full theme-bg-surface border theme-border rounded-xl p-2.5 text-xs theme-text-main placeholder-slate-400 font-sans focus:outline-none focus:border-brand resize-none"></textarea>
 
           <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5">
             <!-- Quick Intent Pills -->
-            <div class="flex items-center space-x-1 overflow-x-auto text-[10px] font-mono text-slate-400">
-              <span class="text-slate-500">Preset:</span>
-              <button onclick="setComposeIntent('Follow up on our previous discussion and check if you have any questions on the proposal.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Follow Up</button>
-              <button onclick="setComposeIntent('Propose a 30-minute sync meeting this week to review project milestones and sprint goals.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Meeting Request</button>
-              <button onclick="setComposeIntent('Provide a status report on the Personal AI OS deployment, test results, and next deliverables.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Project Update</button>
-              <button onclick="setComposeIntent('Thank you for the productive meeting and sharing the helpful documentation.')" type="button" class="px-2 py-0.5 rounded bg-white/5 hover:bg-indigo-600/30 hover:text-cyan-300 text-slate-300 transition">Thank You</button>
+            <div class="flex items-center space-x-1 overflow-x-auto text-[10px] font-mono theme-text-muted">
+              <span>Preset:</span>
+              <button onclick="setComposeIntent('Follow up on our previous discussion and check if you have any questions on the proposal.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Follow Up</button>
+              <button onclick="setComposeIntent('Propose a 30-minute sync meeting this week to review project milestones and sprint goals.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Meeting Request</button>
+              <button onclick="setComposeIntent('Provide a status report on the Personal AI OS deployment, test results, and next deliverables.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Project Update</button>
+              <button onclick="setComposeIntent('Thank you for the productive meeting and sharing the helpful documentation.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Thank You</button>
             </div>
 
             <!-- Generate Button -->
-            <button id="btn-generate-ai-compose" onclick="generateAiComposeDraft()" type="button" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition active:scale-95">
+            <button id="btn-generate-ai-compose" onclick="generateAiComposeDraft()" type="button" class="px-3.5 py-1.5 rounded-xl btn-brand-primary font-bold text-xs flex items-center space-x-1.5 cursor-pointer shadow-md transition active:scale-95">
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
               <span id="btn-generate-ai-text">✨ Generate Draft</span>
             </button>
@@ -3962,18 +4397,18 @@ DASHBOARD_HTML = r"""
         <!-- Editable Draft Body Area -->
         <div class="space-y-1 pt-1">
           <div class="flex items-center justify-between">
-            <label class="font-mono text-[11px] text-slate-300">Message Body (Editable):</label>
-            <span id="compose-word-count" class="font-mono text-[10px] text-slate-500">0 words</span>
+            <label class="font-mono text-[11px] theme-text-main font-medium">Message Body (Editable):</label>
+            <span id="compose-word-count" class="font-mono text-[10px] theme-text-muted">0 words</span>
           </div>
-          <textarea id="compose-body" oninput="updateComposeWordCount()" rows="7" placeholder="Email body will appear here or you can type directly..." class="w-full bg-black/60 border theme-border rounded-xl p-3.5 text-xs text-slate-100 placeholder-slate-500 font-sans leading-relaxed focus:outline-none focus:border-cyan-400 resize-y"></textarea>
+          <textarea id="compose-body" oninput="updateComposeWordCount()" rows="7" placeholder="Email body will appear here or you can type directly..." class="w-full theme-card border theme-border rounded-xl p-3.5 text-xs theme-text-main placeholder-slate-400 font-sans leading-relaxed focus:outline-none focus:border-brand resize-y"></textarea>
         </div>
       </div>
 
       <!-- Action Buttons Footer -->
       <div class="flex items-center justify-between pt-2 border-t theme-border">
-        <button onclick="closeAiComposeModal()" class="px-4 py-2 rounded-xl theme-card border text-slate-300 text-xs hover:text-white cursor-pointer">Discard</button>
+        <button onclick="closeAiComposeModal()" class="px-4 py-2 rounded-xl theme-card border theme-border theme-text-muted hover:theme-text-main text-xs cursor-pointer transition">Discard</button>
         <div class="flex items-center space-x-2">
-          <button onclick="sendComposedEmail(true)" id="btn-compose-draft" class="px-4 py-2 rounded-xl theme-card border hover:border-amber-400 text-amber-300 text-xs flex items-center space-x-1.5 cursor-pointer transition">
+          <button onclick="sendComposedEmail(true)" id="btn-compose-draft" class="px-4 py-2 rounded-xl theme-card border theme-border hover:border-amber-400 text-amber-400 text-xs flex items-center space-x-1.5 cursor-pointer transition">
             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
             <span>Save as Draft</span>
           </button>
@@ -3988,12 +4423,12 @@ DASHBOARD_HTML = r"""
 
   <!-- ─── 5.11 QUICK-ACCESS SPOTLIGHT HUD MODAL (⌘K / CTRL+K) ───────── -->
   <div id="spotlight-modal" class="fixed inset-0 theme-modal-backdrop z-50 items-center justify-center p-4" style="display: none;" onclick="if(event.target===this) closeSpotlightModal()">
-    <div class="theme-modal max-w-2xl w-full p-4 rounded-2xl border border-cyan-500/30 bg-slate-950/95 backdrop-blur-2xl space-y-3 shadow-2xl shadow-cyan-500/10">
+    <div class="theme-modal theme-dropdown-menu max-w-2xl w-full p-4 rounded-2xl border space-y-3 shadow-2xl">
       <!-- Search Input Header -->
       <div class="relative flex items-center">
-        <i data-lucide="search" class="w-5 h-5 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-        <input type="text" id="spotlight-search-input" placeholder="Type a command, search notes & docs, or ask AI... (e.g. 'research vLLM', 'inbox', 'sync')" class="w-full pl-11 pr-20 py-3 rounded-xl bg-black/60 border border-white/10 text-sm text-white placeholder-slate-400 font-sans focus:outline-none focus:border-cyan-400 transition" oninput="handleSpotlightInput(this.value)" onkeydown="handleSpotlightKeydown(event)" autocomplete="off" />
-        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">ESC to close</span>
+        <i data-lucide="search" class="w-5 h-5 theme-text-brand absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <input type="text" id="spotlight-search-input" placeholder="Type a command, search notes & docs, or ask AI... (e.g. 'research vLLM', 'inbox', 'sync')" class="w-full pl-11 pr-28 py-3 rounded-xl border text-sm font-sans focus:outline-none transition" oninput="handleSpotlightInput(this.value)" onkeydown="handleSpotlightKeydown(event)" autocomplete="off" />
+        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono px-2 py-0.5 rounded bg-black/10 border theme-border theme-text-muted pointer-events-none select-none">ESC to close</span>
       </div>
 
       <!-- Live Search Results Categorized -->
@@ -4002,13 +4437,87 @@ DASHBOARD_HTML = r"""
       </div>
 
       <!-- Keyboard shortcuts legend -->
-      <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-white/10 pt-2 px-1">
+      <div class="flex items-center justify-between text-[10px] font-mono theme-text-muted border-t theme-border pt-2 px-1">
         <div class="flex items-center space-x-3">
-          <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">↓</kbd> Navigate</span>
-          <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">ENTER</kbd> Select</span>
+          <span><kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">↓</kbd> Navigate</span>
+          <span><kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">ENTER</kbd> Select</span>
         </div>
-        <span class="text-cyan-400">Personal AI OS Spotlight HUD</span>
+        <span class="theme-text-brand font-bold">Personal AI OS Spotlight HUD</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── 5.12 IMMERSIVE FULLSCREEN JARVIS VOICE CONVERSATION SUITE ────── -->
+  <div id="jarvis-voice-modal" class="fixed inset-0 flex flex-col justify-between p-6 sm:p-12 select-none" style="display: none; z-index: 999999 !important; background: radial-gradient(circle at 50% 35%, #181c2e 0%, #090c15 55%, #030408 100%) !important;">
+    
+    <!-- Top Bar: Ambient Title, Voice Status Indicator & Close Button -->
+    <div class="flex items-center justify-between w-full max-w-4xl mx-auto z-10 pt-2">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-3.5 h-3.5 rounded-full bg-rose-500 animate-ping" id="jarvis-voice-indicator-dot"></div>
+        <div class="space-y-0.5 text-left">
+          <div class="text-xs font-mono font-bold tracking-widest uppercase text-white" id="jarvis-voice-state-title">JARVIS LIVE VOICE</div>
+          <div class="text-[10px] font-mono text-cyan-400 flex items-center space-x-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            <span id="jarvis-active-voice-label">Hands-Free Speech Engine</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="cycleJarvisVoice(); playCyberClick();" id="btn-jarvis-voice-pill" style="border-radius: 9999px !important; border: 1px solid rgba(56,189,248,0.3) !important; background: rgba(56,189,248,0.15) !important;" class="px-3.5 py-1.5 text-cyan-300 text-xs font-mono flex items-center space-x-1.5 hover:bg-cyan-400/25 active:scale-95 transition cursor-pointer shadow" title="Click to Cycle Voice (Hazel / Susan / Zira / Jenny / Aria / Samantha)">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-300"></i>
+          <span id="jarvis-voice-pill-text">Female: Hazel</span>
+        </button>
+        <button onclick="closeJarvisVoiceModal(); playCyberClick();" style="border-radius: 9999px !important; border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.1) !important;" class="p-2.5 text-white hover:text-white transition cursor-pointer hover:scale-105 active:scale-95 shadow-md" title="Exit Voice Mode (ESC)">
+          <i data-lucide="x" class="w-5 h-5 text-white"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Stage: Massive 3D Glowing Organic Voice Orb & Live Subtitles -->
+    <div class="flex-1 flex flex-col items-center justify-center my-auto z-10 space-y-8 max-w-2xl mx-auto w-full text-center">
+      
+      <!-- Multi-Layer Fluid Glowing Dynamic Voice Reactor -->
+      <div class="relative flex items-center justify-center py-6">
+        <!-- Floating Fluid Aura Rays -->
+        <div class="absolute w-88 h-88 rounded-full blur-3xl opacity-50 transition-all duration-700 bg-gradient-to-tr from-cyan-500 via-indigo-600 to-rose-500" id="jarvis-glow-aura"></div>
+        
+        <!-- Animated Concentric Rings -->
+        <div class="jarvis-ring-outer w-80 h-80 border border-white/15 animate-ping opacity-25" id="jarvis-ring-ping"></div>
+        <div class="jarvis-ring-outer w-72 h-72 border-2 border-dashed border-cyan-400/40 animate-spin" style="animation-duration: 35s;" id="jarvis-ring-spin"></div>
+        
+        <!-- 3D Luminous Liquid Glowing Voice Sphere -->
+        <div id="jarvis-orb-sphere" class="jarvis-orb-sphere listening" onclick="handleJarvisOrbClick(); playCyberClick();" title="Click to Stop & Send Now">
+          <i data-lucide="mic" class="w-12 h-12 text-white drop-shadow-lg transition-transform duration-300 pointer-events-none" id="jarvis-core-icon"></i>
+        </div>
+      </div>
+
+      <!-- Real-Time Subtitle Stream (Streaming Live Voice Typography) -->
+      <div class="space-y-3 px-4 w-full min-h-[120px] flex flex-col items-center justify-center">
+        <div class="text-xs font-mono font-bold tracking-widest uppercase text-cyan-400" id="jarvis-transcript-role">
+          🎙️ Listening to you...
+        </div>
+        <p id="jarvis-live-transcript" class="text-xl sm:text-2xl font-sans font-medium text-white leading-relaxed select-text transition-all duration-200">
+          "Speak naturally... Sovereign Copilot will respond automatically."
+        </p>
+      </div>
+    </div>
+
+    <!-- Bottom Floating Action Bar -->
+    <div class="w-full max-w-md mx-auto flex items-center justify-center space-x-4 z-10 pb-4">
+      <button onclick="toggleJarvisMicManual(); playCyberClick();" id="btn-jarvis-mute" style="border-radius: 9999px !important; border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.12) !important;" class="px-6 py-3 text-white text-xs font-mono flex items-center space-x-2 transition cursor-pointer shadow-xl backdrop-blur-md hover:bg-white/20 active:scale-95">
+        <i data-lucide="mic" class="w-4 h-4 text-rose-400" id="icon-jarvis-mute"></i>
+        <span id="label-jarvis-mute" class="text-white font-medium">Mute Mic</span>
+      </button>
+
+      <button onclick="interruptJarvisSpeech(); playCyberClick();" id="btn-jarvis-interrupt" style="border-radius: 9999px !important; border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.12) !important;" class="px-6 py-3 text-white text-xs font-mono flex items-center space-x-2 transition cursor-pointer shadow-xl backdrop-blur-md hover:bg-white/20 active:scale-95">
+        <i data-lucide="square" class="w-3.5 h-3.5 text-rose-400"></i>
+        <span class="text-white font-medium">Interrupt</span>
+      </button>
+
+      <button onclick="closeJarvisVoiceModal(); playCyberClick();" style="border-radius: 9999px !important; border: 1px solid rgba(244,63,94,0.5) !important; background: rgba(225,29,72,0.9) !important;" class="p-3.5 text-white transition cursor-pointer shadow-xl shadow-rose-600/40 hover:bg-rose-600 active:scale-95" title="Exit Voice Mode">
+        <i data-lucide="phone-off" class="w-4 h-4 text-white"></i>
+      </button>
     </div>
   </div>
 
@@ -4024,9 +4533,45 @@ DASHBOARD_HTML = r"""
     const STORAGE_CRT = 'omarchy_crt_enabled';
     const STORAGE_AUDIO = 'omarchy_audio_enabled';
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
+    const STORAGE_SHADOW_STYLE = 'sovereign_shadow_style';
+
+    // ── Architectural Shadow Depth & Offset Customizer ──
+    function setShadowStyle(styleName, save = true) {
+      if (save) localStorage.setItem(STORAGE_SHADOW_STYLE, styleName);
+      
+      document.querySelectorAll('.shadow-style-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-shadow-style') === styleName;
+        if (isActive) {
+          btn.classList.add('border-indigo-500', 'bg-indigo-600/30', 'text-white');
+          btn.classList.remove('border-transparent', 'text-slate-300');
+        } else {
+          btn.classList.remove('border-indigo-500', 'bg-indigo-600/30', 'text-white');
+          btn.classList.add('border-transparent', 'text-slate-300');
+        }
+      });
+      
+      const root = document.documentElement;
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'sovereign-manifesto';
+      const isParchment = currentTheme === 'sovereign-manifesto';
+      const shadowColor = isParchment ? '#0a0a0a' : '#000000';
+
+      if (styleName === 'hard-offset') {
+        root.style.setProperty('--shadow-card', `3px 3px 0px ${shadowColor}`);
+        root.style.setProperty('--shadow-card-hover', `5px 5px 0px var(--color-brand), 0 0 0 1px ${shadowColor}`);
+      } else if (styleName === 'deep-bold') {
+        root.style.setProperty('--shadow-card', `5px 5px 0px ${shadowColor}`);
+        root.style.setProperty('--shadow-card-hover', `7px 7px 0px var(--color-brand), 0 0 0 1px ${shadowColor}`);
+      } else if (styleName === 'hybrid') {
+        root.style.setProperty('--shadow-card', `3px 3px 0px ${shadowColor}, 0 8px 20px -2px rgba(0,0,0,0.7)`);
+        root.style.setProperty('--shadow-card-hover', `5px 5px 0px var(--color-brand), 0 16px 36px -4px rgba(0,0,0,0.85)`);
+      } else if (styleName === 'subtle') {
+        root.style.setProperty('--shadow-card', `1.5px 1.5px 0px ${shadowColor}`);
+        root.style.setProperty('--shadow-card-hover', `3px 3px 0px var(--color-brand), 0 0 0 1px ${shadowColor}`);
+      }
+    }
 
     function initThemeState() {
-      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'sovereign-slate';
+      const savedTheme = localStorage.getItem(STORAGE_THEME) || 'sovereign-manifesto';
       document.documentElement.setAttribute('data-theme', savedTheme);
       if (savedTheme === 'custom') {
         const savedCustom = localStorage.getItem('sovereign_custom_theme');
@@ -4036,31 +4581,16 @@ DASHBOARD_HTML = r"""
           } catch(e) {}
         }
       }
+      const savedShadowStyle = localStorage.getItem(STORAGE_SHADOW_STYLE) || 'hard-offset';
+      setShadowStyle(savedShadowStyle, false);
     }
 
-    // ── Old Regime Lenis Inertial Momentum Smooth Scrolling ──
+    // ── Old Regime Smooth Scrolling & Reset Protocol ──
     function initLenisSmoothScroll() {
-      try {
-        const scrollContainer = document.getElementById('main-content-scroll');
-        if (scrollContainer && typeof Lenis !== 'undefined') {
-          window.__lenis = new Lenis({
-            wrapper: scrollContainer,
-            content: scrollContainer.firstElementChild || scrollContainer,
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            touchMultiplier: 2,
-          });
-          function raf(time) {
-            if (window.__lenis) window.__lenis.raf(time);
-            requestAnimationFrame(raf);
-          }
-          requestAnimationFrame(raf);
-        }
-      } catch (err) {
-        console.warn('[Lenis] Init error:', err);
+      // Native smooth scrolling enabled via CSS without wheel hijacking
+      const scrollContainer = document.getElementById('main-content-scroll');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0;
       }
     }
 
@@ -4304,7 +4834,39 @@ DASHBOARD_HTML = r"""
     }
 
     // ── Theme Switcher Engine ──
+    function clearCustomThemeInlineStyles() {
+      const root = document.documentElement;
+      const customProps = [
+        '--rgb-base',
+        '--rgb-sidebar',
+        '--rgb-surface',
+        '--rgb-card',
+        '--rgb-card-hover',
+        '--bg-base',
+        '--bg-sidebar',
+        '--bg-surface',
+        '--bg-card',
+        '--bg-card-hover',
+        '--color-brand',
+        '--color-brand-hover',
+        '--color-accent',
+        '--text-main',
+        '--border-main',
+        '--border-accent',
+        '--glow-shadow',
+        '--waybar-bg',
+        '--shadow-card',
+        '--shadow-card-hover',
+        '--bevel-highlight',
+        '--bevel-highlight-hover'
+      ];
+      customProps.forEach(prop => root.style.removeProperty(prop));
+    }
+
     function setThemePreset(themeName) {
+      if (themeName !== 'custom') {
+        clearCustomThemeInlineStyles();
+      }
       document.documentElement.setAttribute('data-theme', themeName);
       localStorage.setItem(STORAGE_THEME, themeName);
       
@@ -4333,6 +4895,9 @@ DASHBOARD_HTML = r"""
             applyCustomThemeVariables(JSON.parse(savedCustom));
           } catch(e) {}
         }
+      } else {
+        const savedShadowStyle = localStorage.getItem(STORAGE_SHADOW_STYLE) || 'hard-offset';
+        setShadowStyle(savedShadowStyle, false);
       }
       
       const label = document.getElementById('current-theme-label');
@@ -4518,14 +5083,34 @@ DASHBOARD_HTML = r"""
       closeThemeModal();
     }
 
+    function hexToRgbString(hex) {
+      if (!hex) return '13, 16, 23';
+      let c = hex.replace(/^#/, '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      if (c.length !== 6) return '13, 16, 23';
+      const num = parseInt(c, 16);
+      return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+    }
+
     function applyCustomThemeVariables(themeObj) {
       if (!themeObj) return;
       const root = document.documentElement;
       
-      root.style.setProperty('--bg-base', themeObj.bg_base);
-      root.style.setProperty('--bg-sidebar', themeObj.bg_sidebar);
-      root.style.setProperty('--bg-surface', themeObj.bg_card);
-      root.style.setProperty('--bg-card', themeObj.bg_card);
+      const rgbBase = hexToRgbString(themeObj.bg_base);
+      const rgbSidebar = hexToRgbString(themeObj.bg_sidebar);
+      const rgbCard = hexToRgbString(themeObj.bg_card);
+
+      root.style.setProperty('--rgb-base', rgbBase);
+      root.style.setProperty('--rgb-sidebar', rgbSidebar);
+      root.style.setProperty('--rgb-surface', rgbCard);
+      root.style.setProperty('--rgb-card', rgbCard);
+      root.style.setProperty('--rgb-card-hover', rgbCard);
+
+      root.style.setProperty('--bg-base', `rgb(${rgbBase})`);
+      root.style.setProperty('--bg-sidebar', `rgba(${rgbSidebar}, var(--sidebar-opacity))`);
+      root.style.setProperty('--bg-surface', `rgba(${rgbCard}, var(--surface-opacity))`);
+      root.style.setProperty('--bg-card', `rgba(${rgbCard}, var(--card-opacity))`);
+      root.style.setProperty('--bg-card-hover', `rgba(${rgbCard}, calc(var(--card-opacity) + 0.1))`);
       root.style.setProperty('--color-brand', themeObj.color_brand);
       root.style.setProperty('--color-brand-hover', themeObj.color_brand);
       root.style.setProperty('--color-accent', themeObj.color_accent);
@@ -4533,7 +5118,7 @@ DASHBOARD_HTML = r"""
       root.style.setProperty('--border-main', themeObj.border_main);
       root.style.setProperty('--border-accent', themeObj.color_brand);
       root.style.setProperty('--glow-shadow', `0 4px 20px -2px ${themeObj.color_brand}40`);
-      root.style.setProperty('--waybar-bg', themeObj.bg_sidebar);
+      root.style.setProperty('--waybar-bg', `rgba(${rgbSidebar}, var(--sidebar-opacity))`);
       root.style.setProperty('--shadow-card', `0 2px 10px -2px rgba(0, 0, 0, 0.4), 0 14px 32px -4px ${themeObj.color_brand}18`);
       root.style.setProperty('--shadow-card-hover', `0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -6px ${themeObj.color_brand}30`);
       root.style.setProperty('--bevel-highlight', `inset 0 1px 0 0 rgba(255, 255, 255, 0.08)`);
@@ -5056,6 +5641,238 @@ DASHBOARD_HTML = r"""
       }
     }, 1000);
 
+    // ── Ambient Focus Audio Generator (Pure Web Audio Synthesizer) ──
+    let ambientAudioContext = null;
+    let ambientNodes = {};
+    let ambientIsPlaying = false;
+    let ambientPreset = 'rain';
+    let ambientVolume = 0.3;
+
+    function initAmbientAudio() {
+      if (!ambientAudioContext && typeof AudioContext !== 'undefined') {
+        ambientAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function toggleAmbientAudioDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('menu-ambient-audio');
+      if (!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      closeQuickSettingsMenu();
+      if (isHidden) {
+        menu.classList.remove('hidden');
+      } else {
+        menu.classList.add('hidden');
+      }
+      refreshIcons();
+    }
+
+    function closeAmbientAudioDropdown() {
+      const menu = document.getElementById('menu-ambient-audio');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    function toggleAmbientPlayback() {
+      if (ambientIsPlaying) {
+        stopAmbientSoundscape();
+      } else {
+        startAmbientSoundscape();
+      }
+    }
+
+    function selectAmbientPreset(presetKey) {
+      ambientPreset = presetKey;
+      document.querySelectorAll('.ambient-option-btn').forEach(b => {
+        b.className = 'ambient-option-btn w-full px-2.5 py-1.5 rounded-xl text-left text-xs flex items-center justify-between hover:bg-white/10 transition cursor-pointer text-slate-300';
+      });
+      const activeBtn = document.getElementById(`ambient-preset-${presetKey}`);
+      if (activeBtn) {
+        activeBtn.className = 'ambient-option-btn w-full px-2.5 py-1.5 rounded-xl text-left text-xs flex items-center justify-between hover:bg-white/10 transition cursor-pointer text-cyan-300 bg-white/5 border theme-border';
+      }
+      if (ambientIsPlaying) {
+        stopAmbientSoundscape();
+        startAmbientSoundscape();
+      }
+    }
+
+    function setAmbientVolume(val) {
+      ambientVolume = val / 100;
+      const label = document.getElementById('label-ambient-volume');
+      if (label) label.textContent = `${val}%`;
+      if (ambientNodes.gainNode && ambientAudioContext) {
+        ambientNodes.gainNode.gain.setValueAtTime(ambientVolume, ambientAudioContext.currentTime);
+      }
+    }
+
+    function startAmbientSoundscape() {
+      initAmbientAudio();
+      if (ambientAudioContext.state === 'suspended') {
+        ambientAudioContext.resume();
+      }
+      stopAmbientSoundscape();
+
+      const masterGain = ambientAudioContext.createGain();
+      masterGain.gain.setValueAtTime(ambientVolume, ambientAudioContext.currentTime);
+      masterGain.connect(ambientAudioContext.destination);
+      ambientNodes.gainNode = masterGain;
+
+      if (ambientPreset === 'rain') {
+        // Generative Rain + Soft Drone
+        const bufferSize = ambientAudioContext.sampleRate * 2;
+        const noiseBuffer = ambientAudioContext.createBuffer(1, bufferSize, ambientAudioContext.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.02 * white)) / 1.02; // Pink-ish noise filter
+          lastOut = output[i];
+          output[i] *= 3.5;
+        }
+        const whiteNoise = ambientAudioContext.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        const filter = ambientAudioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, ambientAudioContext.currentTime);
+
+        whiteNoise.connect(filter);
+        filter.connect(masterGain);
+        whiteNoise.start();
+        ambientNodes.sources = [whiteNoise];
+      } else if (ambientPreset === 'space') {
+        // Deep Space Resonant Harmonic Drone
+        const osc1 = ambientAudioContext.createOscillator();
+        const osc2 = ambientAudioContext.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(55, ambientAudioContext.currentTime); // A1 Sub
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(110.5, ambientAudioContext.currentTime); // Harmonic
+        osc1.connect(masterGain);
+        osc2.connect(masterGain);
+        osc1.start();
+        osc2.start();
+        ambientNodes.sources = [osc1, osc2];
+      } else if (ambientPreset === 'alpha') {
+        // Binaural Alpha Beats (432Hz Carrier, 10Hz Alpha Differential)
+        const leftOsc = ambientAudioContext.createOscillator();
+        const rightOsc = ambientAudioContext.createOscillator();
+        leftOsc.type = 'sine';
+        leftOsc.frequency.setValueAtTime(216, ambientAudioContext.currentTime);
+        rightOsc.type = 'sine';
+        rightOsc.frequency.setValueAtTime(226, ambientAudioContext.currentTime); // 10Hz Alpha
+        leftOsc.connect(masterGain);
+        rightOsc.connect(masterGain);
+        leftOsc.start();
+        rightOsc.start();
+        ambientNodes.sources = [leftOsc, rightOsc];
+      }
+
+      ambientIsPlaying = true;
+      const playBtn = document.getElementById('btn-ambient-playpause');
+      if (playBtn) playBtn.textContent = 'Pause';
+      const dot = document.getElementById('dot-ambient-playing');
+      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+    }
+
+    function stopAmbientSoundscape() {
+      if (ambientNodes.sources) {
+        ambientNodes.sources.forEach(s => {
+          try { s.stop(); } catch(e) {}
+        });
+        ambientNodes.sources = [];
+      }
+      ambientIsPlaying = false;
+      const playBtn = document.getElementById('btn-ambient-playpause');
+      if (playBtn) playBtn.textContent = 'Play';
+      const dot = document.getElementById('dot-ambient-playing');
+      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-slate-500';
+    }
+
+    // ── Focus / Pomodoro Timer ──
+    let pomodoroSecondsLeft = 25 * 60;
+    let pomodoroInterval = null;
+    let pomodoroIsRunning = false;
+
+    function togglePomodoroTimer() {
+      if (pomodoroIsRunning) {
+        clearInterval(pomodoroInterval);
+        pomodoroIsRunning = false;
+        const icon = document.getElementById('icon-pomodoro-play');
+        if (icon) icon.setAttribute('data-lucide', 'play');
+      } else {
+        pomodoroInterval = setInterval(() => {
+          if (pomodoroSecondsLeft > 0) {
+            pomodoroSecondsLeft--;
+            renderPomodoroTimer();
+          } else {
+            clearInterval(pomodoroInterval);
+            pomodoroIsRunning = false;
+            playHudBeep(1400);
+            setTimeout(() => playHudBeep(1800), 200);
+            showSystemToast('Focus Session Complete! Take a 5-minute break.', 'success');
+            resetPomodoroTimer();
+          }
+        }, 1000);
+        pomodoroIsRunning = true;
+        const icon = document.getElementById('icon-pomodoro-play');
+        if (icon) icon.setAttribute('data-lucide', 'pause');
+      }
+      refreshIcons();
+    }
+
+    function resetPomodoroTimer() {
+      clearInterval(pomodoroInterval);
+      pomodoroIsRunning = false;
+      pomodoroSecondsLeft = 25 * 60;
+      renderPomodoroTimer();
+      const icon = document.getElementById('icon-pomodoro-play');
+      if (icon) icon.setAttribute('data-lucide', 'play');
+      refreshIcons();
+    }
+
+    function renderPomodoroTimer() {
+      const el = document.getElementById('nav-pomodoro-timer');
+      if (!el) return;
+      const mins = Math.floor(pomodoroSecondsLeft / 60);
+      const secs = pomodoroSecondsLeft % 60;
+      el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // ── Quick Settings & Dropdown Handlers ──
+    function toggleQuickSettingsMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('nav-quick-settings-menu');
+      if (!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      closeAmbientAudioDropdown();
+      if (isHidden) {
+        menu.classList.remove('hidden');
+      } else {
+        menu.classList.add('hidden');
+      }
+      refreshIcons();
+    }
+
+    function closeQuickSettingsMenu() {
+      const menu = document.getElementById('nav-quick-settings-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#nav-ambient-audio-container')) {
+        closeAmbientAudioDropdown();
+      }
+      if (!e.target.closest('#nav-quick-settings-container')) {
+        closeQuickSettingsMenu();
+      }
+      if (!e.target.closest('#trace-simulate-container')) {
+        const simMenu = document.getElementById('trace-simulate-menu');
+        if (simMenu) simMenu.classList.add('hidden');
+      }
+    });
+
     // ── Navigation & Workspace Switching ──
     function switchTab(tabId) {
       const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'obsidian', 'calendar', 'activity', 'system', 'research', 'documents'];
@@ -5078,6 +5895,9 @@ DASHBOARD_HTML = r"""
           else ws.classList.remove('active');
         }
       });
+
+      closeAmbientAudioDropdown();
+      closeQuickSettingsMenu();
 
       const breadcrumb = document.getElementById('page-breadcrumb');
       if (breadcrumb) {
@@ -5130,8 +5950,9 @@ DASHBOARD_HTML = r"""
         fetchIngestedDocuments();
       }
       refreshIcons();
-      if (window.__lenis) {
-        try { window.__lenis.scrollTo(0, { immediate: true }); } catch (e) {}
+      const scrollContainer = document.getElementById('main-content-scroll');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0;
       }
 
     }
@@ -5323,16 +6144,14 @@ DASHBOARD_HTML = r"""
 
       if (messages.length === 0) {
         box.innerHTML = `
-          <div class="flex items-start space-x-3">
-            <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-shrink-0">
-              <i data-lucide="bot" class="w-4 h-4"></i>
+          <div class="h-full flex flex-col items-center justify-center text-center p-8 space-y-3 my-auto">
+            <div class="w-12 h-12 rounded-2xl btn-brand-primary flex items-center justify-center text-white shadow-lg mb-1">
+              <i data-lucide="bot" class="w-6 h-6"></i>
             </div>
-            <div class="p-4 rounded-2xl bg-black/40 border theme-border max-w-2xl space-y-2">
-              <div class="text-xs font-semibold text-cyan-300">Personal AI</div>
-              <p class="text-xs text-slate-200 leading-relaxed font-sans">
-                Greetings! How can I assist you in this conversation?
-              </p>
-            </div>
+            <h2 class="text-base font-bold text-main">How can Sovereign Copilot help you today?</h2>
+            <p class="text-xs theme-text-muted max-w-md leading-relaxed">
+              Ask about your Obsidian knowledge vault, run multi-agent DAG pipelines, conduct deep web research, or automate inbox triage.
+            </p>
           </div>
         `;
         refreshIcons();
@@ -5352,20 +6171,16 @@ DASHBOARD_HTML = r"""
 
     function createUserMessageBubble(text) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'flex items-start justify-end space-x-3 group';
+      wrapper.className = 'flex justify-end my-4 group w-full';
       wrapper.innerHTML = `
-        <div class="user-bubble p-4 rounded-2xl text-white max-w-2xl space-y-1.5 relative shadow-md">
-          <div class="flex items-center justify-between border-b border-white/20 pb-1">
-            <span class="text-[10px] font-mono text-white/90 font-bold">You</span>
-            <button onclick="copyMessageText(this)" title="Copy message" class="copy-btn text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/20 hover:bg-black/40 text-white/90 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
+        <div class="user-bubble max-w-[85%] md:max-w-2xl p-4 rounded-2xl rounded-tr-md shadow-sm relative group space-y-1">
+          <p class="text-[14px] leading-relaxed whitespace-pre-wrap select-text font-sans">${escapeHtml(text)}</p>
+          <div class="flex justify-end pt-1 opacity-0 group-hover:opacity-100 transition">
+            <button onclick="copyMessageText(this)" title="Copy message" class="copy-btn text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20 hover:bg-black/40 text-white/90 border border-white/10 flex items-center space-x-1 cursor-pointer transition">
               <i data-lucide="copy" class="w-2.5 h-2.5"></i>
               <span>Copy</span>
             </button>
           </div>
-          <p class="text-xs leading-relaxed whitespace-pre-wrap select-text msg-content">${escapeHtml(text)}</p>
-        </div>
-        <div class="w-8 h-8 rounded-xl bg-slate-700/80 flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-          <i data-lucide="user" class="w-4 h-4"></i>
         </div>
       `;
       return wrapper;
@@ -5373,36 +6188,33 @@ DASHBOARD_HTML = r"""
 
     function createAssistantMessageBubble(text = '', tool = null, runId = null) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'flex items-start space-x-3 group';
+      wrapper.className = 'flex items-start space-x-3.5 my-4 group max-w-4xl w-full';
       wrapper.innerHTML = `
-        <div class="w-8 h-8 rounded-xl theme-avatar-bot flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-          <i data-lucide="bot" class="w-4 h-4"></i>
+        <div class="w-7 h-7 rounded-lg theme-avatar-bot flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
+          <i data-lucide="bot" class="w-3.5 h-3.5"></i>
         </div>
-        <div class="bubble-card theme-card p-4 rounded-2xl max-w-2xl space-y-2 relative shadow-sm">
-          <div class="flex items-center justify-between border-b theme-border pb-1.5">
-            <div class="text-xs font-semibold theme-text-brand flex items-center space-x-1.5">
-              <span>Sovereign Copilot</span>
-            </div>
-            <div class="flex items-center space-x-1.5">
-              <button onclick="speakMessageBubble(this)" title="Read message aloud (TTS)" class="speak-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-cyan-300 border theme-border flex items-center space-x-1 cursor-pointer transition">
-                <i data-lucide="volume-2" class="w-3 h-3 text-cyan-400"></i>
-                <span>Listen</span>
-              </button>
-              <button onclick="copyMessageText(this)" title="Copy message text" class="copy-btn text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border theme-border flex items-center space-x-1 cursor-pointer transition">
-                <i data-lucide="copy" class="w-3 h-3"></i>
-                <span>Copy</span>
-              </button>
-            </div>
+        <div class="bubble-card flex-1 min-w-0 space-y-2">
+          <div class="msg-content select-text prose-chat">
+            ${text ? formatMarkdownText(text) : ''}
           </div>
-          <div class="text-xs leading-relaxed msg-content select-text">${text ? formatMarkdownText(text) : ''}</div>
-          ${runId ? `
-            <div class="pt-2 flex items-center space-x-2 border-t theme-border">
-              <button onclick="inspectSpecificTrace('${runId}')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center space-x-1 cursor-pointer transition">
+          
+          <!-- Streamlined ChatGPT-style bottom toolbar -->
+          <div class="flex items-center space-x-2 pt-1 opacity-60 group-hover:opacity-100 transition text-[11px] font-mono theme-text-muted">
+            <button onclick="copyMessageText(this)" title="Copy response" class="copy-btn px-2 py-1 rounded hover:bg-white/10 hover:text-white transition cursor-pointer flex items-center space-x-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Copy</span>
+            </button>
+            <button onclick="speakMessageBubble(this)" title="Listen aloud (TTS)" class="speak-btn px-2 py-1 rounded hover:bg-white/10 hover:text-white transition cursor-pointer flex items-center space-x-1">
+              <i data-lucide="volume-2" class="w-3 h-3 theme-text-brand"></i>
+              <span>Listen</span>
+            </button>
+            ${runId ? `
+              <button onclick="inspectSpecificTrace('${runId}')" title="Inspect DAG Run" class="px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 transition cursor-pointer flex items-center space-x-1">
                 <i data-lucide="git-branch" class="w-3 h-3"></i>
-                <span>Inspect Trace (${runId})</span>
+                <span>Trace (${runId})</span>
               </button>
-            </div>
-          ` : ''}
+            ` : ''}
+          </div>
         </div>
       `;
       return wrapper;
@@ -5706,97 +6518,582 @@ DASHBOARD_HTML = r"""
       }
     }
 
-    // ── Speech Recognition (STT Voice Input) ──
-    let speechRecognition = null;
-    let isVoiceRecording = false;
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🎙️ IMMERSIVE FULLSCREEN JARVIS VOICE ENGINE (AUTO-SEND, NEURAL TTS & VAD)
+    // ══════════════════════════════════════════════════════════════════════════
 
-    function initSpeechRecognition() {
+    let isJarvisModalOpen = false;
+    let jarvisRecognition = null;
+    let jarvisIsListening = false;
+    let jarvisIsSpeaking = false;
+    let jarvisIsSubmitting = false;
+    let jarvisVadTimer = null;
+    let jarvisCurrentTranscript = "";
+    let jarvisPendingFinalTranscript = "";
+    let jarvisPreferredVoice = null;
+    let jarvisRestartBackoff = null;
+
+    function playJarvisChime(type = 'wake') {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+
+        if (type === 'wake') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          osc.frequency.exponentialRampToValueAtTime(1320, now + 0.24);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.start(now);
+          osc.stop(now + 0.28);
+        } else if (type === 'submit') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(660, now);
+          osc.frequency.exponentialRampToValueAtTime(1100, now + 0.12);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        } else if (type === 'done') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1100, now);
+          osc.frequency.exponentialRampToValueAtTime(740, now + 0.14);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      } catch (e) {}
+    }
+
+    const FEMALE_VOICE_KEYWORDS = [
+      'hazel', 'susan', 'zira', 'jenny', 'aria', 'samantha', 'victoria', 'karen',
+      'moira', 'fiona', 'tessa', 'serena', 'ava', 'emma', 'sonia', 'female'
+    ];
+
+    function detectBestNeuralVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (voices.length === 0) return null;
+
+      const savedVoiceName = localStorage.getItem('jarvis_voice_preference');
+      if (savedVoiceName) {
+        const saved = voices.find(v => v.name === savedVoiceName);
+        if (saved) {
+          jarvisPreferredVoice = saved;
+          updateVoiceLabel(saved);
+          return saved;
+        }
+      }
+
+      // Priority 1: High quality English Female Voice (Hazel, Susan, Jenny, Aria, Zira, Samantha)
+      let preferred = voices.find(v => {
+        const lower = v.name.toLowerCase();
+        return FEMALE_VOICE_KEYWORDS.some(k => lower.includes(k)) && v.lang.startsWith('en');
+      });
+
+      // Priority 2: Any English Female Voice
+      if (!preferred) {
+        preferred = voices.find(v => {
+          const lower = v.name.toLowerCase();
+          return FEMALE_VOICE_KEYWORDS.some(k => lower.includes(k));
+        });
+      }
+
+      // Priority 3: Natural / Neural English Voice
+      if (!preferred) {
+        preferred = voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.startsWith('en'));
+      }
+
+      // Priority 4: Any English Voice
+      if (!preferred) {
+        preferred = voices.find(v => v.lang.startsWith('en')) || voices[0];
+      }
+
+      jarvisPreferredVoice = preferred;
+      updateVoiceLabel(preferred);
+      return preferred;
+    }
+
+    function updateVoiceLabel(voice) {
+      if (!voice) return;
+      const cleanName = voice.name.replace(/Microsoft |Google /g, '').split(' - ')[0];
+      const isFemale = FEMALE_VOICE_KEYWORDS.some(k => voice.name.toLowerCase().includes(k));
+      const prefix = isFemale ? 'Female' : 'Voice';
+
+      const label = document.getElementById('jarvis-active-voice-label');
+      if (label) label.textContent = `${prefix} Voice: ${cleanName}`;
+
+      const pillText = document.getElementById('jarvis-voice-pill-text');
+      if (pillText) pillText.textContent = `${prefix}: ${cleanName}`;
+    }
+
+    function cycleJarvisVoice() {
+      if (!('speechSynthesis' in window)) return;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (voices.length <= 1) return;
+
+      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+      const pool = englishVoices.length > 0 ? englishVoices : voices;
+
+      const currentIndex = pool.findIndex(v => v.name === (jarvisPreferredVoice ? jarvisPreferredVoice.name : ''));
+      const nextIndex = (currentIndex + 1) % pool.length;
+      jarvisPreferredVoice = pool[nextIndex];
+      localStorage.setItem('jarvis_voice_preference', jarvisPreferredVoice.name);
+      updateVoiceLabel(jarvisPreferredVoice);
+
+      window.speechSynthesis.cancel();
+      const testUtterance = new SpeechSynthesisUtterance("Female voice activated.");
+      testUtterance.voice = jarvisPreferredVoice;
+      testUtterance.pitch = 1.08;
+      testUtterance.rate = 1.02;
+      window.speechSynthesis.speak(testUtterance);
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = detectBestNeuralVoice;
+    }
+
+    async function openJarvisVoiceModal() {
+      const modal = document.getElementById('jarvis-voice-modal');
+      if (!modal) return;
+      
+      if (modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+      }
+      modal.style.display = 'flex';
+      isJarvisModalOpen = true;
+      jarvisIsSubmitting = false;
+      jarvisCurrentTranscript = "";
+      jarvisPendingFinalTranscript = "";
+      detectBestNeuralVoice();
+      playJarvisChime('wake');
+
+      const dotStatus = document.getElementById('dot-voice-status');
+      const dotPing = document.getElementById('dot-voice-ping');
+      if (dotStatus) dotStatus.className = "relative inline-flex rounded-full h-2 w-2 bg-rose-500";
+      if (dotPing) dotPing.classList.remove('hidden');
+
+      setJarvisUIState('listening', 'Speak your question or command...');
+
+      // Request browser audio permission if needed
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          await navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            // Keep stream open briefly or close tracks once permitted
+            stream.getTracks().forEach(t => t.stop());
+          }).catch(e => {
+            console.warn('[JARVIS Voice] Mic permission notice:', e);
+          });
+        }
+      } catch (e) {}
+
+      // Start Hands-Free Speech Recognition loop
+      startJarvisSpeechRecognition();
+    }
+
+    function closeJarvisVoiceModal() {
+      const modal = document.getElementById('jarvis-voice-modal');
+      if (!modal) return;
+      modal.style.display = 'none';
+      isJarvisModalOpen = false;
+      jarvisIsSubmitting = false;
+      jarvisCurrentTranscript = "";
+      jarvisPendingFinalTranscript = "";
+
+      clearTimeout(jarvisVadTimer);
+      clearTimeout(jarvisRestartBackoff);
+
+      // Stop speech recognition
+      if (jarvisRecognition) {
+        try { 
+          jarvisRecognition.onend = null;
+          jarvisRecognition.onerror = null;
+          jarvisRecognition.stop(); 
+        } catch(e) {}
+        jarvisRecognition = null;
+      }
+      jarvisIsListening = false;
+
+      // Stop TTS
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      jarvisIsSpeaking = false;
+
+      const dotStatus = document.getElementById('dot-voice-status');
+      const dotPing = document.getElementById('dot-voice-ping');
+      if (dotStatus) dotStatus.className = "relative inline-flex rounded-full h-2 w-2 bg-slate-500";
+      if (dotPing) dotPing.classList.add('hidden');
+    }
+
+    function startJarvisSpeechRecognition() {
+      if (jarvisIsSubmitting || jarvisIsSpeaking) return;
+
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        console.warn("[Voice] Web SpeechRecognition API is not supported in this browser.");
+        setJarvisUIState('idle', 'Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.');
         return;
       }
 
-      speechRecognition = new SpeechRecognition();
-      speechRecognition.continuous = false;
-      speechRecognition.interimResults = true;
-      speechRecognition.lang = 'en-US';
+      if (jarvisRecognition) {
+        try { 
+          jarvisRecognition.onend = null;
+          jarvisRecognition.onerror = null;
+          jarvisRecognition.abort(); 
+        } catch(e) {}
+        jarvisRecognition = null;
+      }
 
-      speechRecognition.onstart = () => {
-        isVoiceRecording = true;
-        updateVoiceButtonUi(true);
-        appendSystemLog("[Voice] Listening to microphone input...");
-      };
+      try {
+        jarvisRecognition = new SpeechRecognition();
+        jarvisRecognition.continuous = true;
+        jarvisRecognition.interimResults = true;
+        jarvisRecognition.maxAlternatives = 1;
+        jarvisRecognition.lang = 'en-US';
 
-      speechRecognition.onresult = (event) => {
-        let transcript = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        const textarea = document.getElementById('chat-input-textarea');
-        if (textarea) {
-          textarea.value = transcript;
-          textarea.style.height = 'auto';
-          textarea.style.height = textarea.scrollHeight + 'px';
-        }
-        const statusEl = document.getElementById('voice-status-indicator');
-        if (statusEl) statusEl.textContent = `🎙️ "${transcript}"`;
-      };
+        jarvisRecognition.onstart = () => {
+          jarvisIsListening = true;
+          setJarvisUIState('listening', jarvisPendingFinalTranscript || 'Speak your question or command...');
+        };
 
-      speechRecognition.onerror = (event) => {
-        console.warn("[Voice] Recognition error:", event.error);
-        stopVoiceRecording();
-      };
+        jarvisRecognition.onresult = (event) => {
+          if (jarvisIsSpeaking) {
+            interruptJarvisSpeech();
+          }
 
-      speechRecognition.onend = () => {
-        stopVoiceRecording();
-      };
+          let interimTranscript = '';
+          let finalTranscript = '';
+          for (let i = 0; i < event.results.length; ++i) {
+            const item = event.results[i];
+            if (item && item[0]) {
+              if (item.isFinal) {
+                finalTranscript += item[0].transcript + ' ';
+              } else {
+                interimTranscript += item[0].transcript;
+              }
+            }
+          }
+
+          const fullSpokenText = (finalTranscript + interimTranscript).trim();
+          if (fullSpokenText) {
+            jarvisPendingFinalTranscript = fullSpokenText;
+            setJarvisUIState('speaking_user', `"${fullSpokenText}"`);
+            
+            // Automatic Silence / VAD Trigger (900ms after you stop speaking)
+            clearTimeout(jarvisVadTimer);
+            jarvisVadTimer = setTimeout(() => {
+              if (jarvisPendingFinalTranscript && jarvisPendingFinalTranscript.length > 1 && !jarvisIsSpeaking && !jarvisIsSubmitting) {
+                const textToSend = jarvisPendingFinalTranscript;
+                jarvisPendingFinalTranscript = "";
+                jarvisCurrentTranscript = "";
+                submitJarvisQuery(textToSend);
+              }
+            }, 900);
+          }
+        };
+
+        jarvisRecognition.onerror = (event) => {
+          if (event.error === 'no-speech' || event.error === 'aborted') return;
+          console.warn('[JARVIS Voice] Recognition error:', event.error);
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            setJarvisUIState('idle', 'Microphone access is blocked. Please allow microphone access in your browser address bar.');
+          } else if (event.error === 'audio-capture') {
+            setJarvisUIState('idle', 'No microphone detected on your system. Please connect an audio input device.');
+          } else if (event.error === 'network') {
+            setJarvisUIState('idle', 'Speech service network issue. Please check internet connection.');
+          }
+        };
+
+        jarvisRecognition.onend = () => {
+          jarvisIsListening = false;
+          
+          // If speech was captured and browser ended utterance on silence -> AUTO-SEND IMMEDIATELY!
+          if (jarvisPendingFinalTranscript && jarvisPendingFinalTranscript.length > 1 && !jarvisIsSubmitting && !jarvisIsSpeaking) {
+            const textToSend = jarvisPendingFinalTranscript;
+            jarvisPendingFinalTranscript = "";
+            jarvisCurrentTranscript = "";
+            clearTimeout(jarvisVadTimer);
+            submitJarvisQuery(textToSend);
+            return;
+          }
+
+          // Otherwise cleanly recreate listening instance if modal is still active
+          if (isJarvisModalOpen && !jarvisIsSpeaking && !jarvisIsSubmitting) {
+            clearTimeout(jarvisRestartBackoff);
+            jarvisRestartBackoff = setTimeout(() => {
+              if (isJarvisModalOpen && !jarvisIsSpeaking && !jarvisIsSubmitting) {
+                startJarvisSpeechRecognition();
+              }
+            }, 300);
+          }
+        };
+
+        jarvisRecognition.start();
+      } catch (err) {
+        console.warn("[JARVIS Voice] Start error:", err);
+      }
     }
 
-    function toggleVoiceRecording() {
-      if (!speechRecognition) {
-        initSpeechRecognition();
-      }
-      if (!speechRecognition) {
-        alert("Speech Recognition is not supported by your current browser engine.");
+    function handleJarvisOrbClick() {
+      // 1. If currently speaking AI response -> Interrupt and open mic
+      if (jarvisIsSpeaking) {
+        interruptJarvisSpeech();
         return;
       }
 
-      if (isVoiceRecording) {
-        speechRecognition.stop();
-        stopVoiceRecording();
-      } else {
-        try {
-          speechRecognition.start();
-          playHudBeep(1400);
-        } catch (e) {
-          stopVoiceRecording();
+      // 2. If user has spoken text captured in transcript -> Tap to Send immediately!
+      const currentText = jarvisPendingFinalTranscript || jarvisCurrentTranscript.trim();
+      if (currentText.length > 1) {
+        jarvisPendingFinalTranscript = "";
+        jarvisCurrentTranscript = "";
+        clearTimeout(jarvisVadTimer);
+        submitJarvisQuery(currentText);
+        return;
+      }
+
+      // 3. Otherwise toggle mic on/off cleanly
+      toggleJarvisMicManual();
+    }
+
+    function toggleJarvisMicManual() {
+      if (jarvisIsListening) {
+        if (jarvisRecognition) {
+          try { 
+            jarvisRecognition.onend = null;
+            jarvisRecognition.stop(); 
+          } catch(e) {}
         }
-      }
-    }
-
-    function stopVoiceRecording() {
-      isVoiceRecording = false;
-      updateVoiceButtonUi(false);
-    }
-
-    function updateVoiceButtonUi(active) {
-      const btn = document.getElementById('btn-voice-input');
-      const icon = document.getElementById('icon-voice-input');
-      const ring = document.getElementById('voice-pulse-ring');
-      const statusEl = document.getElementById('voice-status-indicator');
-      if (!btn) return;
-
-      if (active) {
-        btn.className = "p-2 rounded-lg bg-rose-600/30 text-rose-400 border border-rose-500/50 transition cursor-pointer relative shadow-md shadow-rose-500/20";
-        if (ring) ring.classList.remove('hidden');
-        if (statusEl) statusEl.textContent = "🎙️ Listening... (speak now)";
+        jarvisIsListening = false;
+        setJarvisUIState('idle', 'Microphone muted. Click orb or button below to speak.');
       } else {
-        btn.className = "p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative";
-        if (ring) ring.classList.add('hidden');
-        if (statusEl) statusEl.textContent = "🎙️ Ready for voice/text";
+        startJarvisSpeechRecognition();
       }
     }
+
+    async function submitJarvisQuery(queryText) {
+      if (!queryText || !queryText.trim() || jarvisIsSubmitting) return;
+      
+      jarvisIsSubmitting = true;
+      clearTimeout(jarvisVadTimer);
+      clearTimeout(jarvisRestartBackoff);
+
+      if (jarvisRecognition) {
+        try { 
+          jarvisRecognition.onend = null;
+          jarvisRecognition.stop(); 
+        } catch(e) {}
+      }
+      jarvisIsListening = false;
+
+      playJarvisChime('submit');
+      setJarvisUIState('thinking', `"${queryText}"`);
+
+      if (!currentSessionId) {
+        await createNewChatSession();
+      }
+
+      // Add to main chat stream UI in background
+      const box = document.getElementById('chat-messages-box');
+      if (box) {
+        box.appendChild(createUserMessageBubble(queryText));
+        box.scrollTop = box.scrollHeight;
+      }
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            command: queryText,
+            message: queryText,
+            query: queryText,
+            session_id: currentSessionId,
+            thread_id: currentSessionId
+          })
+        });
+
+        const data = await response.json();
+        const replyText = data.final_output || data.reply || data.output || data.response || "I have processed your request.";
+
+        if (box) {
+          box.appendChild(createAssistantMessageBubble(replyText, data.planned_tool, data.run_id));
+          box.scrollTop = box.scrollHeight;
+        }
+        fetchChatSessions(false);
+        fetchTraces();
+
+        speakJarvisResponse(replyText);
+
+      } catch (err) {
+        console.error('[JARVIS Voice] Execution error:', err);
+        setJarvisUIState('idle', `Execution notice: ${err.message}. Speak again to retry.`);
+        jarvisIsSubmitting = false;
+        setTimeout(() => {
+          if (isJarvisModalOpen) startJarvisSpeechRecognition();
+        }, 2000);
+      } finally {
+        jarvisCurrentTranscript = "";
+        jarvisPendingFinalTranscript = "";
+      }
+    }
+
+    function cleanTextForTTS(rawText) {
+      if (!rawText) return "";
+      return rawText
+        .replace(/```[\s\S]*?```/g, ' [code omitted] ')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/[#*_~>|]/g, '')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/(\r\n|\n|\r)/gm, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function speakJarvisResponse(textToSpeak) {
+      const cleanText = cleanTextForTTS(textToSpeak);
+
+      if (!('speechSynthesis' in window)) {
+        setJarvisUIState('speaking_ai', cleanText);
+        jarvisIsSubmitting = false;
+        setTimeout(() => {
+          if (isJarvisModalOpen) startJarvisSpeechRecognition();
+        }, 4000);
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const voice = jarvisPreferredVoice || detectBestNeuralVoice();
+      if (voice) utterance.voice = voice;
+      utterance.rate = 1.02;
+      utterance.pitch = 1.08;
+
+      utterance.onstart = () => {
+        jarvisIsSpeaking = true;
+        setJarvisUIState('speaking_ai', cleanText);
+      };
+
+      utterance.onend = () => {
+        jarvisIsSpeaking = false;
+        jarvisIsSubmitting = false;
+        playJarvisChime('done');
+        setJarvisUIState('listening', 'Speak your next question...');
+        if (isJarvisModalOpen) {
+          startJarvisSpeechRecognition();
+        }
+      };
+
+      utterance.onerror = (e) => {
+        console.warn("[JARVIS Voice] TTS utterance event:", e);
+        jarvisIsSpeaking = false;
+        jarvisIsSubmitting = false;
+        if (isJarvisModalOpen) startJarvisSpeechRecognition();
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function interruptJarvisSpeech() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      jarvisIsSpeaking = false;
+      jarvisIsSubmitting = false;
+      playJarvisChime('done');
+      setJarvisUIState('listening', 'Listening resumed. Speak your command...');
+      if (isJarvisModalOpen) {
+        startJarvisSpeechRecognition();
+      }
+    }
+
+    function setJarvisUIState(state, message) {
+      const stateTitle = document.getElementById('jarvis-voice-state-title');
+      const dot = document.getElementById('jarvis-voice-indicator-dot');
+      const transcriptRole = document.getElementById('jarvis-transcript-role');
+      const liveTranscript = document.getElementById('jarvis-live-transcript');
+      const orbSphere = document.getElementById('jarvis-orb-sphere');
+      const coreIcon = document.getElementById('jarvis-core-icon');
+      const auraGlow = document.getElementById('jarvis-glow-aura');
+      const ringPing = document.getElementById('jarvis-ring-ping');
+      const labelMute = document.getElementById('label-jarvis-mute');
+      const iconMute = document.getElementById('icon-jarvis-mute');
+
+      if (liveTranscript) {
+        if (message) liveTranscript.textContent = message;
+        liveTranscript.style.color = '#f8fafc';
+        liveTranscript.style.opacity = '1';
+        liveTranscript.style.fontWeight = '500';
+        liveTranscript.style.textShadow = '0 2px 16px rgba(0,0,0,0.8)';
+      }
+
+      if (stateTitle) {
+        stateTitle.style.color = '#ffffff';
+        stateTitle.style.opacity = '1';
+        stateTitle.style.fontWeight = '700';
+      }
+
+      if (transcriptRole) {
+        transcriptRole.style.color = '#38bdf8';
+        transcriptRole.style.opacity = '1';
+        transcriptRole.style.fontWeight = '700';
+      }
+
+      if (orbSphere) {
+        orbSphere.className = `jarvis-orb-sphere ${state}`;
+      }
+
+      if (state === 'listening') {
+        if (stateTitle) stateTitle.textContent = "JARVIS LISTENING...";
+        if (dot) dot.className = "w-3 h-3 rounded-full bg-rose-500 animate-ping";
+        if (transcriptRole) transcriptRole.textContent = "🎙️ Listening to you...";
+        if (auraGlow) auraGlow.className = "absolute w-80 h-80 rounded-full blur-3xl opacity-40 transition-all duration-700 bg-gradient-to-tr from-rose-500 via-pink-600 to-purple-600";
+        if (ringPing) ringPing.className = "jarvis-ring-outer w-80 h-80 border border-rose-500/30 animate-ping opacity-30";
+        if (labelMute) labelMute.textContent = "Mute Mic";
+        if (iconMute) iconMute.setAttribute('data-lucide', 'mic');
+      } else if (state === 'speaking_user') {
+        if (stateTitle) stateTitle.textContent = "CAPTURING SPEECH...";
+        if (dot) dot.className = "w-3 h-3 rounded-full bg-rose-400 animate-ping";
+        if (transcriptRole) transcriptRole.textContent = "🎙️ You";
+        if (auraGlow) auraGlow.className = "absolute w-88 h-88 rounded-full blur-3xl opacity-50 transition-all duration-700 bg-gradient-to-tr from-rose-500 via-purple-600 to-pink-500";
+      } else if (state === 'thinking') {
+        if (stateTitle) stateTitle.textContent = "THINKING & PROCESSING...";
+        if (dot) dot.className = "w-3 h-3 rounded-full bg-amber-400 animate-spin";
+        if (transcriptRole) transcriptRole.textContent = "🧠 Sovereign Copilot Thinking...";
+        if (auraGlow) auraGlow.className = "absolute w-88 h-88 rounded-full blur-3xl opacity-55 transition-all duration-700 bg-gradient-to-tr from-amber-400 via-yellow-500 to-orange-500";
+        if (ringPing) ringPing.className = "jarvis-ring-outer w-80 h-80 border border-amber-400/40 animate-ping opacity-30";
+      } else if (state === 'speaking_ai') {
+        if (stateTitle) stateTitle.textContent = "SOVEREIGN COPILOT SPEAKING...";
+        if (dot) dot.className = "w-3 h-3 rounded-full bg-cyan-400 animate-pulse";
+        if (transcriptRole) transcriptRole.textContent = "🤖 Sovereign Copilot";
+        if (auraGlow) auraGlow.className = "absolute w-96 h-96 rounded-full blur-3xl opacity-60 transition-all duration-700 bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-600";
+        if (ringPing) ringPing.className = "jarvis-ring-outer w-88 h-88 border border-cyan-400/50 animate-ping opacity-40";
+      } else if (state === 'idle') {
+        if (stateTitle) stateTitle.textContent = "MIC MUTED";
+        if (dot) dot.className = "w-3 h-3 rounded-full bg-slate-500";
+        if (transcriptRole) transcriptRole.textContent = "🎙️ Microphone Inactive";
+        if (auraGlow) auraGlow.className = "absolute w-72 h-72 rounded-full blur-3xl opacity-20 bg-slate-700";
+        if (ringPing) ringPing.className = "hidden";
+        if (labelMute) labelMute.textContent = "Unmute Mic";
+        if (iconMute) iconMute.setAttribute('data-lucide', 'mic-off');
+      }
+
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+
+    const toggleVoiceRecording = openJarvisVoiceModal;
 
     // ── Document Knowledge Ingestion ──
     function triggerDocUploadDialog() {
@@ -6509,67 +7806,125 @@ DASHBOARD_HTML = r"""
     let cachedInboxItems = [];
     let cachedSentItems = [];
 
-    function filterInboxCategory(categoryKey) {
+    function setInboxFilter(categoryKey) {
       currentInboxCategory = categoryKey;
       playCyberClick(900);
 
-      // Update Tab Buttons UI
+      // Update Filter Buttons UI
       const tabs = ['all', 'important', 'job_career', 'system_update', 'marketing_promo', 'likely_scam', 'sent'];
       tabs.forEach(t => {
-        const btn = document.getElementById(`inbox-tab-${t}`);
+        const btn = document.getElementById(`inbox-filter-${t}`) || document.getElementById(`inbox-tab-${t}`);
         if (!btn) return;
         if (t === categoryKey) {
           if (t === 'sent') {
-            btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-emerald-600/40 border-emerald-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+            btn.className = "inbox-tab-btn px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold cursor-pointer transition flex items-center space-x-1.5 shadow-sm";
           } else {
-            btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border bg-indigo-600/40 border-indigo-500 text-white font-bold flex items-center space-x-1.5 transition cursor-pointer shadow-sm";
+            btn.className = "inbox-tab-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold cursor-pointer transition flex items-center space-x-1.5 shadow-sm";
           }
         } else {
-          btn.className = "inbox-tab-btn px-3 py-1.5 rounded-xl border theme-card border-transparent text-slate-400 hover:text-white flex items-center space-x-1.5 transition cursor-pointer";
+          btn.className = "inbox-tab-btn px-2.5 py-1 rounded-lg theme-card border border-transparent text-slate-400 hover:text-white cursor-pointer transition flex items-center space-x-1.5";
         }
       });
 
+      const searchVal = (document.getElementById('inbox-search-input')?.value || '').toLowerCase().trim();
       if (categoryKey === 'sent') {
-        renderSentRows();
+        renderSentRows(searchVal);
       } else {
-        renderInboxRows();
+        renderInboxRows(searchVal);
       }
     }
 
-    async function fetchInbox(forceSync = false) {
+    const filterInboxCategory = setInboxFilter;
+    const fetchInboxEmails = fetchInbox;
+    const fetchSentEmails = () => fetchInbox(false);
+
+    function filterInboxDisplay() {
+      const searchVal = (document.getElementById('inbox-search-input')?.value || '').toLowerCase().trim();
+      if (currentInboxCategory === 'sent') {
+        renderSentRows(searchVal);
+      } else {
+        renderInboxRows(searchVal);
+      }
+    }
+
+    async function fetchInbox(forceSync = false, reset = false) {
       try {
-        const container = document.getElementById('inbox-cards-stream');
-        if (forceSync && container) {
-          container.innerHTML = `<div class="p-8 text-center text-xs text-cyan-400 animate-pulse font-mono"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2 animate-spin"></i> Syncing live messages directly from Gmail API...</div>`;
-          refreshIcons();
-          await fetch('/api/inbox/sync', { method: 'POST' });
+        const container = document.getElementById('inbox-messages-stream') || document.getElementById('inbox-cards-stream');
+
+        if (reset) {
+          cachedInboxItems = [];
+          cachedSentItems = [];
+          if (container) {
+            container.innerHTML = `<div class="p-8 text-center text-xs theme-text-muted font-mono"><i data-lucide="loader" class="w-5 h-5 mx-auto mb-2 animate-spin theme-text-brand"></i> Connecting to Gmail and syncing fresh emails...</div>`;
+            refreshIcons();
+          }
+        } else if (cachedInboxItems && cachedInboxItems.length > 0) {
+          // Immediately render cached items if available for 0ms visual latency
+          if (currentInboxCategory === 'sent') renderSentRows();
+          else renderInboxRows();
         }
 
+        if (forceSync && container) {
+          const syncBanner = document.createElement('div');
+          syncBanner.id = 'inbox-sync-progress-banner';
+          syncBanner.className = 'p-3 mb-3 text-center text-xs text-cyan-400 bg-cyan-950/40 border border-cyan-500/30 rounded-lg animate-pulse font-mono flex items-center justify-center space-x-2';
+          syncBanner.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-1.5 animate-spin"></i> Syncing live messages directly from Gmail API...`;
+          container.prepend(syncBanner);
+          refreshIcons();
+          try {
+            await fetch(`/api/inbox/sync?reset=${reset ? 'true' : 'false'}`, { method: 'POST' });
+          } catch(e) {}
+          const existingBanner = document.getElementById('inbox-sync-progress-banner');
+          if (existingBanner) existingBanner.remove();
+        }
+
+        // 2. Fetch fresh inbox state
         const res = await fetch('/api/inbox');
         const data = await res.json();
         cachedInboxItems = data.inbox || [];
 
-        // Also fetch sent items
-        try {
-          const sentRes = await fetch('/api/inbox/sent');
-          const sentData = await sentRes.json();
-          cachedSentItems = sentData.sent || [];
-          const sentBadge = document.getElementById('tab-count-sent');
-          if (sentBadge) sentBadge.textContent = cachedSentItems.length;
-        } catch (e) {}
-
         const navBadge = document.getElementById('nav-inbox-badge');
+        const navCounter = document.getElementById('nav-inbox-counter');
         const cardBadge = document.getElementById('card-inbox-count');
         if (navBadge) navBadge.textContent = cachedInboxItems.length;
+        if (navCounter) navCounter.textContent = cachedInboxItems.length;
         if (cardBadge) cardBadge.textContent = cachedInboxItems.length;
 
+        // 3. Render inbox view immediately without waiting for sent emails
         if (currentInboxCategory === 'sent') {
           renderSentRows();
         } else {
           renderInboxRows();
         }
+
+        // 4. Fetch sent items asynchronously in background without blocking the UI
+        fetch('/api/inbox/sent')
+          .then(r => r.json())
+          .then(sentData => {
+            if (sentData && sentData.sent) {
+              cachedSentItems = sentData.sent;
+              const sentBadge = document.getElementById('tab-count-sent');
+              if (sentBadge) sentBadge.textContent = cachedSentItems.length;
+              if (currentInboxCategory === 'sent') {
+                renderSentRows();
+              }
+            }
+          })
+          .catch(() => {});
+
       } catch (err) {
         console.error("Failed to fetch inbox:", err);
+      }
+    }
+
+    async function clearInboxCache() {
+      if (!confirm("Clear cached inbox messages and re-sync from active Gmail account?")) return;
+      try {
+        await fetch('/api/inbox/clear', { method: 'POST' });
+        await fetchInbox(true, true);
+        playHudBeep(1200);
+      } catch (e) {
+        alert("Failed to clear cache: " + e.message);
       }
     }
 
@@ -6593,7 +7948,7 @@ DASHBOARD_HTML = r"""
         case 'important':
           return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">⚡ Important</span>`;
         case 'job_career':
-          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">💼 Job / Career</span>`;
+          return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">💼 Career</span>`;
         case 'system_update':
           return `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">🔔 Update</span>`;
         case 'marketing_promo':
@@ -6603,8 +7958,8 @@ DASHBOARD_HTML = r"""
       }
     }
 
-    function renderInboxRows() {
-      const container = document.getElementById('inbox-cards-stream');
+    function renderInboxRows(searchQuery = '') {
+      const container = document.getElementById('inbox-messages-stream') || document.getElementById('inbox-cards-stream');
       if (!container) return;
 
       // Calculate Category Counts
@@ -6617,17 +7972,26 @@ DASHBOARD_HTML = r"""
         likely_scam: cachedInboxItems.filter(i => (i.category === 'likely_scam' || (i.triage && i.triage.predicted_category === 'likely_scam'))).length,
       };
 
-      document.getElementById('tab-count-all').textContent = counts.all;
-      document.getElementById('tab-count-important').textContent = counts.important;
-      document.getElementById('tab-count-job_career').textContent = counts.job_career;
-      document.getElementById('tab-count-system_update').textContent = counts.system_update;
-      document.getElementById('tab-count-marketing_promo').textContent = counts.marketing_promo;
-      document.getElementById('tab-count-likely_scam').textContent = counts.likely_scam;
+      if (document.getElementById('tab-count-all')) document.getElementById('tab-count-all').textContent = counts.all;
+      if (document.getElementById('tab-count-important')) document.getElementById('tab-count-important').textContent = counts.important;
+      if (document.getElementById('tab-count-job_career')) document.getElementById('tab-count-job_career').textContent = counts.job_career;
+      if (document.getElementById('tab-count-system_update')) document.getElementById('tab-count-system_update').textContent = counts.system_update;
+      if (document.getElementById('tab-count-marketing_promo')) document.getElementById('tab-count-marketing_promo').textContent = counts.marketing_promo;
+      if (document.getElementById('tab-count-likely_scam')) document.getElementById('tab-count-likely_scam').textContent = counts.likely_scam;
 
       // Filter Items
-      const filtered = currentInboxCategory === 'all' 
+      let filtered = currentInboxCategory === 'all' 
         ? cachedInboxItems 
         : cachedInboxItems.filter(i => (i.category === currentInboxCategory || (i.triage && i.triage.predicted_category === currentInboxCategory)));
+
+      if (searchQuery) {
+        filtered = filtered.filter(i => 
+          (i.sender && i.sender.toLowerCase().includes(searchQuery)) ||
+          (i.subject && i.subject.toLowerCase().includes(searchQuery)) ||
+          (i.body && i.body.toLowerCase().includes(searchQuery)) ||
+          (i.snippet && i.snippet.toLowerCase().includes(searchQuery))
+        );
+      }
 
       container.innerHTML = '';
 
@@ -6661,10 +8025,10 @@ DASHBOARD_HTML = r"""
 
         const row = document.createElement('div');
         row.id = `inbox-item-row-${em.id}`;
-        row.className = `group transition ${isRead ? 'opacity-85' : 'bg-white/[0.02]'}`;
+        row.className = `group rounded-xl theme-card border transition ${isRead ? 'opacity-85' : 'border-indigo-500/30 shadow-sm'}`;
         row.innerHTML = `
           <!-- Concise Header Row (Gmail Style) -->
-          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.05] flex items-center justify-between cursor-pointer space-x-3 transition">
+          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition rounded-xl">
             <!-- Left: Sender -->
             <div class="flex items-center space-x-3 w-56 flex-shrink-0">
               <div class="w-6 h-6 rounded-lg ${isRead ? 'bg-slate-700/30 text-slate-400 border border-slate-700/40' : 'bg-indigo-600/30 text-cyan-300 border border-indigo-500/50'} font-mono text-[10px] flex items-center justify-center font-bold">
@@ -6706,7 +8070,7 @@ DASHBOARD_HTML = r"""
           </div>
 
           <!-- Expandable Detail Drawer -->
-          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3">
+          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3 rounded-b-xl">
             <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
               <div class="space-y-0.5">
                 <div class="text-slate-300 font-mono text-[11px]">From: <span class="text-white">${escapeHtml(em.sender)}</span></div>
@@ -6765,13 +8129,23 @@ DASHBOARD_HTML = r"""
       refreshIcons();
     }
 
-    function renderSentRows() {
-      const container = document.getElementById('inbox-cards-stream');
+    function renderSentRows(searchQuery = '') {
+      const container = document.getElementById('inbox-messages-stream') || document.getElementById('inbox-cards-stream');
       if (!container) return;
 
       container.innerHTML = '';
 
-      if (cachedSentItems.length === 0) {
+      let filtered = cachedSentItems;
+      if (searchQuery) {
+        filtered = filtered.filter(i => 
+          (i.to && i.to.toLowerCase().includes(searchQuery)) ||
+          (i.subject && i.subject.toLowerCase().includes(searchQuery)) ||
+          (i.body && i.body.toLowerCase().includes(searchQuery)) ||
+          (i.snippet && i.snippet.toLowerCase().includes(searchQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
         container.innerHTML = `
           <div class="p-12 text-center space-y-3">
             <div class="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mx-auto">
@@ -6789,7 +8163,7 @@ DASHBOARD_HTML = r"""
         return;
       }
 
-      cachedSentItems.forEach((em, idx) => {
+      filtered.forEach((em, idx) => {
         const dateFormatted = formatEmailDate(em.sent_at_timestamp);
         let recipientDisplay = em.to || 'Unknown Recipient';
         if (recipientDisplay.includes('<')) {
@@ -6803,62 +8177,41 @@ DASHBOARD_HTML = r"""
 
         const row = document.createElement('div');
         row.id = `sent-item-row-${em.id}`;
-        row.className = `group transition bg-white/[0.02] hover:bg-white/[0.04]`;
+        row.className = "group rounded-xl theme-card border transition border-emerald-500/20 shadow-sm";
         row.innerHTML = `
-          <!-- Concise Header Row (Gmail Style) -->
-          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.05] flex items-center justify-between cursor-pointer space-x-3 transition">
-            <!-- Left: Recipient -->
+          <div onclick="toggleInboxRowDetails('${em.id}')" class="px-4 py-3 hover:bg-white/[0.04] flex items-center justify-between cursor-pointer space-x-3 transition rounded-xl">
             <div class="flex items-center space-x-3 w-56 flex-shrink-0">
               <div class="w-6 h-6 rounded-lg bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 font-mono text-[10px] flex items-center justify-center font-bold">
-                ${escapeHtml((recipientDisplay[0] || 'T').toUpperCase())}
+                TO
               </div>
-              <span class="text-xs font-bold text-white truncate max-w-[170px]" title="${safeTo}">
-                To: ${escapeHtml(recipientDisplay)}
+              <span class="text-xs text-slate-300 truncate max-w-[170px]" title="${safeTo}">
+                ${escapeHtml(recipientDisplay)}
               </span>
             </div>
 
-            <!-- Middle: Subject & 1-line Snippet -->
             <div class="flex-1 min-w-0 flex items-center space-x-2 text-xs truncate">
-              <span class="font-bold text-slate-200 flex-shrink-0 truncate max-w-[280px]">${safeSubject}</span>
+              <span class="font-bold text-white flex-shrink-0 truncate max-w-[280px]">${safeSubject}</span>
               <span class="text-slate-500 font-normal truncate max-w-lg select-text">— ${safeSnippet}</span>
             </div>
 
-            <!-- Right: Sent Badge + Quick Actions + Timestamp + Expand -->
             <div class="flex items-center space-x-2 flex-shrink-0">
-              <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 mr-1" onclick="event.stopPropagation()">
-                <button onclick="openAiComposeModal('${safeTo}', 'Follow-up: ${safeSubject}', 'Draft a polite follow-up regarding our earlier message')" title="Compose Follow-up with AI" class="p-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 transition cursor-pointer shadow-sm">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 Sent</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">📤 SENT</span>
               <span class="text-[11px] font-mono text-slate-400 w-16 text-right">${dateFormatted}</span>
               <i data-lucide="chevron-down" id="chevron-${em.id}" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-transform duration-200"></i>
             </div>
           </div>
 
-          <!-- Expandable Detail Drawer -->
-          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3">
+          <div id="drawer-${em.id}" class="hidden px-5 py-4 bg-black/50 border-t border-white/5 space-y-3 rounded-b-xl">
             <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
               <div class="space-y-0.5">
-                <div class="text-slate-300 font-mono text-[11px]">To: <span class="text-emerald-300 font-bold">${safeTo}</span></div>
-                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-white font-bold">${safeSubject}</span></div>
+                <div class="text-slate-300 font-mono text-[11px]">To: <span class="text-white">${safeTo}</span></div>
+                <div class="text-slate-300 font-mono text-[11px]">Subject: <span class="text-emerald-300 font-bold">${safeSubject}</span></div>
               </div>
-              <div class="flex items-center space-x-2">
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Google Gmail Outbound</span>
-              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">DISPATCHED</span>
             </div>
 
             <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs text-slate-200 leading-relaxed font-sans select-text whitespace-pre-wrap max-h-72 overflow-y-auto">
               ${safeBody}
-            </div>
-
-            <div class="flex items-center justify-between pt-1 text-xs font-mono">
-              <span class="text-[10px] text-slate-500">Message ID: ${em.id}</span>
-              <button onclick="openAiComposeModal('${safeTo}', 'Follow-up: ${safeSubject}', 'Follow up on the sent email above')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 text-cyan-300 hover:text-white border border-indigo-500/40 text-xs flex items-center space-x-1.5 cursor-pointer transition">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                <span>✨ Compose Follow-up with AI</span>
-              </button>
             </div>
           </div>
         `;
@@ -7165,9 +8518,9 @@ DASHBOARD_HTML = r"""
         const btn = document.getElementById(`tone-btn-${t}`);
         if (!btn) return;
         if (t === tone) {
-          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md bg-cyan-500/30 text-cyan-200 border border-cyan-500/50 font-bold transition";
+          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md btn-brand-primary text-white font-bold transition";
         } else {
-          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md theme-card text-slate-400 hover:text-slate-200 transition";
+          btn.className = "compose-tone-btn px-2 py-0.5 rounded-md theme-card border theme-border theme-text-muted hover:theme-text-main transition";
         }
       });
     }
@@ -7334,11 +8687,13 @@ DASHBOARD_HTML = r"""
         cachedPendingApprovals = data.pending_approvals || [];
         
         const badge = document.getElementById('nav-approval-badge');
+        const navCounter = document.getElementById('nav-approvals-counter');
         const cardBadge = document.getElementById('card-pending-approvals');
         const heroAlerts = document.getElementById('hero-alerts-count');
         const hitlCountBadge = document.getElementById('badge-hitl-pending-count');
 
         if (badge) badge.textContent = cachedPendingApprovals.length;
+        if (navCounter) navCounter.textContent = cachedPendingApprovals.length;
         if (cardBadge) cardBadge.textContent = cachedPendingApprovals.length;
         if (heroAlerts) heroAlerts.textContent = `${cachedPendingApprovals.length} Pending`;
         if (hitlCountBadge) hitlCountBadge.textContent = cachedPendingApprovals.length;
@@ -7888,7 +9243,7 @@ DASHBOARD_HTML = r"""
 
     function formatMarkdownText(rawText) {
       if (!rawText) return '';
-      var text = String(rawText);
+      var text = String(rawText).trim();
 
       // Handle frontmatter if present
       if (text.indexOf('---') === 0) {
@@ -7901,16 +9256,16 @@ DASHBOARD_HTML = r"""
             var k = parts[0].trim();
             var v = parts.slice(1).join(':').trim();
             if (!k) return '';
-            return '<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-[10px] font-mono text-cyan-300 mr-1.5 mb-1"><span class="text-slate-400">' + escapeHtml(k) + ':</span> <b class="text-white">' + escapeHtml(v) + '</b></span>';
+            return '<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-black/40 border theme-border text-[10px] font-mono text-cyan-300 mr-1.5 mb-1"><span class="text-slate-400">' + escapeHtml(k) + ':</span> <b class="theme-text-brand">' + escapeHtml(v) + '</b></span>';
           }).filter(Boolean).join('');
-          text = '<div class="mb-3 p-2.5 rounded-xl bg-black/30 border border-white/10 flex flex-wrap items-center">' + fmLines + '</div>\n\n' + text;
+          text = '<div class="mb-3 p-2.5 rounded-xl bg-black/30 border theme-border flex flex-wrap items-center">' + fmLines + '</div>\n\n' + text;
         }
       }
 
       // 1. Extract code blocks & mermaid blocks first
       var codeBlocks = [];
       text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function(match, lang, code) {
-        var placeholder = '__CODE_BLOCK_' + codeBlocks.length + '__';
+        var placeholder = '@@CODE_BLOCK_' + codeBlocks.length + '@@';
         if (lang === 'mermaid') {
           codeBlocks.push(
             '<div class="my-3 p-4 rounded-xl bg-black/60 border theme-border overflow-x-auto text-center">' +
@@ -7918,16 +9273,17 @@ DASHBOARD_HTML = r"""
             '</div>'
           );
         } else {
+          var displayLang = (lang || 'code').toLowerCase();
           codeBlocks.push(
-            '<div class="code-container relative my-2.5 rounded-xl border border-white/10 overflow-hidden bg-black/80">' +
-              '<div class="flex items-center justify-between px-3 py-1.5 bg-black/70 border-b border-white/5 text-[10px] font-mono text-slate-400">' +
-                '<span class="text-cyan-400 font-bold">' + escapeHtml(lang || 'code') + '</span>' +
-                '<button onclick="copyCodeSnippet(this)" class="copy-btn hover:text-white text-slate-400 flex items-center space-x-1 cursor-pointer transition">' +
+            '<div class="my-3 rounded-xl border theme-border overflow-hidden bg-black/80 shadow-md font-sans">' +
+              '<div class="flex items-center justify-between px-3.5 py-1.5 bg-black/60 border-b theme-border text-[11px] font-mono text-slate-400">' +
+                '<span class="font-bold theme-text-brand uppercase text-[10px] tracking-wider">' + escapeHtml(displayLang) + '</span>' +
+                '<button onclick="copyCodeSnippet(this)" class="copy-btn hover:text-white text-slate-400 flex items-center space-x-1 cursor-pointer transition text-[10px] font-mono">' +
                   '<i data-lucide="copy" class="w-3 h-3"></i>' +
-                  '<span>Copy</span>' +
+                  '<span>Copy code</span>' +
                 '</button>' +
               '</div>' +
-              '<pre class="p-3.5 font-mono text-[11px] text-cyan-300 overflow-x-auto select-text">' + escapeHtml(code.trim()) + '</pre>' +
+              '<pre class="p-3.5 font-mono text-[12px] text-slate-100 overflow-x-auto select-text leading-relaxed font-normal">' + escapeHtml(code.trim()) + '</pre>' +
             '</div>'
           );
         }
@@ -7935,7 +9291,7 @@ DASHBOARD_HTML = r"""
       });
 
       // 2. Escape HTML for remaining markdown body
-      text = text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
+      text = escapeHtml(text);
 
       // 3. Markdown Tables
       text = text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, function(tableBlock) {
@@ -7944,13 +9300,13 @@ DASHBOARD_HTML = r"""
           var headers = lines[0].split('|').slice(1, -1).map(function(h) { return h.trim(); });
           var rows = lines.slice(2).map(function(r) { return r.split('|').slice(1, -1).map(function(c) { return c.trim(); }); });
           
-          var tableHtml = '<div class="my-3 overflow-x-auto rounded-xl border border-white/10 shadow-sm"><table class="w-full text-left text-xs border-collapse font-sans">';
-          tableHtml += '<thead class="bg-black/60 border-b border-white/10 text-cyan-300 font-mono text-[11px]"><tr>';
-          headers.forEach(function(h) { tableHtml += '<th class="p-2.5 font-bold">' + h + '</th>'; });
+          var tableHtml = '<div class="my-3 overflow-x-auto rounded-xl border theme-border shadow-sm"><table class="w-full text-left text-xs border-collapse font-sans">';
+          tableHtml += '<thead class="bg-black/50 border-b theme-border font-semibold text-xs theme-text-brand"><tr>';
+          headers.forEach(function(h) { tableHtml += '<th class="p-3 font-semibold">' + h + '</th>'; });
           tableHtml += '</tr></thead><tbody class="divide-y divide-white/5">';
           rows.forEach(function(r) {
             tableHtml += '<tr class="hover:bg-white/5 transition">';
-            r.forEach(function(c) { tableHtml += '<td class="p-2.5 text-slate-200">' + c + '</td>'; });
+            r.forEach(function(c) { tableHtml += '<td class="p-3 text-[13px] leading-relaxed">' + c + '</td>'; });
             tableHtml += '</tr>';
           });
           tableHtml += '</tbody></table></div>';
@@ -7963,51 +9319,74 @@ DASHBOARD_HTML = r"""
       text = text.replace(/&gt;\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]([^\n]*)\n((?:&gt;[^\n]*\n?)*)/gi, function(match, type, title, body) {
         var cleanBody = body.replace(/&gt;\s?/g, '').trim();
         var upperType = type.toUpperCase();
-        var colorClass = "border-indigo-500/50 bg-indigo-950/30 text-indigo-300";
+        var colorClass = "border-indigo-500/50 bg-indigo-950/20 text-indigo-300";
         var icon = "info";
-        if (upperType === 'TIP') { colorClass = "border-emerald-500/50 bg-emerald-950/30 text-emerald-300"; icon = "lightbulb"; }
-        if (upperType === 'IMPORTANT') { colorClass = "border-cyan-500/50 bg-cyan-950/30 text-cyan-300"; icon = "alert-circle"; }
-        if (upperType === 'WARNING') { colorClass = "border-amber-500/50 bg-amber-950/30 text-amber-300"; icon = "alert-triangle"; }
-        if (upperType === 'CAUTION') { colorClass = "border-rose-500/50 bg-rose-950/30 text-rose-300"; icon = "shield-alert"; }
+        if (upperType === 'TIP') { colorClass = "border-emerald-500/50 bg-emerald-950/20 text-emerald-300"; icon = "lightbulb"; }
+        if (upperType === 'IMPORTANT') { colorClass = "border-cyan-500/50 bg-cyan-950/20 text-cyan-300"; icon = "alert-circle"; }
+        if (upperType === 'WARNING') { colorClass = "border-amber-500/50 bg-amber-950/20 text-amber-300"; icon = "alert-triangle"; }
+        if (upperType === 'CAUTION') { colorClass = "border-rose-500/50 bg-rose-950/20 text-rose-300"; icon = "shield-alert"; }
 
         return '<div class="my-3 p-3.5 rounded-xl border ' + colorClass + ' space-y-1 shadow-sm">' +
           '<div class="font-bold text-xs uppercase font-mono tracking-wider flex items-center space-x-1.5">' +
             '<i data-lucide="' + icon + '" class="w-3.5 h-3.5"></i>' +
-            '<span>' + escapeHtml(title ? title.trim() : upperType) + '</span>' +
+            '<span>' + (title ? title.trim() : upperType) + '</span>' +
           '</div>' +
-          '<div class="text-xs text-slate-200 leading-relaxed font-sans">' + cleanBody + '</div>' +
+          '<div class="text-[13px] leading-relaxed font-sans">' + cleanBody + '</div>' +
         '</div>';
       });
 
       // 5. Standard Blockquotes (&gt; text)
       text = text.replace(/((?:&gt;[^\n]*\n?)+)/g, function(quoteBlock) {
         var clean = quoteBlock.replace(/&gt;\s?/g, '').trim();
-        return '<blockquote class="my-2.5 pl-3.5 py-1.5 border-l-4 border-cyan-400 bg-cyan-950/20 text-slate-200 text-xs italic rounded-r-lg font-sans leading-relaxed shadow-sm">' + clean + '</blockquote>';
+        return '<blockquote class="my-3 pl-3.5 py-1 border-l-2 border-brand text-[13px] italic theme-text-muted font-sans leading-relaxed">' + clean + '</blockquote>';
       });
 
       // 6. Headers
-      text = text.replace(/^####\s+(.*$)/gim, '<h4 class="text-xs font-bold text-indigo-300 mt-3 mb-1 font-display tracking-tight">$1</h4>');
-      text = text.replace(/^###\s+(.*$)/gim, '<h3 class="text-sm font-bold text-cyan-300 mt-4 mb-1.5 font-display flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span>$1</span></h3>');
-      text = text.replace(/^##\s+(.*$)/gim, '<h2 class="text-base font-bold text-white mt-5 mb-2 font-display border-b border-white/10 pb-1.5 tracking-tight flex items-center space-x-2"><span class="w-2 h-2 rounded bg-indigo-500"></span><span>$1</span></h2>');
-      text = text.replace(/^#\s+(.*$)/gim, '<h1 class="text-lg font-extrabold text-white mt-6 mb-3 font-display border-b-2 border-indigo-500 pb-2 tracking-tight">$1</h1>');
+      text = text.replace(/^####\s+(.*$)/gim, '<h4 class="text-sm font-semibold text-main mt-3.5 mb-1.5">$1</h4>');
+      text = text.replace(/^###\s+(.*$)/gim, '<h3 class="text-base font-semibold text-main mt-4 mb-2">$1</h3>');
+      text = text.replace(/^##\s+(.*$)/gim, '<h2 class="text-lg font-bold text-main mt-5 mb-2.5">$1</h2>');
+      text = text.replace(/^#\s+(.*$)/gim, '<h1 class="text-xl font-bold text-main mt-6 mb-3">$1</h1>');
 
       // 7. Horizontal rules
-      text = text.replace(/^(?:---|___|\*\*\*)$/gim, '<hr class="my-4 border-white/10" />');
+      text = text.replace(/^(?:---|___|\*\*\*)$/gim, '<hr class="my-4 theme-border border-t" />');
 
       // 8. Bold, Italics, Inline Code, Links
-      text = text.replace(/\*\*(.*?)\*\*/g, '<b class="font-bold text-white">$1</b>');
-      text = text.replace(/\*(.*?)\*/g, '<i class="italic text-slate-300">$1</i>');
-      text = text.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-mono text-[11px] border border-white/10">$1</code>');
-      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center space-x-0.5">$1 <i data-lucide="external-link" class="w-2.5 h-2.5 ml-0.5 inline"></i></a>');
+      text = text.replace(/\*\*(.*?)\*\*/g, '<b class="font-semibold text-main">$1</b>');
+      text = text.replace(/\*(.*?)\*/g, '<i class="italic">$1</i>');
+      text = text.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/30 theme-border border font-mono text-[12px] theme-text-brand font-medium">$1</code>');
+      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="theme-text-brand hover:underline font-medium inline-flex items-center space-x-0.5">$1 <i data-lucide="external-link" class="w-2.5 h-2.5 ml-0.5 inline"></i></a>');
 
-      // 9. Bullet lists & Numbered lists
-      text = text.replace(/^-\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-disc">$1</li>');
-      text = text.replace(/^\*\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-disc">$1</li>');
-      text = text.replace(/^\d+\.\s+(.*$)/gim, '<li class="text-xs text-slate-300 ml-4 list-decimal">$1</li>');
+      // 9. Group list items into proper <ul> and <ol>
+      text = text.replace(/((?:^(?:-\s+|\*\s+)[^\n]+\r?\n?)+)/gm, function(listBlock) {
+        var items = listBlock.trim().split('\n').map(function(line) {
+          var cleaned = line.replace(/^(?:-\s+|\*\s+)/, '').trim();
+          return '<li class="leading-relaxed">' + cleaned + '</li>';
+        }).join('');
+        return '<ul class="list-disc pl-5 my-2.5 space-y-1">\n' + items + '\n</ul>';
+      });
 
-      // 10. Restore code & mermaid blocks
+      text = text.replace(/((?:^\d+\.\s+[^\n]+\r?\n?)+)/gm, function(listBlock) {
+        var items = listBlock.trim().split('\n').map(function(line) {
+          var cleaned = line.replace(/^\d+\.\s+/, '').trim();
+          return '<li class="leading-relaxed">' + cleaned + '</li>';
+        }).join('');
+        return '<ol class="list-decimal pl-5 my-2.5 space-y-1">\n' + items + '\n</ol>';
+      });
+
+      // 10. Paragraph splitting: wrap standalone blocks separated by 2+ newlines in <p> tags
+      var blocks = text.split(/\n\s*\n/);
+      text = blocks.map(function(block) {
+        block = block.trim();
+        if (!block) return '';
+        if (/^(?:<div|<h[1-6]|<ul|<ol|<blockquote|<table|<hr|<pre|@@CODE_BLOCK_)/i.test(block)) {
+          return block;
+        }
+        return '<p class="mb-3 leading-relaxed">' + block.replace(/\n/g, '<br/>') + '</p>';
+      }).filter(Boolean).join('\n\n');
+
+      // 11. Restore code & mermaid blocks
       codeBlocks.forEach(function(block, idx) {
-        text = text.replace('__CODE_BLOCK_' + idx + '__', block);
+        text = text.replace('@@CODE_BLOCK_' + idx + '@@', block);
       });
 
       return text;
@@ -8768,7 +10147,7 @@ DASHBOARD_HTML = r"""
       if (actions.length > 0) {
         const sec = document.createElement('div');
         sec.className = 'space-y-1';
-        sec.innerHTML = `<div class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider px-2">⚡ Quick Actions</div>`;
+        sec.innerHTML = `<div class="text-[10px] font-mono theme-text-brand font-bold uppercase tracking-wider px-2">⚡ Quick Actions</div>`;
         actions.forEach(act => {
           const idx = spotlightResultsList.length;
           spotlightResultsList.push(act);
@@ -8807,7 +10186,7 @@ DASHBOARD_HTML = r"""
       }
 
       if (spotlightResultsList.length === 0) {
-        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 font-mono">No matching actions, notes, or suggestions.</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-xs theme-text-muted font-mono">No matching actions, notes, or suggestions.</div>`;
       } else {
         highlightSpotlightIndex(0);
       }
@@ -8817,17 +10196,17 @@ DASHBOARD_HTML = r"""
     function createSpotlightItemElement(item, index) {
       const div = document.createElement('div');
       div.id = `spotlight-item-${index}`;
-      div.className = `p-2.5 rounded-xl border border-transparent transition cursor-pointer text-xs flex items-center justify-between hover:bg-cyan-500/10 hover:border-cyan-500/30 ${index === 0 ? 'bg-cyan-500/15 border-cyan-500/40 text-white' : 'text-slate-300'}`;
+      div.className = `p-2.5 rounded-xl transition cursor-pointer text-xs flex items-center justify-between border ${index === 0 ? 'spotlight-item-active' : 'spotlight-item-idle'}`;
       div.onclick = () => executeSpotlightItem(item);
 
       div.innerHTML = `
         <div class="flex items-center space-x-3 truncate">
           <div class="leading-tight truncate">
-            <div class="font-bold text-white truncate">${escapeHtml(item.title)}</div>
-            <div class="text-[10px] text-slate-400 truncate">${escapeHtml(item.description || '')}</div>
+            <div class="font-bold spotlight-item-title truncate">${escapeHtml(item.title)}</div>
+            <div class="text-[10px] spotlight-item-desc truncate opacity-80">${escapeHtml(item.description || '')}</div>
           </div>
         </div>
-        ${item.shortcut ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300 font-bold">${item.shortcut}</span>` : ''}
+        ${item.shortcut ? `<span class="spotlight-item-shortcut text-[10px] font-mono px-2 py-0.5 rounded border font-bold">${item.shortcut}</span>` : ''}
       `;
       return div;
     }
@@ -8837,10 +10216,10 @@ DASHBOARD_HTML = r"""
         const el = document.getElementById(`spotlight-item-${i}`);
         if (!el) return;
         if (i === index) {
-          el.className = 'p-2.5 rounded-xl border border-cyan-500/40 bg-cyan-500/20 text-white transition cursor-pointer text-xs flex items-center justify-between';
+          el.className = 'p-2.5 rounded-xl transition cursor-pointer text-xs flex items-center justify-between border spotlight-item-active';
           el.scrollIntoView({ block: 'nearest' });
         } else {
-          el.className = 'p-2.5 rounded-xl border border-transparent text-slate-300 transition cursor-pointer text-xs flex items-center justify-between hover:bg-cyan-500/10 hover:border-cyan-500/30';
+          el.className = 'p-2.5 rounded-xl transition cursor-pointer text-xs flex items-center justify-between border spotlight-item-idle';
         }
       });
       spotlightSelectedIndex = index;
@@ -9224,7 +10603,7 @@ DASHBOARD_HTML = r"""
             <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>
             <span>Executive Intelligence Summary</span>
           </div>
-          <p class="text-sm text-slate-100 leading-relaxed font-sans font-medium select-text">${escapeHtml(dossier.executive_summary || '')}</p>
+          <div class="text-sm text-slate-100 leading-relaxed font-sans font-medium select-text prose-chat">${formatMarkdownText(dossier.executive_summary || '')}</div>
         </div>
       `;
 
@@ -9286,12 +10665,12 @@ DASHBOARD_HTML = r"""
               </div>
               <span class="text-[10px] font-mono text-slate-500">Query: ${escapeHtml(sec.query || '')}</span>
             </div>
-            <p class="text-xs text-slate-200 font-sans leading-relaxed select-text">${escapeHtml(sec.summary)}</p>
+            <div class="text-[13.5px] font-sans leading-relaxed select-text prose-chat">${formatMarkdownText(sec.summary || '')}</div>
             ${(sec.highlights && sec.highlights.length > 0) ? `
               <div class="p-3 rounded-xl bg-black/50 border border-white/5 space-y-1.5 mt-2">
                 <div class="text-[10px] font-bold uppercase font-mono text-slate-400">Key Evidence & Takeaways:</div>
                 <ul class="list-disc list-inside text-xs text-slate-300 space-y-1 font-sans pl-1 select-text">
-                  ${sec.highlights.map(h => `<li>${escapeHtml(h)}</li>`).join('')}
+                  ${sec.highlights.map(h => `<li>${formatMarkdownText(h)}</li>`).join('')}
                 </ul>
               </div>
             ` : ''}

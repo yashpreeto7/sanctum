@@ -239,17 +239,35 @@ class GmailConnector:
                 search_queries.extend([
                     f"from:{clean_q}",
                     f"subject:{clean_q}",
-                    f"{clean_q}",
                 ])
 
-            all_messages = []
-            seen_ids = set()
+            def _fetch_inbound(m):
+                try:
+                    svc = self._get_thread_safe_service()
+                    if not svc:
+                        return None
+                    msg = svc.users().messages().get(userId="me", id=m["id"], format="full").execute()
+                    payload = msg.get("payload", {})
+                    headers = {h["name"].lower(): h["value"] for h in payload.get("headers", [])}
+                    full_body = _extract_body_from_payload(payload) or msg.get("snippet", "")
+                    return InboundEmail(
+                        id=m["id"],
+                        sender=headers.get("from", "Unknown Sender"),
+                        subject=headers.get("subject", "No Subject"),
+                        body=full_body,
+                        received_at_timestamp=float(msg.get("internalDate", 0)) / 1000.0 if msg.get("internalDate") else time.time(),
+                        thread_id=m.get("threadId", m["id"]),
+                        is_read="UNREAD" not in msg.get("labelIds", []),
+                    )
+                except Exception:
+                    return None
 
             for sq in search_queries:
                 try:
                     res = service.users().messages().list(
                         userId="me", q=sq, maxResults=max_results
                     ).execute()
+                    messages = res.get("messages", [])
                     if not messages:
                         continue
 

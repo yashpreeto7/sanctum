@@ -43,11 +43,17 @@
 - **RAG Engine**:
   - Hybrid dense vector search + BM25 keyword matching + recency decay scoring.
   - Automatic indexing of all research dossiers and Obsidian notes.
+- **Theme Engine Inline Style Overlap Fix (Phase 13)**:
+  - **Root Cause**: When a custom theme was saved or applied via `applyCustomThemeVariables()`, custom CSS variables (`--bg-base`, `--bg-card`, `--color-brand`, `--border-main`, etc.) were attached directly as inline styles onto `document.documentElement.style`. Because CSS inline styles have higher specificity than stylesheet attribute selectors (`[data-theme="..."]`), subsequent selection of pre-configured themes in `setThemePreset()` failed to override those inline properties until the page was refreshed.
+  - **Solution**: Added `clearCustomThemeInlineStyles()` inside `setThemePreset()` to remove all custom inline properties from `document.documentElement.style` whenever switching to any non-custom pre-configured theme. Switching between custom themes and pre-configured themes is now immediate and clean without refreshing.
 
-## 6. Old Regime Tactile Physics, Shadows & Momentum Scrolling
-- **Lenis Inertial Scrolling**:
-  - Initialized on `#main-content-scroll` with `duration: 1.2`, cubic-bezier deceleration curve `(t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))`, `smoothWheel: true`, and `touchMultiplier: 2`.
-  - Automatic `scrollTo(0, { immediate: true })` on view tab transitions.
+## 6. High-Performance Native Scroll Engine & Anti-Chaining
+- **Native Hardware-Accelerated Scrolling**:
+  - Removed third-party Lenis library which intercepted native wheel events on `#main-content-scroll` and locked scrolling when non-first views were active.
+  - Enabled standard CSS `scroll-behavior: smooth;` and cross-browser thin scrollbar support (`scrollbar-width: thin; scrollbar-color: var(--border-main) transparent;`).
+- **Anti-Chaining & Jitter Prevention**:
+  - Bound `overscroll-behavior: contain;` and `-webkit-overflow-scrolling: touch;` on all scrollable sub-panels (`#chat-messages-box`, `#chat-sessions-list`, `#traces-list-container`, `#obsidian-notes-list-container`, `#obsidian-markdown-body`, `#spotlight-results-container`, modals, code blocks).
+  - Scrolling inside sub-containers no longer chains or causes outer viewport bounce jitter.
 - **Film Grain & Organic Texture**:
   - `.noise-overlay` using SVG fractal noise filter (`feTurbulence`) fixed across viewport with `mix-blend-mode: overlay` (dark themes) and `multiply` (light themes) at `0.035` opacity.
 - **Dynamic Difference Follower Cursor**:

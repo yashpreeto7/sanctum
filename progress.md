@@ -56,8 +56,19 @@
   - Added spring physics (`cubic-bezier(0.16, 1, 0.3, 1)`) for card hover lifts (`translateY(-2px)`), button active clicks (`scale(0.98)`), row hover glides (`translateX(2px)`), and view crossfades (`@keyframes viewFadeIn`).
   - Verified 100% pass rate in test suite.
 
-- **Phase 9: Multi-Layer Ambient Occlusion Shadows & Live Browser Verification**:
-  - Upgraded `--shadow-card` to a 3-layer ambient occlusion + grounded perimeter stack (`0 8px 24px -4px rgba(0,0,0,0.75), 0 2px 8px -2px rgba(0,0,0,0.5), 0 0 0 1px ...`).
+- **Phase 10: Dynamic Background & Glass Opacity Resolution for Light Modes & Old Regime**:
+  - Resolved opacity failure in `sovereign-manifesto`, `sovereign-light`, and custom palettes by converting hardcoded solid hex overrides to dynamic RGBA channels bound to `--card-opacity`, `--sidebar-opacity`, and `--surface-opacity`.
+  - Added `hexToRgbString` converter to `applyCustomThemeVariables` in [server/dashboard_template.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/server/dashboard_template.py) to enable full glassmorphism for user-created themes.
+  - Verified in live browser automation that adjusting Card Glass Opacity, Wallpaper Visibility, and Background Blur renders backdrop particles, meshes, and videos cleanly beneath translucent cards while preserving high-contrast text and brutalist `3px 3px 0` offset shadows.
+  - Visual proof captured at [screenshot_sovereign_manifesto_opacity_verified.png](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/screenshot_sovereign_manifesto_opacity_verified.png).
+
+- **2026-08-30 (Phase 24)**:
+  - **Female Neural Voice Preference & Interactive Voice Switcher**:
+    1. **Female Voice Prioritization Engine**: Upgraded `detectBestNeuralVoice()` in [server/dashboard_template.py](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/server/dashboard_template.py) to automatically scan and select natural female voices (`Hazel`, `Susan`, `Zira`, `Jenny`, `Aria`, `Samantha`, etc.).
+    2. **Refined Vocal Acoustics**: Configured speech synthesis pitch (`1.08`) and conversational rate (`1.02`) for clear, pleasant, natural female tonality.
+    3. **Interactive HUD Voice Switcher**: Added a glass pill button (`[ ✨ Female: Hazel ]`) in the top bar of the fullscreen HUD so users can tap to cycle between available female/male voices, automatically persisting the user's choice to `localStorage`.
+  - Visual proof captured at [screenshot_voice_female_voice_configured.png](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/screenshot_voice_female_voice_configured.png).
+
   - Upgraded `--shadow-card-hover` to a deep expanded contact shadow (`0 20px 48px -8px ...`) with specular top bevel (`inset 0 1px 0 0 ...`).
   - Enforced high-priority hover lift (`transform: translateY(-3px) !important;`) across `.theme-card` and `.seamless-card`.
   - Executed autonomous browser session across all 14 presets (Sovereign Slate, Titanium Onyx, Minimal Studio, Obsidian Gold, Sovereign Manifesto, Light Studio, Tokyo Night) and verified rich physical depth and crisp cornering.

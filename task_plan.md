@@ -48,14 +48,30 @@
 - **Status:** complete
 - [x] Applied **Old Regime design system** as foundational base: `Playfair Display` serif headers + `Space Grotesk` sans + `JetBrains Mono` code, 1px continuous precision grid borders, corner crosshair anchors (`+`), and monospace section stamps (`01 //`, `02 //`).
 - [x] Added **Sovereign Manifesto** theme preset (cream parchment `#f5f0e8`, deep charcoal ink `#0a0a0a`, Swiss vermilion accent `#d42b2b`, brutalist 2px offset shadows).
-### Phase 8: Old Regime 100% Sharp Blueprint Cornering Geometry
+### Phase 10: Dynamic Background & Glass Opacity Engine for Light Modes & Old Regime
 - **Status:** complete
-- [x] Identified root cause of rounding discrepancy: eliminated all `rounded-2xl`, `rounded-xl`, `rounded-lg`, and `border-radius: 1rem` pill softening.
-- [x] Enforced Old Regime pure rectilinear blueprint drafting geometry (`border-radius: 0px !important;`) across all cards, buttons, navigation items, workspace pills, modals, inputs, and badges in every theme.
-- [x] Maintained circular status indicators (`.status-dot`, `.cur-dot`, `.avatar-circle`) while turning all structural containers into crisp cornered architectural units.
+- [x] Identified root cause: `sovereign-manifesto` and `sovereign-light` themes hardcoded opaque hex colors with `!important`, ignoring `--card-opacity`, `--sidebar-opacity`, and `--surface-opacity`.
+- [x] Converted all background variables (`--bg-base`, `--bg-sidebar`, `--bg-surface`, `--bg-card`, `--bg-card-hover`, `--waybar-bg`) in `:root`, `sovereign-manifesto`, and `sovereign-light` to dynamic `rgba(var(--rgb-...), var(--...-opacity))` channels.
+- [x] Fixed `applyCustomThemeVariables` with `hexToRgbString` so Custom Theme Studio palettes also inherit full glassmorphism and transparency slider support.
+- [x] Verified live transparency rendering with cyber particles and wallpapers visible through translucent cards and sidebars in headless browser (`screenshot_sovereign_manifesto_opacity_verified.png`).
+
+### Phase 11: High-Performance Native Scroll Engine & Anti-Chaining Fixes
+- **Status:** complete
+- [x] Phase 11: Remove Lenis wheel interceptor, fix CSS animation transform isolation, and apply `min-h-0` / `overflow-y: auto` to Inbox, Chat, Traces, Obsidian, and Calendar. <!-- id: 11 -->
+- [x] Phase 12: Live browser & programmatic validation across all 5 scroll containers (Inbox messages stream, Chat history & message box, Traces list & DAG inspector, Obsidian notes list & markdown body, Calendar agenda & festivals). <!-- id: 12 -->
+- [x] Phase 13: Fix custom theme inline style leakage on preset themes. <!-- id: 13 -->
+- [x] Phase 14: Navigation Bar Redesign with theme synchronization. <!-- id: 14 -->
+- [x] Phase 15: Solid Dropdown Surfaces & Executive Focus Suite (Ambient Soundscape generator, Pomodoro Timer, live Triage Attention counters). <!-- id: 15 -->
+- [x] Phase 16: Universal Search Bar & Spotlight HUD Dynamic Theming. <!-- id: 16 -->
+- [x] Phase 17: ChatGPT-Style Streamlined Response Formatting & Modern Prose Layout. <!-- id: 17 -->
+- [x] Phase 18: Universal Text Streamlining Across All Workspaces (Obsidian, Research, Inbox, Traces, Docs). <!-- id: 18 -->
+- [x] Phase 19: Real-Time JARVIS Hands-Free Voice Assistant (Continuous VAD, Web Audio Visualizer, Neural TTS & Barge-In). <!-- id: 19 -->
+- [x] Phase 20: JARVIS 3D Luminous Voice Orb & Speech Engine Overhaul (Eliminated Glitch Loops, Tap-to-Send, Fluid Morphing Sphere). <!-- id: 20 -->
+- [x] Phase 21: ChatGPT-Style Immersive Fullscreen Voice Mode & Autonomous Hands-Free Spoken Reply Engine. <!-- id: 21 -->
+- [x] Phase 22: Voice Pipeline Fix & Verified End-to-End Spoken Reply for Natural Language Inquiries. <!-- id: 22 -->
+- [x] Phase 23: Interactive Voice & Chat Latency Optimization (Fast-tracked Quarantine & Triage, Flash Thinking Budgeting). <!-- id: 23 -->
+- [x] Phase 24: Female Neural Voice Prioritization & Interactive Voice Switcher Suite. <!-- id: 24 -->
+- [x] Fixed instant scroll-top reset on tab switching in `switchTab()`.
 
 ## Next Steps
-- User hands-on testing of cornered blueprint architecture and tactile physics.
-- On user approval, merge branch `feature/research-ux-and-sidebar-toggle` into `main`.
-
-
+- Verify test completion and report resolution to user.

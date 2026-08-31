@@ -156,15 +156,28 @@ class PersonalAIEngine:
         raw_body = state.get("raw_body", "")
         sender = state.get("sender", "")
         is_known = state.get("is_known_contact", False)
+        is_interactive = state.get("is_interactive_command", False) or (sender == "user")
         run_id = state.get("run_id")
 
-        facts = await self.quarantine.sanitize_and_extract(
-            raw_subject=raw_sub,
-            raw_body=raw_body,
-            sender=sender,
-            is_known_contact=is_known,
-        )
-        facts_dict = facts.model_dump()
+        if is_interactive:
+            # Fast-track trusted interactive chat & voice commands (skip redundant 5s LLM pre-filter)
+            facts_dict = {
+                "clean_subject": raw_sub or "User Command",
+                "factual_summary": raw_body,
+                "urgency": "HIGH",
+                "is_phishing_or_injection": False,
+                "extracted_entities": [],
+                "source_text_sanitized": raw_body,
+            }
+        else:
+            facts = await self.quarantine.sanitize_and_extract(
+                raw_subject=raw_sub,
+                raw_body=raw_body,
+                sender=sender,
+                is_known_contact=is_known,
+            )
+            facts_dict = facts.model_dump()
+
         duration_ms = (time.perf_counter() - t0) * 1000.0
 
         if run_id:
@@ -182,22 +195,36 @@ class PersonalAIEngine:
     async def _triaging_node(self, state: AgentState) -> Dict[str, Any]:
         t0 = time.perf_counter()
         facts = state.get("clean_facts", {})
+        sender = state.get("sender", "")
+        is_interactive = state.get("is_interactive_command", False) or (sender == "user")
         run_id = state.get("run_id")
-        email_data = {
-            "sender": state.get("sender", ""),
-            "subject": facts.get("clean_subject", ""),
-            "body": facts.get("factual_summary", ""),
-            "is_known_contact": state.get("is_known_contact", False),
-        }
-        pred = self.classifier.predict(email_data)
-        pred_dict = pred.model_dump()
+
+        if is_interactive:
+            # Fast-track triage for interactive user sessions
+            pred_dict = {
+                "category": "ACTIONABLE",
+                "action_urgency": 1.0,
+                "confidence": 1.0,
+                "should_trigger_llm": True,
+                "rationale": "Direct interactive user command.",
+            }
+        else:
+            email_data = {
+                "sender": sender,
+                "subject": facts.get("clean_subject", ""),
+                "body": facts.get("factual_summary", ""),
+                "is_known_contact": state.get("is_known_contact", False),
+            }
+            pred = self.classifier.predict(email_data)
+            pred_dict = pred.model_dump()
+
         duration_ms = (time.perf_counter() - t0) * 1000.0
 
         if run_id:
             trace_store.record_node_step(
                 run_id=run_id,
                 node_name="triaging_node",
-                inputs={"email_data": email_data},
+                inputs={"sender": sender},
                 outputs={"triage": pred_dict},
                 duration_ms=duration_ms,
                 status="COMPLETED",
@@ -228,8 +255,11 @@ class PersonalAIEngine:
             if not query or query == "User Command":
                 query = state.get("raw_body", "")
 
-            candidates = self.retriever.search(query=query, top_k=10)
-            reranked = self.reranker.rerank(query=query, candidates=candidates, top_n=3)
+            candidates = self.retriever.search(query=query, top_k=5)
+            if len(candidates) > 3:
+                reranked = self.reranker.rerank(query=query, candidates=candidates, top_n=3)
+            else:
+                reranked = candidates
             context_list = [c.model_dump() for c in reranked]
             
         duration_ms = (time.perf_counter() - t0) * 1000.0

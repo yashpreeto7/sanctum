@@ -256,9 +256,15 @@ class GeminiProvider(BaseLLMProvider):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:generateContent?key={self.api_key}"
 
         contents = [{"role": "user", "parts": [{"text": prompt}]}]
+        gen_config: Dict[str, Any] = {
+            "temperature": temperature or settings.LLM_TEMPERATURE,
+        }
+        if "2.5" in str(target_model):
+            gen_config["thinkingConfig"] = {"thinkingBudget": 0}
+
         body: Dict[str, Any] = {
             "contents": contents,
-            "generationConfig": {"temperature": temperature or settings.LLM_TEMPERATURE},
+            "generationConfig": gen_config,
         }
         if system_prompt:
             body["systemInstruction"] = {"parts": [{"text": system_prompt}]}
@@ -318,18 +324,18 @@ class HybridLLMProvider(BaseLLMProvider):
         self.gemini = GeminiProvider()
 
     async def is_available(self) -> bool:
-        if await self.ollama.is_available():
+        if bool(self.gemini.api_key):
             return True
-        if await self.gemini.is_available():
+        if await self.ollama.is_available():
             return True
         return False
 
     async def _get_active_provider(self) -> BaseLLMProvider:
-        if await self.gemini.is_available():
+        if bool(self.gemini.api_key):
             return self.gemini
         if await self.ollama.is_available():
             return self.ollama
-        return self.ollama
+        return self.gemini
 
     async def generate(
         self,

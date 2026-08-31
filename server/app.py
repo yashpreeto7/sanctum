@@ -185,9 +185,14 @@ auto_index_sample_knowledge()
 
 # Request / Response Schemas
 class ChatCommandRequest(BaseModel):
-    command: str
+    command: Optional[str] = None
+    message: Optional[str] = None
+    query: Optional[str] = None
     thread_id: Optional[str] = None
     session_id: Optional[str] = None
+
+    def get_text(self) -> str:
+        return (self.command or self.message or self.query or "").strip()
 
 
 class CreateChatSessionPayload(BaseModel):
@@ -375,6 +380,10 @@ async def clear_all_chats():
 @app.post("/api/chat")
 async def handle_chat_command(payload: ChatCommandRequest):
     """Processes natural language user requests through the LangGraph engine with persistent chat history and full trace capturing."""
+    user_query = payload.get_text()
+    if not user_query:
+        raise HTTPException(status_code=400, detail="Command or message is required.")
+
     session_id = payload.session_id or f"session-{uuid.uuid4().hex[:8]}"
     thread_id = payload.thread_id or session_id
     config = {"configurable": {"thread_id": thread_id}}
@@ -384,14 +393,14 @@ async def handle_chat_command(payload: ChatCommandRequest):
     history_tuples = [{"role": m.role, "content": m.content} for m in past_messages[-10:]]
 
     # Record user message in local SQLite history
-    chat_history_store.add_message(session_id=session_id, role="user", content=payload.command)
+    chat_history_store.add_message(session_id=session_id, role="user", content=user_query)
 
-    trace = trace_store.start_trace(query=payload.command, thread_id=thread_id, sender="user")
+    trace = trace_store.start_trace(query=user_query, thread_id=thread_id, sender="user")
 
     initial_state = {
         "run_id": trace.run_id,
         "raw_subject": "User Command",
-        "raw_body": payload.command,
+        "raw_body": user_query,
         "sender": "user",
         "is_known_contact": True,
         "is_interactive_command": True,
@@ -430,7 +439,7 @@ async def handle_chat_command(payload: ChatCommandRequest):
 
         # Continuously ingest conversation Q&A into hybrid vector RAG store
         try:
-            qa_summary = f"User Query: {payload.command}\nPersonal AI Response: {final_output}"
+            qa_summary = f"User Query: {user_query}\nPersonal AI Response: {final_output}"
             if planned_tool and planned_tool != "no_action":
                 qa_summary += f"\nAction Performed: {planned_tool} with parameters {tool_args}"
             vector_store.insert_chunks([
@@ -441,7 +450,7 @@ async def handle_chat_command(payload: ChatCommandRequest):
                         "session_id": session_id,
                         "run_id": trace.run_id,
                         "timestamp": time.time(),
-                        "query": payload.command,
+                        "query": user_query,
                     },
                 )
             ])
@@ -453,6 +462,9 @@ async def handle_chat_command(payload: ChatCommandRequest):
             "run_id": trace.run_id,
             "thread_id": thread_id,
             "final_output": final_output,
+            "reply": final_output,
+            "output": final_output,
+            "response": final_output,
             "planned_tool": planned_tool,
             "tool_args": tool_args,
             "approval_required": approval_req,
@@ -527,9 +539,14 @@ async def ingest_inbound_email(payload: InboundEmailPayload):
 
 
 @app.post("/api/inbox/sync")
-async def sync_live_gmail():
+async def sync_live_gmail(reset: bool = False):
     """Fetches emails directly from Gmail API (inbox + unread), runs triage & quarantine, and populates inbox."""
     try:
+        if reset:
+            inbox_store.clear()
+            gmail_connector._cached_sent = []
+            gmail_connector._cached_sent_time = 0.0
+
         inbox_emails = await asyncio.to_thread(gmail_connector.list_inbox_messages, 35)
         existing_ids = {item.get("id") for item in inbox_store}
         new_count = 0
@@ -579,6 +596,16 @@ async def sync_live_gmail():
         return {"status": "synced", "total_inbox": len(inbox_store), "new_synced": new_count}
     except Exception as e:
         return {"status": "error", "error": str(e), "total_inbox": len(inbox_store)}
+
+
+@app.post("/api/inbox/clear")
+async def clear_inbox_cache():
+    """Flushes all cached inbox and sent emails, allowing clean fresh reload."""
+    inbox_store.clear()
+    _save_inbox_store()
+    gmail_connector._cached_sent = []
+    gmail_connector._cached_sent_time = 0.0
+    return {"status": "cleared", "total_inbox": 0}
 
 
 @app.get("/api/inbox")
@@ -1735,7 +1762,14 @@ async def get_manifest():
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard():
     """Serves the rich, responsive SovereignOS Web Command Center."""
-    return HTMLResponse(content=DASHBOARD_HTML)
+    try:
+        import importlib
+        import server.dashboard_template
+        importlib.reload(server.dashboard_template)
+        return HTMLResponse(content=server.dashboard_template.DASHBOARD_HTML)
+    except Exception:
+        from server.dashboard_template import DASHBOARD_HTML
+        return HTMLResponse(content=DASHBOARD_HTML)
 
 
 if __name__ == '__main__':
