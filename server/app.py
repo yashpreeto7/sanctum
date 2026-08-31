@@ -1304,6 +1304,20 @@ async def delete_memory_endpoint(memory_id: int):
     return {"status": "success" if deleted else "not_found", "memory_id": memory_id}
 
 
+@app.put("/api/memory/{memory_id}")
+async def update_memory_endpoint(memory_id: int, request: Request):
+    """Updates the value of a memory fact by ID (inline edit)."""
+    from execution.ml.memory_graph import memory_graph
+    body = await request.json()
+    new_value = body.get("value", "").strip()
+    if not new_value:
+        return {"status": "error", "message": "value is required"}
+    updated = memory_graph.update_memory_by_id(memory_id, new_value)
+    if updated:
+        return {"status": "success", "memory": updated}
+    return {"status": "not_found", "memory_id": memory_id}
+
+
 @app.get("/api/memory/search")
 async def search_memories_endpoint(q: str = ""):
     """Searches memory graph for matching entities or values."""

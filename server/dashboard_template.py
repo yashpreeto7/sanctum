@@ -6011,7 +6011,7 @@ DASHBOARD_HTML = r"""
 
     // ── Navigation & Workspace Switching ──
     function switchTab(tabId) {
-      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'rag', 'obsidian', 'calendar', 'activity', 'system', 'research', 'documents'];
+      const tabs = ['home', 'chat', 'traces', 'inbox', 'approvals', 'topology', 'memory', 'rag', 'obsidian', 'calendar', 'activity', 'system', 'research', 'documents'];
       
       tabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
@@ -6044,6 +6044,7 @@ DASHBOARD_HTML = r"""
           inbox: 'Inbox & ML Triage',
           approvals: 'HITL Approvals',
           topology: 'LangGraph Topology DAG',
+          memory: 'Autonomous Memory Graph',
           rag: 'Knowledge Vault (RAG)',
           obsidian: 'Obsidian Knowledge Vault',
           calendar: 'Schedule & Google Calendar',
@@ -6084,6 +6085,9 @@ DASHBOARD_HTML = r"""
       }
       if (tabId === 'documents') {
         fetchIngestedDocuments();
+      }
+      if (tabId === 'memory') {
+        fetchMemories();
       }
       refreshIcons();
       const scrollContainer = document.getElementById('main-content-scroll');
@@ -6390,6 +6394,7 @@ DASHBOARD_HTML = r"""
           const data = await res.json();
           box.appendChild(createAssistantMessageBubble(data.final_output, data.planned_tool, data.run_id));
           box.scrollTop = box.scrollHeight;
+          injectFollowUpSuggestions(data.final_output || '', box);
           fetchChatSessions(false);
           fetchTraces();
           playHudBeep(1100);
@@ -6464,6 +6469,8 @@ DASHBOARD_HTML = r"""
         fetchChatSessions(false);
         playHudBeep(1200);
         refreshIcons();
+        // Inject follow-up suggestions after AI reply
+        injectFollowUpSuggestions(data.content || '', box);
 
         // Speak aloud assistant response if JARVIS voice mode is enabled
         speakAssistantResponse(data.content);
@@ -7326,6 +7333,155 @@ DASHBOARD_HTML = r"""
       return c;
     }
 
+    // ── Typed Toast (success / error / info / warning) ──
+    function showToast(title, message, type = 'info') {
+      const icons = {
+        success: { emoji: '✅', color: 'text-emerald-300', dot: 'bg-emerald-400', border: 'border-emerald-500/40' },
+        error:   { emoji: '❌', color: 'text-rose-300',    dot: 'bg-rose-400',    border: 'border-rose-500/40'    },
+        info:    { emoji: 'ℹ️',  color: 'text-cyan-300',   dot: 'bg-cyan-400',    border: 'border-cyan-500/40'    },
+        warning: { emoji: '⚠️', color: 'text-amber-300',  dot: 'bg-amber-400',   border: 'border-amber-500/40'   },
+      };
+      const s = icons[type] || icons.info;
+      const container = createToastContainer();
+      const toast = document.createElement('div');
+      toast.className = `p-3 rounded-xl theme-card border ${s.border} bg-black/90 backdrop-blur-xl shadow-2xl text-white max-w-xs pointer-events-auto transition-all duration-300 flex items-start space-x-3`;
+      toast.innerHTML = `
+        <span class="text-base leading-none mt-0.5">${s.emoji}</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-bold ${s.color} font-display">${title}</div>
+          <div class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">${message}</div>
+        </div>
+        <button onclick="this.closest('div.p-3').remove()" class="text-slate-400 hover:text-white text-xs cursor-pointer flex-shrink-0">✕</button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+      }, 5000);
+    }
+
+    // ── Memory Inline Edit ──
+    async function updateMemoryInline(memoryId, newValue) {
+      try {
+        const res = await fetch(`/api/memory/${memoryId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ value: newValue })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          const idx = allMemoriesList.findIndex(m => m.id === memoryId);
+          if (idx !== -1) allMemoriesList[idx].value = newValue;
+          showToast('Memory Updated', `Saved new value for fact #${memoryId}`, 'success');
+        } else {
+          showToast('Update Failed', 'Could not save memory edit.', 'error');
+        }
+      } catch (e) {
+        showToast('Error', e.message, 'error');
+      }
+    }
+
+    function startMemoryEdit(memoryId) {
+      const el = document.getElementById(`mem-val-${memoryId}`);
+      if (!el) return;
+      el.contentEditable = 'true';
+      el.classList.add('cursor-text', 'ring-1', 'ring-cyan-500/40');
+      el.classList.remove('cursor-default');
+      // Strip quotes for editing
+      el.textContent = el.dataset.original;
+      el.focus();
+      // Place cursor at end
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    }
+
+    function saveMemoryEdit(el) {
+      if (el.contentEditable !== 'true') return;
+      el.contentEditable = 'false';
+      el.classList.remove('cursor-text', 'ring-1', 'ring-cyan-500/40');
+      el.classList.add('cursor-default');
+      const newValue = el.textContent.trim();
+      const memoryId = parseInt(el.dataset.memid, 10);
+      if (newValue && newValue !== el.dataset.original) {
+        el.dataset.original = newValue;
+        updateMemoryInline(memoryId, newValue);
+      }
+      // Restore display with quotes
+      el.textContent = `"${newValue || el.dataset.original}"`;
+    }
+
+    // ── F2: Keyboard Shortcut Cheatsheet (? key) ──
+    function openShortcutCheatsheet() {
+      if (document.getElementById('shortcut-overlay')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'shortcut-overlay';
+      overlay.className = 'fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4';
+      overlay.innerHTML = `
+        <div class="bg-[#0d0d14] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold font-display text-white flex items-center space-x-2">
+              <span>⌨️</span><span>Keyboard Shortcuts</span>
+            </h2>
+            <button onclick="document.getElementById('shortcut-overlay').remove()" class="text-slate-400 hover:text-white text-lg cursor-pointer">✕</button>
+          </div>
+          <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-[11px]">
+            ${[
+              ['Ctrl + K', 'Open Command Palette'],
+              ['Ctrl + B', 'Toggle Sidebar'],
+              ['Ctrl + Enter', 'Send Chat (in input)'],
+              ['?', 'Show this shortcut guide'],
+              ['Escape', 'Close modal / Cancel edit'],
+              ['Tab 1–9', 'Switch between nav tabs'],
+            ].map(([key, desc]) => `
+              <div class="flex items-center justify-between py-1.5 border-b border-slate-800/60">
+                <span class="text-slate-400">${desc}</span>
+                <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300 font-mono text-[10px]">${key}</kbd>
+              </div>
+            `).join('')}
+          </div>
+          <p class="text-[10px] text-slate-500 text-center">Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Esc</kbd> to dismiss</p>
+        </div>
+      `;
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+      document.body.appendChild(overlay);
+    }
+
+    // ── F4: Suggested Follow-up Prompts ──
+    function injectFollowUpSuggestions(responseText, box) {
+      const suggestions = generateFollowUps(responseText);
+      if (!suggestions.length) return;
+      const el = document.createElement('div');
+      el.className = 'flex flex-wrap gap-2 pt-1 pl-1';
+      el.innerHTML = suggestions.map(s => `
+        <button onclick="setChatPrompt(${JSON.stringify(s)}); sendChatMessage();"
+          class="text-[10px] font-mono px-2.5 py-1 rounded-full border border-cyan-500/30 text-cyan-300 bg-cyan-500/5 hover:bg-cyan-500/20 transition cursor-pointer max-w-[200px] truncate">
+          ↩ ${s}
+        </button>
+      `).join('');
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function generateFollowUps(text) {
+      const lower = text.toLowerCase();
+      const prompts = [];
+      if (lower.includes('email') || lower.includes('inbox'))   prompts.push('Show me my unread emails');
+      if (lower.includes('calendar') || lower.includes('event')) prompts.push('What is on my schedule today?');
+      if (lower.includes('memory') || lower.includes('fact'))   prompts.push('Show the Memory Graph');
+      if (lower.includes('research') || lower.includes('arxiv')) prompts.push('Save this to Obsidian');
+      if (lower.includes('error') || lower.includes('failed'))  prompts.push('Why did that fail? Explain the error.');
+      if (lower.includes('agent') || lower.includes('tool'))    prompts.push('Show execution traces');
+      // Generic fallbacks
+      if (prompts.length < 2) {
+        prompts.push('Summarize that in bullet points');
+        prompts.push('What should I do next?');
+      }
+      return prompts.slice(0, 3);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       const textarea = document.getElementById('chat-input-textarea');
       if (textarea) {
@@ -7336,6 +7492,19 @@ DASHBOARD_HTML = r"""
           }
         });
       }
+
+      // ? key opens shortcut cheatsheet
+      document.addEventListener('keydown', (e) => {
+        const tag = document.activeElement?.tagName?.toLowerCase();
+        const isEditable = tag === 'input' || tag === 'textarea' || document.activeElement?.contentEditable === 'true';
+        if (e.key === '?' && !isEditable && !e.ctrlKey && !e.metaKey) {
+          openShortcutCheatsheet();
+        }
+        if (e.key === 'Escape') {
+          const overlay = document.getElementById('shortcut-overlay');
+          if (overlay) overlay.remove();
+        }
+      });
     });
 
     function focusChatInput() {
@@ -11239,6 +11408,9 @@ DASHBOARD_HTML = r"""
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded border ${catColors[m.category] || 'bg-slate-500/20 text-slate-300 border-slate-500/30'}">${escapeHtml(m.category)}</span>
             <div class="flex items-center space-x-1 opacity-60 group-hover:opacity-100 transition">
+              <button onclick="startMemoryEdit(${m.id})" title="Edit value" class="p-1 rounded hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 transition">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              </button>
               <button onclick="deleteMemoryItem(${m.id})" title="Delete fact" class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 transition">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
@@ -11250,7 +11422,11 @@ DASHBOARD_HTML = r"""
               <span class="text-slate-500">.</span>
               <span class="text-slate-200">${escapeHtml(m.attribute)}</span>
             </div>
-            <div class="text-xs text-slate-300 font-sans leading-relaxed select-text bg-black/30 p-2 rounded-lg border theme-border">
+            <div id="mem-val-${m.id}" contenteditable="false"
+              data-memid="${m.id}" data-original="${escapeHtml(m.value)}"
+              onblur="saveMemoryEdit(this)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}if(event.key==='Escape'){this.textContent=this.dataset.original;this.blur()}"
+              class="text-xs text-slate-300 font-sans leading-relaxed select-text bg-black/30 p-2 rounded-lg border theme-border cursor-default transition focus:outline-none focus:border-cyan-500/60 focus:bg-black/50 focus:cursor-text">
               "${escapeHtml(m.value)}"
             </div>
           </div>
@@ -11260,6 +11436,7 @@ DASHBOARD_HTML = r"""
           </div>
         </div>
       `).join('');
+
 
       refreshIcons();
     }

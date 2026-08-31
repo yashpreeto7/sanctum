@@ -7,6 +7,12 @@
       "skillPath": "SKILL.md",
       "computedHash": "cee2494adc2d3bdbedbf2a4b1a87c7eda12482c0de1ec690d8c3c19b9a0c3ebc"
     },
+    "loop-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/in-progress/loop-me/SKILL.md",
+      "computedHash": "d7fbcf41b5af203a6f2a7937afaaaebdd9941b0aa4cc3654b52daec01d3fb564"
+    },
     "observability-and-instrumentation": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
@@ -42,6 +48,12 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
       "computedHash": "d1de8ff8d228cd4204bf06eb959ef4317d5b927908d9f42765971e33e80c8a7e"
+    },
+    "verification-loop": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/verification-loop/SKILL.md",
+      "computedHash": "18e7a80e867972c6230ee7682e13df41f9bb4e25c86e5000b5da178d9f9663d5"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",

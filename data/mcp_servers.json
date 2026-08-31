@@ -1,14 +1,10 @@
 {
   "filesystem": {
     "command": "npx",
-    "args": [
-      "-y",
-      "@modelcontextprotocol/server-filesystem",
-      "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT"
-    ],
+    "args": [],
     "env": {},
-    "enabled": false,
-    "description": "Local file system operations, reading directories, writing and searching files."
+    "enabled": true,
+    "description": ""
   },
   "sqlite": {
     "command": "npx",

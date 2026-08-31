@@ -122,6 +122,20 @@ class MemoryGraph:
             conn.commit()
             return cursor.rowcount > 0
 
+    def update_memory_by_id(self, memory_id: int, value: str) -> Dict[str, Any]:
+        """Updates the value of an existing memory fact by its ID."""
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).isoformat()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE memories SET value=?, last_accessed_at=? WHERE id=?",
+                (value.strip(), now, memory_id)
+            )
+            conn.commit()
+            row = cursor.execute("SELECT * FROM memories WHERE id=?", (memory_id,)).fetchone()
+            return dict(row) if row else {}
+
     def get_all_memories(self, category: Optional[str] = None, limit: int = 200) -> List[Dict[str, Any]]:
         """Retrieves list of memories with optional category filter."""
         with self._get_connection() as conn:
