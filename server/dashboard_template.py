@@ -27,7 +27,7 @@ DASHBOARD_HTML = r"""
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Mermaid.js for Architecture & Flowchart Diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -73,6 +73,17 @@ DASHBOARD_HTML = r"""
       --sidebar-opacity: 0.95;
       --surface-opacity: 0.95;
       --card-blur: 8px;
+
+      /* Typography Engine */
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-display: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+      /* Glow Intensity Multiplier */
+      --glow-intensity: 1;
+
+      /* Card Border Width */
+      --card-border-width: 1px;
 
       /* Sovereign Manifesto (Old Regime Editorial Swiss/Parchment - Default Master Base) */
       --rgb-base: 245, 240, 232;
@@ -1551,6 +1562,80 @@ DASHBOARD_HTML = r"""
         padding: 40px !important;
       }
     }
+
+    /* ── Typography Engine ── */
+    body, .font-sans, p, span, div, input, textarea, select, button {
+      font-family: var(--font-sans) !important;
+    }
+    .font-display, h1, h2, h3, h4 {
+      font-family: var(--font-display) !important;
+    }
+    .font-mono, code, pre, kbd, .font-mono * {
+      font-family: var(--font-mono) !important;
+    }
+
+    /* ── Glow Intensity Engine ── */
+    .theme-card:hover {
+      box-shadow: var(--shadow-card-hover), calc(var(--glow-intensity) * 1) var(--bevel-highlight-hover) !important;
+    }
+    .btn-brand-primary {
+      box-shadow: 0 4px 14px -2px color-mix(in srgb, var(--color-brand) calc(var(--glow-intensity) * 40%), transparent) !important;
+    }
+
+    /* ── Card Border Width Engine ── */
+    .theme-card { border-width: var(--card-border-width) !important; }
+
+    /* ── Density Modes ── */
+    body.density-compact .p-3    { padding: 0.375rem !important; }
+    body.density-compact .p-4    { padding: 0.5rem !important; }
+    body.density-compact .p-5    { padding: 0.625rem !important; }
+    body.density-compact .p-6    { padding: 0.75rem !important; }
+    body.density-compact .space-y-4 > * + * { margin-top: 0.5rem !important; }
+    body.density-compact .space-y-6 > * + * { margin-top: 0.75rem !important; }
+    body.density-compact .gap-4  { gap: 0.5rem !important; }
+    body.density-compact .gap-6  { gap: 0.75rem !important; }
+    body.density-compact .text-sm { font-size: 0.7rem !important; }
+    body.density-compact .text-xs { font-size: 0.65rem !important; }
+    body.density-compact .text-base { font-size: 0.8rem !important; }
+
+    body.density-spacious .p-3   { padding: 1rem !important; }
+    body.density-spacious .p-4   { padding: 1.25rem !important; }
+    body.density-spacious .p-5   { padding: 1.5rem !important; }
+    body.density-spacious .p-6   { padding: 1.75rem !important; }
+    body.density-spacious .space-y-4 > * + * { margin-top: 1.25rem !important; }
+    body.density-spacious .gap-4 { gap: 1.25rem !important; }
+    body.density-spacious .text-xs { font-size: 0.8rem !important; }
+    body.density-spacious .text-sm { font-size: 0.95rem !important; }
+
+    /* ── Zen / Focus Mode ── */
+    body.zen-mode #app-sidebar {
+      width: 0 !important; min-width: 0 !important; max-width: 0 !important;
+      padding: 0 !important; border: none !important; opacity: 0 !important;
+      pointer-events: none !important; overflow: hidden !important;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    body.zen-mode .waybar-hud {
+      transform: translateY(-100%) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      position: fixed !important;
+    }
+    body:not(.zen-mode) .waybar-hud {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    #zen-exit-btn {
+      display: none;
+    }
+    body.zen-mode #zen-exit-btn {
+      display: flex !important;
+      position: fixed !important;
+      top: 12px !important;
+      right: 16px !important;
+      z-index: 9999 !important;
+    }
   </style>
 </head>
 <body class="flex flex-col h-screen w-screen relative overflow-hidden">
@@ -1563,6 +1648,11 @@ DASHBOARD_HTML = r"""
 
   <!-- Old Regime Film Grain / Noise Texture Overlay -->
   <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- Zen Mode Exit Float Button -->
+  <button id="zen-exit-btn" onclick="toggleZenMode(); playCyberClick();" class="items-center space-x-2 px-4 py-2 rounded-xl bg-black/80 border border-violet-500/50 text-violet-300 text-xs font-mono font-bold shadow-2xl backdrop-blur-md hover:bg-violet-600/30 transition cursor-pointer" style="display:none;">
+    <i data-lucide="minimize-2" class="w-3.5 h-3.5 inline mr-1.5"></i>Exit Zen Mode
+  </button>
 
   <!-- ─── 0. LIVE WALLPAPER, VIDEO & BACKGROUND LAYERS ──────────────── -->
   <!-- Live Canvas Engine (Matrix, Particles, Synthwave, Deep Space, Tokyo Rain, Aurora) -->
@@ -1708,10 +1798,23 @@ DASHBOARD_HTML = r"""
         </div>
       </div>
 
+      <!-- 🎨 Accent Quick-Picker (always visible color dot) -->
+      <div class="relative flex-shrink-0 group" title="Quick Accent Color">
+        <button onclick="document.getElementById('waybar-accent-picker').click()" class="w-7 h-7 rounded-xl border-2 border-white/20 hover:border-white/60 transition cursor-pointer shadow-md flex items-center justify-center" id="waybar-accent-dot" style="background: var(--color-brand);" title="Quick-change accent color">
+          <i data-lucide="pipette" class="w-3 h-3 text-white opacity-0 group-hover:opacity-100 transition"></i>
+        </button>
+        <input type="color" id="waybar-accent-picker" class="absolute opacity-0 w-0 h-0 pointer-events-none" oninput="setQuickAccentColor(this.value)" />
+      </div>
+
       <!-- 🎨 Themes Picker Trigger (Always Visible) -->
       <button onclick="openThemeModal(); playCyberClick();" title="Theme Selector" class="px-2.5 py-1.5 rounded-xl btn-brand-primary text-xs flex items-center space-x-1.5 transition cursor-pointer font-medium shadow-md flex-shrink-0">
         <i data-lucide="palette" class="w-3.5 h-3.5"></i>
         <span id="current-theme-label" class="font-mono text-[11px]">Theme</span>
+      </button>
+
+      <!-- 🧘 Zen / Focus Mode Toggle -->
+      <button onclick="toggleZenMode(); playCyberClick();" id="btn-zen-mode" title="Zen / Focus Mode — hides sidebar & waybar" class="p-2 rounded-xl theme-card border hover:border-violet-400 text-slate-400 hover:text-violet-300 transition cursor-pointer flex-shrink-0">
+        <i data-lucide="focus" class="w-3.5 h-3.5"></i>
       </button>
 
       <!-- ⚙️ Quick Settings / Tools Dropdown Container (Always Visible) -->
@@ -3815,6 +3918,130 @@ DASHBOARD_HTML = r"""
         </div>
       </div>
 
+      <!-- Section 2.8: Typography & Font Engine -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-300">
+            <i data-lucide="type" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>🔤 Typography & Font Engine</span>
+          </div>
+          <span id="label-current-font" class="text-[10px] text-emerald-300 font-mono font-bold">Inter — Default</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="setFontFamily('inter'); playCyberClick();" data-font="inter" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-emerald-500 bg-emerald-600/20 text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Inter', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">Inter</div>
+            <div class="text-[9px] text-slate-500 font-mono">Default</div>
+          </button>
+          <button onclick="setFontFamily('outfit'); playCyberClick();" data-font="outfit" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Outfit', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">Outfit</div>
+            <div class="text-[9px] text-slate-500 font-mono">Modern</div>
+          </button>
+          <button onclick="setFontFamily('space-grotesk'); playCyberClick();" data-font="space-grotesk" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Space Grotesk', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">Space Grotesk</div>
+            <div class="text-[9px] text-slate-500 font-mono">Technical</div>
+          </button>
+          <button onclick="setFontFamily('plus-jakarta'); playCyberClick();" data-font="plus-jakarta" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Plus Jakarta Sans', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">Plus Jakarta</div>
+            <div class="text-[9px] text-slate-500 font-mono">Humanist</div>
+          </button>
+          <button onclick="setFontFamily('dm-sans'); playCyberClick();" data-font="dm-sans" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'DM Sans', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">DM Sans</div>
+            <div class="text-[9px] text-slate-500 font-mono">Clean</div>
+          </button>
+          <button onclick="setFontFamily('sora'); playCyberClick();" data-font="sora" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Sora', sans-serif;">Aa</div>
+            <div class="font-bold text-[10px]">Sora</div>
+            <div class="text-[9px] text-slate-500 font-mono">Geometric</div>
+          </button>
+          <button onclick="setFontFamily('jetbrains'); playCyberClick();" data-font="jetbrains" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'JetBrains Mono', monospace;">Aa</div>
+            <div class="font-bold text-[10px]">JetBrains</div>
+            <div class="text-[9px] text-slate-500 font-mono">Mono Code</div>
+          </button>
+          <button onclick="setFontFamily('playfair'); playCyberClick();" data-font="playfair" class="font-preset-btn p-2.5 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white space-y-0.5">
+            <div class="font-bold text-sm" style="font-family: 'Playfair Display', serif;">Aa</div>
+            <div class="font-bold text-[10px]">Playfair</div>
+            <div class="text-[9px] text-slate-500 font-mono">Editorial</div>
+          </button>
+        </div>
+        <!-- Live font preview -->
+        <div class="p-3 rounded-xl bg-black/20 border theme-border space-y-1" id="font-preview-box">
+          <div class="text-sm font-bold text-white" id="font-preview-heading">The quick brown fox jumps</div>
+          <div class="text-xs text-slate-400" id="font-preview-body">SovereignOS Autonomous Executive Intelligence · 0123456789</div>
+          <div class="text-[10px] font-mono text-slate-500" id="font-preview-mono">const agent = new SovereignAgent({ model: 'gemini-2.0' });</div>
+        </div>
+      </div>
+
+      <!-- Section 2.9: Glow Intensity & Card Border Width -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-cyan-300">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>⚡ Glow Intensity & Card Border Width</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Glow Intensity -->
+          <div class="p-3 rounded-xl bg-black/30 border theme-border space-y-2">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+              <span class="flex items-center space-x-1"><i data-lucide="sun" class="w-3 h-3 text-cyan-400"></i><span>Glow & Bloom Intensity</span></span>
+              <span class="text-cyan-300 font-bold" id="label-glow-intensity">100%</span>
+            </div>
+            <input type="range" id="slider-glow-intensity" min="0" max="200" value="100" oninput="updateGlowIntensity(this.value)" class="w-full accent-cyan-500 cursor-pointer">
+            <div class="text-[10px] text-slate-600 flex justify-between"><span>Off</span><span>Max Bloom</span></div>
+          </div>
+          <!-- Card Border Width -->
+          <div class="p-3 rounded-xl bg-black/30 border theme-border space-y-2">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+              <span class="flex items-center space-x-1"><i data-lucide="frame" class="w-3 h-3 text-amber-400"></i><span>Card Border Thickness</span></span>
+              <span class="text-amber-300 font-bold" id="label-card-border-width">1px</span>
+            </div>
+            <input type="range" id="slider-card-border-width" min="0" max="3" step="1" value="1" oninput="updateCardBorderWidth(this.value)" class="w-full accent-amber-500 cursor-pointer">
+            <div class="text-[10px] text-slate-600 flex justify-between"><span>None</span><span>Bold 3px</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2.95: Content Density & Zen Mode -->
+      <div class="space-y-3 pt-2 border-t theme-border">
+        <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-rose-300">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-rose-400"></i>
+          <span>📊 Content Density & Focus Mode</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Density -->
+          <div class="space-y-2">
+            <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Layout Density</div>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="setDensityMode('compact'); playCyberClick();" data-density="compact" class="density-btn p-2 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white text-[10px] font-mono space-y-0.5">
+                <i data-lucide="minimize-2" class="w-3.5 h-3.5 mx-auto text-slate-400"></i>
+                <div class="font-bold">Compact</div>
+              </button>
+              <button onclick="setDensityMode('default'); playCyberClick();" data-density="default" class="density-btn p-2 rounded-xl border text-center transition cursor-pointer theme-card border-rose-500 bg-rose-600/20 text-white text-[10px] font-mono space-y-0.5">
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5 mx-auto text-rose-400"></i>
+                <div class="font-bold">Default</div>
+              </button>
+              <button onclick="setDensityMode('spacious'); playCyberClick();" data-density="spacious" class="density-btn p-2 rounded-xl border text-center transition cursor-pointer theme-card border-transparent text-slate-300 hover:text-white text-[10px] font-mono space-y-0.5">
+                <i data-lucide="maximize-2" class="w-3.5 h-3.5 mx-auto text-slate-400"></i>
+                <div class="font-bold">Spacious</div>
+              </button>
+            </div>
+          </div>
+          <!-- Zen Mode -->
+          <div class="space-y-2">
+            <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Focus / Zen Mode</div>
+            <button onclick="toggleZenMode(); closeThemeModal(); playCyberClick();" class="w-full p-3 rounded-xl border border-violet-500/40 bg-violet-900/20 hover:bg-violet-700/30 text-violet-300 text-xs font-mono font-bold flex items-center justify-center space-x-2 transition cursor-pointer">
+              <i data-lucide="focus" class="w-4 h-4"></i>
+              <span>Enter Zen Mode</span>
+              <span class="text-[10px] opacity-60 font-normal">(hides sidebar & bar)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Section 3: Custom Theme Studio & Palette Creator -->
       <div class="space-y-4 pt-3 border-t theme-border">
         <div class="flex items-center justify-between">
@@ -4735,6 +4962,11 @@ DASHBOARD_HTML = r"""
     const STORAGE_CUSTOM_URL = 'omarchy_custom_wallpaper_url';
     const STORAGE_SHADOW_STYLE = 'sovereign_shadow_style';
     const STORAGE_BORDER_RADIUS = 'sovereign_border_radius';
+    const STORAGE_FONT = 'sovereign_font';
+    const STORAGE_GLOW = 'sovereign_glow_intensity';
+    const STORAGE_BORDER_WIDTH = 'sovereign_card_border_width';
+    const STORAGE_DENSITY = 'sovereign_density';
+    const STORAGE_ACCENT = 'sovereign_quick_accent';
 
     // ── Border Radius & Corner Softness Engine ──
     function setBorderRadius(val, updateSlider = true) {
@@ -4824,17 +5056,131 @@ DASHBOARD_HTML = r"""
       if (savedTheme === 'custom') {
         const savedCustom = localStorage.getItem('sovereign_custom_theme');
         if (savedCustom) {
-          try {
-            applyCustomThemeVariables(JSON.parse(savedCustom));
-          } catch(e) {}
+          try { applyCustomThemeVariables(JSON.parse(savedCustom)); } catch(e) {}
         }
       }
-      const savedShadowStyle = localStorage.getItem(STORAGE_SHADOW_STYLE) || 'hard-offset';
-      setShadowStyle(savedShadowStyle, false);
+      setShadowStyle(localStorage.getItem(STORAGE_SHADOW_STYLE) || 'hard-offset', false);
+      setBorderRadius(parseInt(localStorage.getItem(STORAGE_BORDER_RADIUS) ?? '6', 10), true);
+      setFontFamily(localStorage.getItem(STORAGE_FONT) || 'inter', false);
+      updateGlowIntensity(parseInt(localStorage.getItem(STORAGE_GLOW) ?? '100'), false);
+      updateCardBorderWidth(parseInt(localStorage.getItem(STORAGE_BORDER_WIDTH) ?? '1'), false);
+      setDensityMode(localStorage.getItem(STORAGE_DENSITY) || 'default', false);
+      const savedAccent = localStorage.getItem(STORAGE_ACCENT);
+      if (savedAccent) setQuickAccentColor(savedAccent, false);
+    }
 
-      // Restore border radius
-      const savedRadius = parseInt(localStorage.getItem(STORAGE_BORDER_RADIUS) ?? '6', 10);
-      setBorderRadius(savedRadius, true);
+    // ── Typography Font Engine ──
+    const fontMap = {
+      'inter':         { label: 'Inter — Default',       sans: "'Inter', system-ui, sans-serif",             display: "'Inter', system-ui, sans-serif",             mono: "'JetBrains Mono', monospace" },
+      'outfit':        { label: 'Outfit — Modern',        sans: "'Outfit', sans-serif",                         display: "'Outfit', sans-serif",                         mono: "'JetBrains Mono', monospace" },
+      'space-grotesk': { label: 'Space Grotesk — Technical', sans: "'Space Grotesk', sans-serif",              display: "'Space Grotesk', sans-serif",              mono: "'JetBrains Mono', monospace" },
+      'plus-jakarta':  { label: 'Plus Jakarta — Humanist',  sans: "'Plus Jakarta Sans', sans-serif",           display: "'Plus Jakarta Sans', sans-serif",           mono: "'JetBrains Mono', monospace" },
+      'dm-sans':       { label: 'DM Sans — Clean',         sans: "'DM Sans', sans-serif",                      display: "'DM Sans', sans-serif",                      mono: "'JetBrains Mono', monospace" },
+      'sora':          { label: 'Sora — Geometric',        sans: "'Sora', sans-serif",                         display: "'Sora', sans-serif",                         mono: "'JetBrains Mono', monospace" },
+      'jetbrains':     { label: 'JetBrains Mono — Code',   sans: "'JetBrains Mono', monospace",               display: "'JetBrains Mono', monospace",               mono: "'JetBrains Mono', monospace" },
+      'playfair':      { label: 'Playfair — Editorial',    sans: "'Plus Jakarta Sans', sans-serif",           display: "'Playfair Display', serif",                 mono: "'JetBrains Mono', monospace" },
+    };
+
+    function setFontFamily(key, save = true) {
+      const f = fontMap[key] || fontMap['inter'];
+      const root = document.documentElement;
+      root.style.setProperty('--font-sans', f.sans);
+      root.style.setProperty('--font-display', f.display);
+      root.style.setProperty('--font-mono', f.mono);
+      if (save) localStorage.setItem(STORAGE_FONT, key);
+
+      const label = document.getElementById('label-current-font');
+      if (label) label.textContent = f.label;
+
+      // Update preview box fonts
+      const ph = document.getElementById('font-preview-heading');
+      const pb = document.getElementById('font-preview-body');
+      const pm = document.getElementById('font-preview-mono');
+      if (ph) ph.style.fontFamily = f.display;
+      if (pb) pb.style.fontFamily = f.sans;
+      if (pm) pm.style.fontFamily = f.mono;
+
+      // Highlight active preset button
+      document.querySelectorAll('.font-preset-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-font') === key;
+        if (isActive) {
+          btn.classList.add('border-emerald-500', 'bg-emerald-600/20', 'text-white');
+          btn.classList.remove('border-transparent', 'text-slate-300');
+        } else {
+          btn.classList.remove('border-emerald-500', 'bg-emerald-600/20', 'text-white');
+          btn.classList.add('border-transparent', 'text-slate-300');
+        }
+      });
+    }
+
+    // ── Glow Intensity Engine ──
+    function updateGlowIntensity(val, save = true) {
+      const v = parseInt(val, 10);
+      document.documentElement.style.setProperty('--glow-intensity', v / 100);
+      const label = document.getElementById('label-glow-intensity');
+      if (label) label.textContent = `${v}%`;
+      const slider = document.getElementById('slider-glow-intensity');
+      if (slider && save !== false) slider.value = v;
+      if (save) localStorage.setItem(STORAGE_GLOW, v);
+    }
+
+    // ── Card Border Width Engine ──
+    function updateCardBorderWidth(val, save = true) {
+      const v = parseInt(val, 10);
+      document.documentElement.style.setProperty('--card-border-width', `${v}px`);
+      const label = document.getElementById('label-card-border-width');
+      if (label) label.textContent = `${v}px`;
+      const slider = document.getElementById('slider-card-border-width');
+      if (slider && save !== false) slider.value = v;
+      if (save) localStorage.setItem(STORAGE_BORDER_WIDTH, v);
+    }
+
+    // ── Content Density Engine ──
+    function setDensityMode(mode, save = true) {
+      document.body.classList.remove('density-compact', 'density-spacious');
+      if (mode === 'compact') document.body.classList.add('density-compact');
+      if (mode === 'spacious') document.body.classList.add('density-spacious');
+      if (save) localStorage.setItem(STORAGE_DENSITY, mode);
+
+      document.querySelectorAll('.density-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-density') === mode;
+        if (isActive) {
+          btn.classList.add('border-rose-500', 'bg-rose-600/20', 'text-white');
+          btn.classList.remove('border-transparent', 'text-slate-300');
+        } else {
+          btn.classList.remove('border-rose-500', 'bg-rose-600/20', 'text-white');
+          btn.classList.add('border-transparent', 'text-slate-300');
+        }
+      });
+    }
+
+    // ── Zen / Focus Mode ──
+    function toggleZenMode() {
+      const isZen = document.body.classList.toggle('zen-mode');
+      const zenBtn = document.getElementById('btn-zen-mode');
+      if (zenBtn) {
+        zenBtn.style.color = isZen ? 'rgb(167, 139, 250)' : '';
+      }
+      localStorage.setItem('sovereign_zen_mode', isZen ? '1' : '0');
+      appendSystemLog(`[Zen Mode] ${isZen ? 'Entered focus mode — sidebar & waybar hidden.' : 'Exited zen mode.'}`);
+      refreshIcons();
+    }
+
+    // ── Accent Quick-Picker ──
+    function setQuickAccentColor(hex, save = true) {
+      const root = document.documentElement;
+      root.style.setProperty('--color-brand', hex);
+      root.style.setProperty('--color-brand-hover', hex);
+      root.style.setProperty('--border-accent', hex);
+
+      const dot = document.getElementById('waybar-accent-dot');
+      if (dot) dot.style.background = hex;
+
+      const picker = document.getElementById('waybar-accent-picker');
+      if (picker && save) picker.value = hex;
+
+      if (save) localStorage.setItem(STORAGE_ACCENT, hex);
+      appendSystemLog(`[Accent] Quick accent set to ${hex}`);
     }
 
     // ── Old Regime Smooth Scrolling & Reset Protocol ──
