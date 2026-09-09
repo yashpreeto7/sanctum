@@ -1882,11 +1882,11 @@ DASHBOARD_HTML = r"""
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center space-x-2.5">
             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 font-bold text-sm">
-              S
+              🛡️
             </div>
             <div>
-              <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Sovereign<span class="text-indigo-400">OS</span></span>
-              <span class="text-[9px] font-mono text-slate-400 leading-none">Autonomous Intelligence</span>
+              <span class="font-display font-bold text-sm text-white tracking-tight block leading-tight">Sanctum</span>
+              <span class="text-[9px] font-mono text-slate-400 leading-none">Autonomous Workspace</span>
             </div>
           </div>
           <!-- Quick Collapse Sidebar Button -->
@@ -2361,7 +2361,7 @@ DASHBOARD_HTML = r"""
               <div class="space-y-3">
                 <div class="flex items-center space-x-2">
                   <i data-lucide="info" class="w-4 h-4 text-cyan-400"></i>
-                  <h3 class="text-sm font-display font-bold text-white">Why 3 Agents in SovereignOS?</h3>
+                  <h3 class="text-sm font-display font-bold text-white">Why 3 Agents in Sanctum?</h3>
                 </div>
 
                 <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed font-sans">
@@ -2524,7 +2524,7 @@ DASHBOARD_HTML = r"""
                   <i data-lucide="paperclip" class="w-4 h-4"></i>
                 </button>
 
-                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sovereign Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
+                <textarea id="chat-input-textarea" rows="1" placeholder="Ask Sanctum Copilot or type a command... (Press Enter to send, Shift+Enter for newline)" class="flex-1 bg-transparent text-xs placeholder-slate-500 focus:outline-none resize-none px-2 py-1 font-sans"></textarea>
                 
                 <!-- Voice Input Microphone Button -->
                 <button type="button" onclick="openJarvisVoiceModal(); playCyberClick();" id="btn-voice-input" title="🎙️ Launch Real-Time JARVIS Voice Assistant (VAD Hands-Free Mode)" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition cursor-pointer relative group">
@@ -4187,7 +4187,7 @@ DASHBOARD_HTML = r"""
                 <div id="preview-avatar" class="w-7 h-7 rounded-lg flex items-center justify-center text-white" style="background: linear-gradient(135deg, #6366f1, #38bdf8);">
                   <i data-lucide="bot" class="w-3.5 h-3.5"></i>
                 </div>
-                <span id="preview-title" class="font-bold text-xs" style="color: #6366f1;">Sovereign Copilot Preview</span>
+                <span id="preview-title" class="font-bold text-xs" style="color: #6366f1;">Sanctum Copilot Preview</span>
               </div>
               <button id="preview-btn" type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-white shadow-sm" style="background-color: #6366f1;">
                 Primary Button
@@ -4977,7 +4977,7 @@ DASHBOARD_HTML = r"""
           🎙️ Listening to you...
         </div>
         <p id="jarvis-live-transcript" class="text-xl sm:text-2xl font-sans font-medium text-white leading-relaxed select-text transition-all duration-200">
-          "Speak naturally... Sovereign Copilot will respond automatically."
+          "Speak naturally... Sanctum Copilot will respond automatically."
         </p>
       </div>
     </div>
@@ -6809,7 +6809,7 @@ DASHBOARD_HTML = r"""
             <div class="w-12 h-12 rounded-2xl btn-brand-primary flex items-center justify-center text-white shadow-lg mb-1">
               <i data-lucide="bot" class="w-6 h-6"></i>
             </div>
-            <h2 class="text-base font-bold text-main">How can Sovereign Copilot help you today?</h2>
+            <h2 class="text-base font-bold text-main">How can Sanctum Copilot help you today?</h2>
             <p class="text-xs theme-text-muted max-w-md leading-relaxed">
               Ask about your Obsidian knowledge vault, run multi-agent DAG pipelines, conduct deep web research, or automate inbox triage.
             </p>
@@ -7886,13 +7886,13 @@ DASHBOARD_HTML = r"""
       } else if (state === 'thinking') {
         if (stateTitle) stateTitle.textContent = "THINKING & PROCESSING...";
         if (dot) dot.className = "w-3 h-3 rounded-full bg-amber-400 animate-spin";
-        if (transcriptRole) transcriptRole.textContent = "🧠 Sovereign Copilot Thinking...";
+        if (transcriptRole) transcriptRole.textContent = "🧠 Sanctum Copilot Thinking...";
         if (auraGlow) auraGlow.className = "absolute w-88 h-88 rounded-full blur-3xl opacity-55 transition-all duration-700 bg-gradient-to-tr from-amber-400 via-yellow-500 to-orange-500";
         if (ringPing) ringPing.className = "jarvis-ring-outer w-80 h-80 border border-amber-400/40 animate-ping opacity-30";
       } else if (state === 'speaking_ai') {
-        if (stateTitle) stateTitle.textContent = "SOVEREIGN COPILOT SPEAKING...";
+        if (stateTitle) stateTitle.textContent = "SANCTUM COPILOT SPEAKING...";
         if (dot) dot.className = "w-3 h-3 rounded-full bg-cyan-400 animate-pulse";
-        if (transcriptRole) transcriptRole.textContent = "🤖 Sovereign Copilot";
+        if (transcriptRole) transcriptRole.textContent = "🤖 Sanctum Copilot";
         if (auraGlow) auraGlow.className = "absolute w-96 h-96 rounded-full blur-3xl opacity-60 transition-all duration-700 bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-600";
         if (ringPing) ringPing.className = "jarvis-ring-outer w-88 h-88 border border-cyan-400/50 animate-ping opacity-40";
       } else if (state === 'idle') {
@@ -8954,7 +8954,7 @@ DASHBOARD_HTML = r"""
           </div>
 
           <div class="flex items-center space-x-1.5">
-            <button onclick="openEmailInChat('${em.id}')" title="Ask Sovereign Copilot about this email" class="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1.5 cursor-pointer transition">
+            <button onclick="openEmailInChat('${em.id}')" title="Ask Sanctum Copilot about this email" class="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center space-x-1.5 cursor-pointer transition">
               <i data-lucide="bot" class="w-3.5 h-3.5"></i>
               <span>Ask Copilot</span>
             </button>
