@@ -16,7 +16,7 @@ DASHBOARD_HTML = r"""
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SovereignOS — Autonomous Executive Intelligence & Sovereign Workspace</title>
+  <title>Sanctum — Autonomous AI Agent Platform & Sovereign Workspace</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#090a0f">
   
@@ -1673,11 +1673,11 @@ DASHBOARD_HTML = r"""
     <!-- Left: Distro Brand, Sidebar Toggle, Autonomous Core Status & Attention Badges -->
     <div class="flex items-center space-x-2 min-w-0 flex-shrink-0">
       <!-- Distro Pill -->
-      <div onclick="switchTab('home'); playCyberClick();" title="SovereignOS Operations Overview" class="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand cursor-pointer transition flex-shrink-0 group">
+      <div onclick="switchTab('home'); playCyberClick();" title="Sanctum Operations Overview" class="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl theme-card border hover:border-brand cursor-pointer transition flex-shrink-0 group">
         <div class="w-5 h-5 rounded-lg btn-brand-primary flex items-center justify-center text-white text-[10px] font-bold shadow-sm group-hover:scale-105 transition">
           <i data-lucide="shield" class="w-3 h-3"></i>
         </div>
-        <span class="font-bold tracking-wider text-xs text-white font-display">SOVEREIGN<span class="theme-text-brand">OS</span></span>
+        <span class="font-bold tracking-wider text-xs text-white font-display">SANCTUM</span>
       </div>
 
       <!-- Sidebar Hide/Show Toggle Button -->
@@ -2014,7 +2014,7 @@ DASHBOARD_HTML = r"""
             <div onclick="switchTab('chat'); setChatPrompt('What is DocDispatch?');" class="px-2.5 py-1.5 rounded-lg theme-card text-slate-300 text-[11px] truncate cursor-pointer transition hover:border-cyan-500/40">
               📖 What is DocDispatch?
             </div>
-            <div onclick="switchTab('chat'); setChatPrompt('Explain why there are 3 agents in Personal AI OS');" class="px-2.5 py-1.5 rounded-lg theme-card text-slate-300 text-[11px] truncate cursor-pointer transition hover:border-cyan-500/40">
+            <div onclick="switchTab('chat'); setChatPrompt('Explain why there are 3 agents in Sanctum');" class="px-2.5 py-1.5 rounded-lg theme-card text-slate-300 text-[11px] truncate cursor-pointer transition hover:border-cyan-500/40">
               🤖 Explain 3 Agents
             </div>
             <div onclick="switchTab('chat'); setChatPrompt('Send email to rahul@techcorp.io with the weekly report');" class="px-2.5 py-1.5 rounded-lg theme-card text-slate-300 text-[11px] truncate cursor-pointer transition hover:border-cyan-500/40">
@@ -2129,7 +2129,7 @@ DASHBOARD_HTML = r"""
                 <h2 class="text-lg font-display font-bold text-white tracking-tight">Operations Command Center</h2>
               </div>
               <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
-                SovereignOS is active. Specialized in multi-agent orchestration, Dual-LLM quarantine defense, hybrid RAG knowledge search, and HITL safety authorization.
+                Sanctum is active. Specialized in multi-agent orchestration, Dual-LLM quarantine defense, hybrid RAG knowledge search, and HITL safety authorization.
               </p>
             </div>
 
@@ -2427,9 +2427,9 @@ DASHBOARD_HTML = r"""
               </div>
 
               <div id="activity-log-feed" class="h-44 overflow-y-auto bg-black/40 rounded-xl border theme-border p-3 space-y-2 font-mono text-[11px] text-slate-300">
-                <div class="text-slate-400">[System] SovereignOS initialized. Hybrid RAG vector store loaded.</div>
+                <div class="text-slate-400">[System] Sanctum initialized. Hybrid RAG vector store loaded.</div>
                 <div class="text-slate-400">[System] LangGraph orchestrator ready with SQLite thread checkpoints.</div>
-                <div class="text-cyan-400">[Theme] SovereignOS Theme & Style engine active.</div>
+                <div class="text-cyan-400">[Theme] Sanctum Theme & Style engine active.</div>
               </div>
             </div>
 
@@ -2506,9 +2506,9 @@ DASHBOARD_HTML = r"""
                   <i data-lucide="bot" class="w-4 h-4"></i>
                 </div>
                 <div class="p-4 rounded-2xl theme-card max-w-2xl space-y-2">
-                  <div class="text-xs font-semibold theme-text-brand">Sovereign Copilot</div>
+                  <div class="text-xs font-semibold theme-text-brand">Sanctum Copilot</div>
                   <p class="text-xs text-slate-200 leading-relaxed font-sans">
-                    Greetings, Yashpreet. SovereignOS is online. How can I assist with executive email triaging, calendar scheduling, autonomous deep research, or knowledge vault search today?
+                    Greetings, Yashpreet. Sanctum is online. How can I assist with executive email triaging, calendar scheduling, autonomous deep research, or knowledge vault search today?
                   </p>
                 </div>
               </div>
@@ -3252,7 +3252,7 @@ DASHBOARD_HTML = r"""
               <span>Quick tests:</span>
               <span onclick="searchRagDirect('DocDispatch spec')" class="cursor-pointer text-cyan-400 hover:underline">"DocDispatch spec"</span>
               <span>•</span>
-              <span onclick="searchRagDirect('Personal AI OS 3 agents')" class="cursor-pointer text-cyan-400 hover:underline">"Personal AI OS 3 agents"</span>
+              <span onclick="searchRagDirect('Sanctum 3 agents')" class="cursor-pointer text-cyan-400 hover:underline">"Sanctum 3 agents"</span>
             </div>
           </div>
 
@@ -3520,7 +3520,7 @@ DASHBOARD_HTML = r"""
                 </div>
                 <div>
                   <h3 class="text-sm font-bold text-white font-display">Model Context Protocol (MCP) Server Hub</h3>
-                  <p class="text-xs text-slate-400">Connect SovereignOS to standardized external tools (GitHub, SQLite, Postgres, Slack, Filesystem, Brave)</p>
+                  <p class="text-xs text-slate-400">Connect Sanctum to standardized external tools (GitHub, SQLite, Postgres, Slack, Filesystem, Brave)</p>
                 </div>
               </div>
               <button onclick="openAddMCPServerModal(); playCyberClick();" class="px-3 py-1.5 rounded-xl btn-brand-primary text-xs font-semibold flex items-center space-x-1.5 transition">
@@ -3735,7 +3735,7 @@ DASHBOARD_HTML = r"""
             <i data-lucide="palette" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-display font-bold text-base text-white">SovereignOS Theme & Style Engine</h3>
+            <h3 class="font-display font-bold text-base text-white">Sanctum Theme & Style Engine</h3>
             <p class="text-xs text-slate-400 font-mono">Select curated professional workstation & cyberpunk aesthetic profiles</p>
           </div>
         </div>
@@ -4012,8 +4012,8 @@ DASHBOARD_HTML = r"""
         <!-- Live font preview -->
         <div class="p-3 rounded-xl bg-black/20 border theme-border space-y-1" id="font-preview-box">
           <div class="text-sm font-bold text-white" id="font-preview-heading">The quick brown fox jumps</div>
-          <div class="text-xs text-slate-400" id="font-preview-body">SovereignOS Autonomous Executive Intelligence · 0123456789</div>
-          <div class="text-[10px] font-mono text-slate-500" id="font-preview-mono">const agent = new SovereignAgent({ model: 'gemini-2.0' });</div>
+          <div class="text-xs text-slate-400" id="font-preview-body">Sanctum Autonomous AI Agent Platform · 0123456789</div>
+          <div class="text-[10px] font-mono text-slate-500" id="font-preview-mono">const agent = new SanctumAgent({ model: 'deepseek-r1' });</div>
         </div>
       </div>
 
@@ -4492,7 +4492,7 @@ DASHBOARD_HTML = r"""
             <span>Option 2: Browser Standalone App (PWA)</span>
           </div>
           <p class="text-slate-400 text-[11px]">
-            In Chrome or Edge, click the <b>Install App</b> icon in the URL address bar or select <i>"Install Personal AI OS as an App"</i> from your browser menu to pin it directly to your Windows Taskbar and Start Menu!
+            In Chrome or Edge, click the <b>Install App</b> icon in the URL address bar or select <i>"Install Sanctum as an App"</i> from your browser menu to pin it directly to your Windows Taskbar and Start Menu!
           </p>
         </div>
       </div>
@@ -4760,7 +4760,7 @@ DASHBOARD_HTML = r"""
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-[11px]">
             <button onclick="selectDAGPreset('rag')" id="dag-preset-rag" class="p-2.5 rounded-xl border bg-purple-600/20 border-purple-500 text-purple-300 text-left cursor-pointer transition">
               <div class="font-bold">🧠 Knowledge Base RAG</div>
-              <div class="text-[10px] text-slate-400 truncate">Explain Personal AI OS architecture</div>
+              <div class="text-[10px] text-slate-400 truncate">Explain Sanctum architecture</div>
             </button>
             <button onclick="selectDAGPreset('phishing')" id="dag-preset-phishing" class="p-2.5 rounded-xl border theme-card border-transparent text-slate-300 text-left hover:border-cyan-400 cursor-pointer transition">
               <div class="font-bold">🚨 Untrusted Email Triage</div>
@@ -4779,7 +4779,7 @@ DASHBOARD_HTML = r"""
 
         <div class="space-y-1">
           <label class="font-mono text-[11px] text-slate-300">Custom Input Prompt / Message:</label>
-          <textarea id="dag-sim-custom-prompt" rows="3" class="w-full bg-black/40 border theme-border rounded-xl p-3 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-purple-400 resize-none">Explain the Personal AI OS multi-agent architecture and quarantine security.</textarea>
+          <textarea id="dag-sim-custom-prompt" rows="3" class="w-full bg-black/40 border theme-border rounded-xl p-3 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-purple-400 resize-none">Explain the Sanctum multi-agent architecture and quarantine security.</textarea>
         </div>
       </div>
 
@@ -4861,7 +4861,7 @@ DASHBOARD_HTML = r"""
               <span>Preset:</span>
               <button onclick="setComposeIntent('Follow up on our previous discussion and check if you have any questions on the proposal.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Follow Up</button>
               <button onclick="setComposeIntent('Propose a 30-minute sync meeting this week to review project milestones and sprint goals.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Meeting Request</button>
-              <button onclick="setComposeIntent('Provide a status report on the Personal AI OS deployment, test results, and next deliverables.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Project Update</button>
+              <button onclick="setComposeIntent('Provide a status report on the Sanctum deployment, test results, and next deliverables.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Project Update</button>
               <button onclick="setComposeIntent('Thank you for the productive meeting and sharing the helpful documentation.')" type="button" class="px-2 py-0.5 rounded-lg theme-card border theme-border hover:border-brand theme-text-muted hover:theme-text-main transition">Thank You</button>
             </div>
 
@@ -4921,7 +4921,7 @@ DASHBOARD_HTML = r"""
           <span><kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">↓</kbd> Navigate</span>
           <span><kbd class="px-1.5 py-0.5 rounded bg-black/30 border theme-border text-slate-300">ENTER</kbd> Select</span>
         </div>
-        <span class="theme-text-brand font-bold">Personal AI OS Spotlight HUD</span>
+        <span class="theme-text-brand font-bold">Sanctum Spotlight HUD</span>
       </div>
     </div>
   </div>
@@ -5785,14 +5785,14 @@ DASHBOARD_HTML = r"""
         color_accent: document.getElementById('custom-color-accent')?.value || '#38bdf8',
         text_main: document.getElementById('custom-text-main')?.value || '#ffffff',
         border_main: document.getElementById('custom-border-main')?.value || '#242d3e',
-        author: 'SovereignOS User',
+        author: 'Sanctum User',
         created_at: new Date().toISOString()
       };
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themeObj, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `sovereign_theme_${themeObj.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.json`);
+      downloadAnchor.setAttribute("download", `sanctum_theme_${themeObj.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -6974,7 +6974,7 @@ DASHBOARD_HTML = r"""
       ws = new WebSocket(`${protocol}//${window.location.host}/ws/chat`);
 
       ws.onopen = () => {
-        appendSystemLog('[WebSocket] Connected to Personal AI OS streaming gateway.');
+        appendSystemLog('[WebSocket] Connected to Sanctum streaming gateway.');
       };
 
       ws.onmessage = (event) => {
@@ -8097,7 +8097,7 @@ DASHBOARD_HTML = r"""
         <div class="bg-[#0d0d14] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-bold font-display text-white flex items-center space-x-2">
-              <span class="text-lg">⌨️</span><span>SovereignOS Keyboard Shortcuts</span>
+              <span class="text-lg">⌨️</span><span>Sanctum Keyboard Shortcuts</span>
             </h2>
             <button onclick="document.getElementById('shortcut-overlay').remove()" class="text-slate-400 hover:text-white text-lg cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition">✕</button>
           </div>
@@ -8272,13 +8272,13 @@ DASHBOARD_HTML = r"""
         return;
       }
       const title = document.getElementById('current-chat-title')?.textContent || 'Conversation';
-      let md = `# ${title}\n\n*Exported from Personal AI OS on ${new Date().toLocaleString()}*\n\n---\n\n`;
+      let md = `# ${title}\n\n*Exported from Sanctum on ${new Date().toLocaleString()}*\n\n---\n\n`;
       currentSessionMessages.forEach(m => {
         const timeStr = new Date(m.timestamp * 1000).toLocaleTimeString();
         if (m.role === 'user') {
           md += `### 👤 User (${timeStr})\n\n${m.content}\n\n`;
         } else {
-          md += `### 🤖 Personal AI (${timeStr})\n\n${m.content}\n\n`;
+          md += `### 🤖 Sanctum Copilot (${timeStr})\n\n${m.content}\n\n`;
         }
       });
 
@@ -10246,7 +10246,7 @@ DASHBOARD_HTML = r"""
       if (!promptBox) return;
 
       const prompts = {
-        rag: "Explain the Personal AI OS multi-agent architecture and quarantine security.",
+        rag: "Explain the Sanctum multi-agent architecture and quarantine security.",
         phishing: "URGENT: Click here to claim your $5,000 lottery award from the bank!",
         high_risk: "Send confidential Q3 architecture blueprint and credentials to external auditor.",
         calendar: "Schedule project roadmap review meeting with design team tomorrow at 2pm."
@@ -10256,7 +10256,7 @@ DASHBOARD_HTML = r"""
 
     async function executeDAGSimulationFromModal() {
       const promptBox = document.getElementById('dag-sim-custom-prompt');
-      const prompt = promptBox ? promptBox.value.trim() : "Explain Personal AI OS architecture";
+      const prompt = promptBox ? promptBox.value.trim() : "Explain Sanctum architecture";
       
       closeDAGSimulateModal();
       switchTab('topology');
@@ -11880,13 +11880,13 @@ DASHBOARD_HTML = r"""
         '</style>' +
         '</head><body>' +
         '<h1>' + escapeHtml(title) + '</h1>';
-      var footer = '<div class="footer">Generated autonomously by Personal AI OS — Deep Autonomous Research & Intelligence Engine on ' + new Date().toLocaleString() + '</div></body></html>';
+      var footer = '<div class="footer">Generated autonomously by Sanctum — Deep Autonomous Research & Intelligence Engine on ' + new Date().toLocaleString() + '</div></body></html>';
       var fullDoc = header + htmlBody + footer;
       var blob = new Blob(['\ufeff' + fullDoc], { type: 'application/msword' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      var cleanName = (filename || 'Personal_AI_OS_Document').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
+      var cleanName = (filename || 'Sanctum_Document').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
       a.download = cleanName.endsWith('.doc') ? cleanName : cleanName + '.doc';
       document.body.appendChild(a);
       a.click();
@@ -11906,10 +11906,10 @@ DASHBOARD_HTML = r"""
       printArea.innerHTML = '<div style="font-family: \'Inter\', -apple-system, sans-serif; color: #0f172a; background: #ffffff; padding: 20px; max-width: 900px; margin: 0 auto; line-height: 1.6;">' +
         '<div style="border-bottom: 2px solid #6366f1; padding-bottom: 12px; margin-bottom: 20px;">' +
           '<h1 style="font-size: 22px; font-weight: 800; color: #1e1b4b; margin: 0 0 6px 0;">' + escapeHtml(title) + '</h1>' +
-          '<div style="font-size: 11px; color: #64748b; font-family: monospace;">Personal AI OS — Autonomous Research & Knowledge Dossier | ' + new Date().toLocaleDateString() + '</div>' +
+          '<div style="font-size: 11px; color: #64748b; font-family: monospace;">Sanctum — Autonomous Research & Knowledge Dossier | ' + new Date().toLocaleDateString() + '</div>' +
         '</div>' +
         htmlBody +
-        '<div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #94a3b8; font-family: monospace;">Personal AI OS Intelligence Engine | Standalone Print Export</div>' +
+        '<div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #94a3b8; font-family: monospace;">Sanctum Intelligence Engine | Standalone Print Export</div>' +
       '</div>';
       window.print();
     }

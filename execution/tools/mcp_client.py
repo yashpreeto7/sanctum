@@ -1,7 +1,9 @@
-"""Universal Model Context Protocol (MCP) Client for SovereignOS.
+"""Universal Model Context Protocol (MCP) Client for Sanctum.
 
-Implements JSON-RPC 2.0 stdio transport protocol for connecting to any standard
-MCP server (GitHub, SQLite, Postgres, Slack, Notion, Brave Search, Filesystem, Puppeteer, etc.).
+Enables the Sovereign agent to connect to any external MCP server (e.g., Filesystem,
+GitHub, Postgres, SQLite, Brave Search, etc.) via JSON-RPC 2.0 stdio pipes or SSE.
+Dynamically fetches tool schemas via tools/list, translates them to LLM tool definitions,
+and dispatches tool execution requests via tools/call.
 """
 
 import asyncio
@@ -12,7 +14,7 @@ import shutil
 import sys
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger("SovereignOS.MCPClient")
+logger = logging.getLogger("Sanctum.MCPClient")
 logger.setLevel(logging.INFO)
 
 
@@ -190,7 +192,7 @@ class MCPClient:
                 "sampling": {},
             },
             "clientInfo": {
-                "name": "SovereignOS-MCP-Client",
+                "name": "Sanctum-MCP-Client",
                 "version": "2.0.0",
             },
         }

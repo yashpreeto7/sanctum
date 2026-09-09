@@ -67,5 +67,5 @@ async def test_dashboard_html_render():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         res = await client.get("/")
         assert res.status_code == 200
-        assert "Personal AI OS" in res.text
+        assert "Sanctum" in res.text
         assert "Operations Overview" in res.text

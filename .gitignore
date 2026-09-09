@@ -38,3 +38,11 @@ Thumbs.db
 .vscode/
 .idea/
 .playwright-mcp/
+playwright-report/
+test-results/
+
+# Personal & User-Specific Docs
+Yashpreet_Resume.tex
+*.tex
+*.pdf
+*.log

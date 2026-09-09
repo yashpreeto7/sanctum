@@ -1,1 +1,1 @@
-"""FastAPI Server Package for Personal AI OS."""
+"""FastAPI Server Package for Sanctum."""

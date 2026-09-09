@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 _BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
-    """Central configuration for Personal AI OS."""
+    """Central configuration for Sanctum."""
 
     model_config = SettingsConfigDict(
         env_file=str(_BASE_DIR / ".env"),

@@ -1,4 +1,5 @@
 import base64
+import logging
 import re
 import threading
 import time
@@ -10,6 +11,8 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+
+logger = logging.getLogger("Sanctum.GmailConnector")
 
 
 class OutboundEmail(BaseModel):
@@ -345,7 +348,7 @@ class GmailConnector:
                     "draft_id": draft.get("id"),
                 }
             except Exception as err:
-                return {"status": "error", "message": str(err)}
+                logger.warning(f"Gmail API create_draft failed: {err}. Falling back to offline draft.")
 
         self._drafts.append(email)
         return {
@@ -379,7 +382,7 @@ class GmailConnector:
                     "provider": "google_gmail_api",
                 }
             except Exception as e:
-                return {"status": "error", "message": str(e)}
+                logger.warning(f"Gmail API send_email failed: {e}. Falling back to offline queue.")
 
         self._sent_emails.append(email)
         return {

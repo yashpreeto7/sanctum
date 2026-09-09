@@ -12,7 +12,7 @@
       "-y",
       "@modelcontextprotocol/server-sqlite",
       "--db-path",
-      "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/data/sovereign.db"
+      "c:/Users/Yashpreet_o7/Desktop/Sanctum/data/sanctum.db"
     ],
     "env": {},
     "enabled": false,

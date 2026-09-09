@@ -1,4 +1,4 @@
-"""MCP Server Hub and Multi-Server Orchestration Manager for SovereignOS."""
+"""MCP Server Hub and Multi-Server Orchestration Manager for Sanctum."""
 
 import asyncio
 import json
@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from execution.tools.mcp_client import MCPClient
 
-logger = logging.getLogger("SovereignOS.MCPManager")
+logger = logging.getLogger("Sanctum.MCPManager")
 logger.setLevel(logging.INFO)
 
 CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "mcp_servers.json"
@@ -18,14 +18,14 @@ CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "mcp_serv
 DEFAULT_TEMPLATES = {
     "filesystem": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-filesystem", "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT"],
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "c:/Users/Yashpreet_o7/Desktop/Sanctum"],
         "env": {},
         "enabled": False,
         "description": "Local file system operations, reading directories, writing and searching files.",
     },
     "sqlite": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/data/sovereign.db"],
+        "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "c:/Users/Yashpreet_o7/Desktop/Sanctum/data/sanctum.db"],
         "env": {},
         "enabled": False,
         "description": "Direct SQLite querying, table introspection, and analytical queries.",

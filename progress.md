@@ -1,5 +1,43 @@
 # Progress Log
 
+## Session: Codebase Streamlining & Rebranding (Sanctum & AetherFlow) (2026-09-07)
+- **Sanctum (formerly SovereignOS / Personal AI OS)**:
+  - Updated `pyproject.toml` (`name = "sanctum"`).
+  - Updated `server/app.py`: FastAPI title to `Sanctum`, description to `Local-First Autonomous AI Agent Platform`, logger to `Sanctum`, manifest name/short_name to `Sanctum`.
+  - Updated `launch_desktop_app.py`: `APP_TITLE = "Sanctum — Autonomous AI Agent Platform"`, docstrings, and startup logs.
+  - Updated `execution/core/config.py`: Central configuration for Sanctum.
+  - Updated `execution/tools/mcp_client.py`: Client handshake info `Sanctum-MCP-Client`, docstring, and logger `Sanctum.MCPClient`.
+  - Updated `execution/tools/mcp_manager.py`: Logger and docstrings to `Sanctum.MCPManager`.
+  - Updated `server/dashboard_template.py`: Title and system status/greeting to `Sanctum`.
+  - GitHub Repository: Renamed `yashpreeto7/personal-ai-os` -> `yashpreeto7/sanctum` via GitHub REST API.
+  - Git Remote: Updated local origin URL to `https://github.com/yashpreeto7/sanctum.git`.
+  - Verified: FastAPI server imports and reports `Sanctum` successfully.
+
+- **AetherFlow (formerly AuraOS / Wallgine)**:
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\package.json`: `"name": "aetherflow"`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src-tauri\Cargo.toml`: `name = "aetherflow"`, `default-run = "aetherflow"`, description to `AetherFlow — High-Performance Windows Desktop Engine & Live Visuals Platform`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src-tauri\tauri.conf.json`: `"productName": "AetherFlow"`, `"identifier": "com.aetherflow.app"`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\index.html`: Title to `AetherFlow — Desktop Engine & Live Visuals` and meta description.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\wallpaper.html`: Title to `AetherFlow Wallpaper`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src\App.jsx`: Header brand to `AetherFlow`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src\pages\Home.jsx`: Welcome title to `AetherFlow`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src\pages\Settings.jsx`: UI labels, description, and footer to `AetherFlow`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src\store\useStore.js`: State storage key to `aetherflow-state`.
+  - Updated `c:\Users\Yashpreet_o7\Desktop\AURAOS\src-tauri\src\main.rs`: Window titles to `AetherFlow` and `AetherFlow Wallpaper - {name}`.
+  - GitHub Repository: Renamed `yashpreeto7/Wallgine` -> `yashpreeto7/aetherflow` via GitHub REST API.
+  - Git Remote: Updated local origin URL to `https://github.com/yashpreeto7/aetherflow.git`.
+  - Verified: `npm run build` compiled 1,904 modules cleanly with zero errors; `cargo check` compiled cleanly.
+
+- **Resume Modernization (`Yashpreet_Resume.tex`)**:
+  - Updated repository links to `https://github.com/yashpreeto7/sanctum` and `https://github.com/yashpreeto7/aetherflow`.
+  - Strictly preserved 1-page geometry (156 lines).
+
+## Session: Resume Modernization Execution (2026-09-07)
+- **Action:** Updated [Yashpreet_Resume.tex](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/Yashpreet_Resume.tex) to feature **Sanctum** and **AetherFlow**.
+- **Action:** Eliminated buzzwords and misleading metrics; applied 100% grounded, code-backed engineering descriptions.
+- **Action:** Reframed SovereignOS to **Sanctum** (Autonomous AI Agent Platform) to eliminate confusing OS kernel claims.
+- **Action:** Preserved strict 1-page geometry (156 lines) with balanced LaTeX environments.
+
 ## Session: Setup & Anti-Cancellation Protocol
 - **Action:** Updated [GEMINI.md](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/GEMINI.md) to enforce non-interactive flags, proper backgrounding, and anti-cancellation rules.
 - **Action:** Created [task_plan.md](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/task_plan.md), [findings.md](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/findings.md), and [progress.md](file:///c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT/progress.md) to preserve state against restarts and `/clear`.
@@ -95,8 +133,18 @@
   - Enforced high-priority hover lift (`transform: translateY(-3px) !important;`) across `.theme-card` and `.seamless-card`.
   - Executed autonomous browser session across all 14 presets (Sovereign Slate, Titanium Onyx, Minimal Studio, Obsidian Gold, Sovereign Manifesto, Light Studio, Tokyo Night) and verified rich physical depth and crisp cornering.
 
+- **Phase 29: Sanctum Rebranding, Verification & Full GitHub Documentation**:
+  - Rebranded the platform to **Sanctum** across all frontend UI elements, Distro pills, headers, page titles, telemetry feeds, and assistant names.
+  - Rebranded backend configurations, FastAPI metadata, manifest, schedulers, and memory graph seeds (`os_codename: "Sanctum"`).
+  - Fixed Google OAuth token expiration by implementing resilient fallback to offline draft/sent queues in [`execution/tools/gmail_connector.py`](file:///c:/Users/Yashpreet_o7/Desktop/Sanctum/execution/tools/gmail_connector.py).
+  - Authored comprehensive, world-class GitHub [`README.md`](file:///c:/Users/Yashpreet_o7/Desktop/Sanctum/README.md) with architectural Mermaid diagrams, feature tables, quickstart guide, and security model.
+  - Added MIT [`LICENSE`](file:///c:/Users/Yashpreet_o7/Desktop/Sanctum/LICENSE).
+  - Captured 7 high-resolution retina UI screenshots in `assets/screenshots/` (Overview, Copilot, DAG Topology, Memory Vault, MCP Studio, Research Dossier, Theme Studio).
+  - Verified 100% pass rate across entire 74-scenario test suite in `pytest` (0 failures).
+  - Pruned 30 unneeded legacy generator scripts, interview manuals, and old loose root screenshots from repository.
+  - Added personal documents and build logs to `.gitignore` to keep GitHub repository pristine and sovereign.
+
 ## Current State
-- Branch: `feature/research-ux-and-sidebar-toggle`
-- Test Pass Rate: 100% (All scenarios passed).
-- UI/UX Feel: Old Regime 100% sharp cornered drafting architecture, multi-layer ambient shadows, -3px hover lift, inertial momentum, and specular bevels active across all themes.
-- Memory: Synced to on-disk persistent memory files and `claude-mem` MCP server corpus (`sovereign_os_context`).
+- Branch: `main`
+- Status: Rebranded to Sanctum, 74/74 tests passing, screenshots integrated, repository cleaned, ready to push to GitHub.
+- Memory: Synced to on-disk persistent memory files and `claude-mem` MCP server.

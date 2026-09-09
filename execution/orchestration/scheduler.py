@@ -1,4 +1,4 @@
-"""Proactive Executive Scheduler and Background Daemons for SovereignOS.
+"""Proactive Executive Scheduler and Background Daemons for Sanctum.
 
 Runs background loops for autonomous morning briefings, periodic inbox triage,
 and system health telemetry without requiring manual user prompts.
@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-logger = logging.getLogger("SovereignOS.Scheduler")
+logger = logging.getLogger("Sanctum.Scheduler")
 logger.setLevel(logging.INFO)
 
 BRIEFING_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "latest_briefing.json"
@@ -40,10 +40,10 @@ class ExecutiveScheduler:
                 logger.error(f"Failed to load cached briefing: {e}")
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "headline": "SovereignOS Executive Intelligence Initialized",
+            "headline": "Sanctum Executive Intelligence Initialized",
             "summary": "Autonomous daemons are standing by. Ready to compile full daily briefings.",
             "metrics": {"unread_emails": 0, "today_events": 0, "active_projects": 1},
-            "action_items": ["Review SovereignOS system status", "Check active MCP connectors"],
+            "action_items": ["Review Sanctum system status", "Check active MCP connectors"],
         }
 
     def _save_latest_briefing(self):
@@ -151,10 +151,10 @@ class ExecutiveScheduler:
             actions.append(f"Triage {unread_count} pending inbox messages in Triage Room")
         if today_events_count > 0:
             actions.append(f"Prepare for {today_events_count} upcoming calendar meetings")
-        actions.append("Review SovereignOS autonomous memory graph & active MCP plugins")
+        actions.append("Review Sanctum autonomous memory graph & active MCP plugins")
 
         summary = (
-            f"Good day, Sovereign Architect. Systems are operational across all cores. "
+            f"Good day, Sanctum Architect. Systems are operational across all cores. "
             f"You have {unread_count} unread communications and {today_events_count} scheduled commitments today."
         )
 

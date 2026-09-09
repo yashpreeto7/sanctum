@@ -1,6 +1,6 @@
-"""Desktop Application Launcher for Personal AI OS.
+"""Desktop Application Launcher for Sanctum.
 
-Launches the Personal AI OS Command Center in a dedicated native desktop window.
+Launches the Sanctum Command Center in a dedicated native desktop window.
 Supports pywebview with automatic fallback to native Chromium/Edge App Mode.
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 PORT = 8000
 APP_URL = f"http://127.0.0.1:{PORT}"
-APP_TITLE = "SovereignOS — Autonomous Executive Intelligence"
+APP_TITLE = "Sanctum — Autonomous AI Agent Platform"
 
 
 def is_server_running(port: int = PORT) -> bool:
@@ -40,7 +40,7 @@ def start_backend_server():
         return None
 
     py_exe = get_python_exe()
-    print(f"[Desktop App] Starting Personal AI OS backend server on {APP_URL} using {py_exe}...")
+    print(f"[Desktop App] Starting Sanctum backend server on {APP_URL} using {py_exe}...")
     log_file = ROOT_DIR / ".tmp" / "desktop_server.log"
     log_file.parent.mkdir(parents=True, exist_ok=True)
     log_handle = open(log_file, "a", encoding="utf-8")

@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-logger = logging.getLogger("SovereignOS")
+logger = logging.getLogger("Sanctum")
 logging.basicConfig(level=logging.INFO)
 
 from execution.core.config import settings
@@ -43,8 +43,8 @@ deep_researcher = DeepResearcher(vector_store=vector_store, llm_provider=llm_pro
 folder_watcher = FolderWatcher(vector_store=vector_store)
 
 app = FastAPI(
-    title="SovereignOS",
-    description="Autonomous Executive Intelligence & Sovereign Workspace",
+    title="Sanctum",
+    description="Local-First Autonomous AI Agent Platform",
     version="2.5.0",
 )
 
@@ -78,7 +78,7 @@ def _load_inbox_store() -> List[Dict[str, Any]]:
             "run_id": "seed-001",
             "sender": "sarah.j@techcorp.io",
             "subject": "Architecture Sync & Milestone Review",
-            "body": "Hi Yashpreet,\n\nFollowing up on our sprint goals. Could we schedule a 30-minute sync this week to review the Personal AI OS multi-agent deployment and RAG pipeline integration?\n\nBest,\nSarah",
+            "body": "Hi Yashpreet,\n\nFollowing up on our sprint goals. Could we schedule a 30-minute sync this week to review the Sanctum multi-agent deployment and RAG pipeline integration?\n\nBest,\nSarah",
             "snippet": "Following up on our sprint goals. Could we schedule a 30-minute sync this week...",
             "category": "important",
             "category_label": "⚡ Important",
@@ -739,7 +739,7 @@ async def ai_compose_email(payload: ComposeAssistRequest):
         }.get(payload.tone or "professional", "Professional tone.")
 
         sys_prompt = (
-            "You are Personal AI OS, an expert executive communication assistant.\n"
+            "You are Sanctum, an expert executive communication assistant.\n"
             "Draft a complete, polished outbound email based on the user's intent.\n"
             "You must return a JSON object with strictly two keys:\n"
             "  - `subject`: A clear, compelling email subject line.\n"
@@ -1589,12 +1589,12 @@ async def simulate_trace_endpoint(payload: SimulateTracePayload):
 
     else:
         # Default: RAG Retrieval & Knowledge Synthesis
-        trace_store.start_trace(run_id=run_id, thread_id="sim-thread", query="Explain Personal AI OS multi-agent architecture and quarantine security", sender="user")
-        trace_store.record_node_step(run_id=run_id, node_name="quarantine_node", inputs={"raw_prompt": "Explain Personal AI OS multi-agent architecture"}, outputs={"clean_facts": {"topic": "architecture_security"}}, duration_ms=35.0, status="COMPLETED")
+        trace_store.start_trace(run_id=run_id, thread_id="sim-thread", query="Explain Sanctum multi-agent architecture and quarantine security", sender="user")
+        trace_store.record_node_step(run_id=run_id, node_name="quarantine_node", inputs={"raw_prompt": "Explain Sanctum multi-agent architecture"}, outputs={"clean_facts": {"topic": "architecture_security"}}, duration_ms=35.0, status="COMPLETED")
         trace_store.record_node_step(run_id=run_id, node_name="triaging_node", inputs={"topic": "architecture_security"}, outputs={"priority_score": 0.75, "category": "important"}, duration_ms=12.0, status="COMPLETED")
-        trace_store.record_node_step(run_id=run_id, node_name="retrieval_node", inputs={"query": "Personal AI OS multi-agent quarantine security"}, outputs={"matches_count": 4, "top_score": 0.92, "sources": ["personal_ai_os_guide.txt", "architecture_spec.md"]}, duration_ms=78.5, status="COMPLETED")
+        trace_store.record_node_step(run_id=run_id, node_name="retrieval_node", inputs={"query": "Sanctum multi-agent quarantine security"}, outputs={"matches_count": 4, "top_score": 0.92, "sources": ["sanctum_guide.txt", "architecture_spec.md"]}, duration_ms=78.5, status="COMPLETED")
         trace_store.record_node_step(run_id=run_id, node_name="reasoning_node", inputs={"retrieved_chunks": 4}, outputs={"tool": "no_action", "synthesis": "Multi-agent LangGraph system with 3-tier isolation."}, duration_ms=210.0, status="COMPLETED")
-        trace_store.finish_trace(run_id=run_id, status="SUCCESS", planned_tool=None, final_output="The Personal AI OS utilizes a 3-tier LangGraph multi-agent architecture featuring tool-isolated Dual-LLM quarantine...")
+        trace_store.finish_trace(run_id=run_id, status="SUCCESS", planned_tool=None, final_output="Sanctum utilizes a 3-tier LangGraph multi-agent architecture featuring tool-isolated Dual-LLM quarantine...")
 
     trace = trace_store.get_trace(run_id)
     return {"status": "simulated", "run_id": run_id, "trace": trace.model_dump() if trace else None}
@@ -1615,7 +1615,7 @@ async def get_trace_detail(run_id: str):
 async def get_graph_topology():
     """Returns the compiled LangGraph architecture, node metadata, conditional routing rules, and security boundaries."""
     return {
-        "graph_name": "Personal AI OS Orchestrator",
+        "graph_name": "Sanctum Orchestrator",
         "entry_point": "quarantine_node",
         "exit_points": ["END"],
         "nodes": [
@@ -2031,9 +2031,9 @@ from server.dashboard_template import DASHBOARD_HTML
 async def get_manifest():
     """PWA Web App Manifest for Desktop App installation."""
     return {
-        "name": "SovereignOS — Autonomous Executive Workspace",
-        "short_name": "SovereignOS",
-        "description": "Autonomous Executive Intelligence & Sovereign Workspace",
+        "name": "Sanctum — Autonomous AI Agent Platform",
+        "short_name": "Sanctum",
+        "description": "Local-First Autonomous AI Agent Platform",
         "start_url": "/",
         "display": "standalone",
         "background_color": "#0d1017",
@@ -2053,7 +2053,7 @@ async def get_manifest():
 # Web Command Center Dashboard UI
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard():
-    """Serves the rich, responsive SovereignOS Web Command Center."""
+    """Serves the rich, responsive Sanctum Web Command Center."""
     try:
         import importlib
         import server.dashboard_template

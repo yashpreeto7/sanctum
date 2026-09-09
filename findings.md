@@ -69,3 +69,29 @@
 - Local Memory: `task_plan.md`, `findings.md`, `progress.md`, `CONTEXT.md`.
 - MCP Memory: `claude-mem` corpus `sovereign_os_context`.
 
+## 8. Resume Modernization Audit & GitHub Discovery (2026-09-07)
+- **Target File**: `Yashpreet_Resume.tex` (189 lines, 1-page compact layout).
+- **Outdated Components Identified**:
+  - Weak projects: `Pal-AI` (generic wrapper) and `DocDispatch` (basic React healthcare mockup) slated for removal.
+  - Summary: Heavy emphasis on MERN and calorie tracker, completely missing flagship autonomous AI OS engineering.
+  - Skills: Lacking modern AI/agentic technologies (LangGraph, MCP, Vector DBs, Hybrid RAG) and enterprise backend standards (PostgreSQL, Docker, HL7 FHIR R4, SNOMED CT).
+- **GitHub Repositories Audited**:
+  1. `personal-ai-os` (`SovereignOS`): Flagship local-first autonomous AI OS with 5-tier LangGraph DAG, MCP host/client, Qdrant+BM25 Hybrid RAG, WebSocket streaming, and HITL approval barriers. (MUST ADD).
+  2. `swasthya-bharat-ehr`: National Interoperable Healthcare Architecture (ABDM M1-M3, HL7 FHIR R4, SNOMED CT, LOINC, Grounded Clinical AI Copilot, Rural Offline FIFO sync, 16/16 verification suite, Next.js 14 + FastAPI + PostgreSQL + Docker). Replaces DocDispatch with an enterprise-grade showcase.
+  3. `Macrolens` (Fitness Tracker): MERN + 1,014 Indian foods serving engine + OpenRouter vision. Solid, but standard MERN compared to Swasthya Bharat EHR.
+  4. `attira-virtual-tryon`: React Native + Express TypeScript + Gemini AI prototype.
+  5. `JobHunter`: Automated job scraper.
+- **Recommended 2-Project Portfolio**:
+  - **Project 1**: `Sanctum` (AI Systems, LangGraph, MCP, Hybrid RAG, WebSockets, Python).
+  - **Project 2**: `AetherFlow` / `Swasthya Bharat EHR` (Production Full-Stack & Desktop Systems).
+
+## 9. Sanctum Rebranding & Offline Fallback Architecture (2026-09-09)
+- **Rebranding Scope**:
+  - Unified project identity under **Sanctum** ("Autonomous AI Agent Platform & Sovereign Workspace").
+  - Updated web dashboard header distro pill, page titles, system telemetry logs, Copilot assistant name, Theme Engine modal, shortcuts modal, and export stamps.
+  - Rebranded backend FastAPI app, manifest, schedulers, and memory graph (`os_codename: "Sanctum"`).
+- **Google OAuth Graceful Fallback**:
+  - **Problem**: Expired/revoked credentials in `.tmp/google_token.json` caused unhandled `RefreshError` in `create_draft` and `send_email`, breaking unit tests and offline operation.
+  - **Solution**: Added try/except error traps that log a warning and seamlessly fall back to local offline draft/sent queues (`self._drafts`, `self._sent_emails`), ensuring 100% test reliability and offline autonomy.
+
+

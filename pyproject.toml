@@ -1,7 +1,7 @@
 [project]
-name = "personal-ai-os"
+name = "sanctum"
 version = "0.1.0"
-description = "Local-first personal AI command center and autonomous automation system"
+description = "Sanctum — Local-first autonomous AI agent platform and workflow automation engine"
 readme = "Personal AI OS — Master Project Specification & Development Blueprint.md"
 requires-python = ">=3.11"
 dependencies = [

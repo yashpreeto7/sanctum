@@ -1,4 +1,4 @@
-"""Persistent Episodic & Semantic Memory Graph for SovereignOS (Mem0-Style).
+"""Persistent Episodic & Semantic Memory Graph for Sanctum (Mem0-Style).
 
 Provides local SQLite-backed entity extraction, user preference tracking, episodic
 event timeline, and zero-latency context injection into LLM system prompts.
@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger("SovereignOS.MemoryGraph")
+logger = logging.getLogger("Sanctum.MemoryGraph")
 logger.setLevel(logging.INFO)
 
 DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "memory_graph.sqlite"
@@ -66,14 +66,14 @@ class MemoryGraph:
             self._seed_default_memories()
 
     def _seed_default_memories(self):
-        """Seeds default operational facts for SovereignOS."""
+        """Seeds default operational facts for Sanctum."""
         defaults = [
             ("user", "name", "Yashpreet", "personal", "system"),
             ("user", "communication_style", "concise, direct, highly technical, markdown-formatted", "preference", "system"),
             ("user", "design_philosophy", "Old Regime editorial aesthetic, 0px sharp architectural borders, tactile physics", "preference", "system"),
-            ("system", "os_codename", "SovereignOS", "system", "system"),
+            ("system", "os_codename", "Sanctum", "system", "system"),
             ("system", "primary_local_model", "deepseek-r1:7b (Ollama)", "system", "system"),
-            ("system", "default_workspace", "c:/Users/Yashpreet_o7/Desktop/PERSONALAGENT", "project", "system"),
+            ("system", "default_workspace", "c:/Users/Yashpreet_o7/Desktop/Sanctum", "project", "system"),
         ]
         for entity, attr, val, cat, src in defaults:
             self.add_or_update_memory(entity, attr, val, category=cat, source=src)

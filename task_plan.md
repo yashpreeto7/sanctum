@@ -95,7 +95,21 @@
 - [x] Build MCP Server Studio inside Settings tab (`#view-system`) with server status, discovered tools, and JSON configuration.
 - [x] Build Daily Briefing modal card in Overview tab (`#view-home`).
 
+### Phase 29: Full Project Rebrand to Sanctum, GitHub Documentation & Clean Repository
+- **Status:** complete
+- [x] Rebrand frontend UI, headers, title, console logs, system status, FAQ, and shortcuts modal to **Sanctum**.
+- [x] Update backend daemons, loggers, memory graph, and scheduler to **Sanctum**.
+- [x] Fix expired OAuth token handling in `execution/tools/gmail_connector.py` with offline fallback mode.
+- [x] Verify unit and integration test suite passing (74/74 tests passed, 100% pass rate).
+- [x] Author comprehensive, world-class GitHub `README.md` with full architecture diagrams and guides.
+- [x] Create `LICENSE` (MIT License).
+- [x] Capture 7 high-resolution retina screenshots in `assets/screenshots/`.
+- [x] Prune 30 unneeded/useless legacy files (interview manuals, book scripts, old loose root screenshots).
+- [x] Add user resume `Yashpreet_Resume.tex`, `*.tex`, `*.pdf`, and `*.log` to `.gitignore`.
+- [x] Stage, commit, and push clean repository to GitHub (`origin/main`).
+
 ## Next Steps
-- Run full test suite, commit changes, and report completed capabilities to user.
+- Run `git add` and commit clean repository.
+- Push to `origin/main` on GitHub.
 
 
